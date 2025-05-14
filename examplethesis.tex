@@ -420,15 +420,16 @@ eng
 %%% and output on the page(s) at the end of the thesis with information for DiVA facilitating the correct
 %%% entry of the meta data for your thesis.
 %%% These page(s) will be removed before the thesis is inserted into DiVA.
-\engExpl{All theses at KTH are \textbf{required} to have an abstract in both \textit{English} and \textit{Swedish}.}
+% ----- EXPLANATION -----
+% \engExpl{All theses at KTH are \textbf{required} to have an abstract in both \textit{English} and \textit{Swedish}.}
 
-\engExpl{Exchange students may want to include one or more abstracts in the language(s) used in their home institutions to avoid the need to write another thesis when returning to their home institution.}
+% \engExpl{Exchange students may want to include one or more abstracts in the language(s) used in their home institutions to avoid the need to write another thesis when returning to their home institution.}
 
-\generalExpl{Keep in mind that most of your potential readers are only going to read your \texttt{title} and \texttt{abstract}. This is why the abstract must give them enough information so that they can decide if this document is relevant to them or not. Otherwise, the likely default choice is to ignore the rest of your document.\\
-An abstract should stand on its own, \ie no citations, cross-references to the body of the document, acronyms must be spelled out, \ldots .\\Write this early and revise as necessary. This will help keep you focused on what you are trying to do.}
+% \generalExpl{Keep in mind that most of your potential readers are only going to read your \texttt{title} and \texttt{abstract}. This is why the abstract must give them enough information so that they can decide if this document is relevant to them or not. Otherwise, the likely default choice is to ignore the rest of your document.\\
+% An abstract should stand on its own, \ie no citations, cross-references to the body of the document, acronyms must be spelled out, \ldots .\\Write this early and revise as necessary. This will help keep you focused on what you are trying to do.}
 
 \begin{scontents}[store-env=abstracts,print-env=true]
-\generalExpl{Enter your abstract here!}
+% \generalExpl{Enter your abstract here!}
 An abstract is (typically) about 250 and 350 words (1/2 A4-page) with the following components:
 % key parts of the abstract
 \begin{itemize}
@@ -440,7 +441,7 @@ An abstract is (typically) about 250 and 350 words (1/2 A4-page) with the follow
 \end{itemize}
 
 \end{scontents}
-\engExpl{The following are some notes about what can be included (in terms of LaTeX) in your abstract.}
+% \engExpl{The following are some notes about what can be included (in terms of LaTeX) in your abstract.}
 Choice of typeface with \textbackslash textit, \textbackslash textbf, and \textbackslash texttt:  \textit{x}, \textbf{x}, and \texttt{x}.
 
 Text superscripts and subscripts with \textbackslash textsubscript and \textbackslash textsuperscript: A\textsubscript{x} and A\textsuperscript{x}.
@@ -489,18 +490,19 @@ Since you should have both English and Swedish keywords - you might think of ord
 \begin{scontents}[store-env=lang]
 swe
 \end{scontents}
-\warningExpl{Inside the following scontents environment, you cannot use a \textbackslash include{filename} as the command rather than the file contents will end up in the for DiVA information. Additionally, you should not use a straight double quote character in the abstracts or keywords, use two single quote characters instead.}
+% \warningExpl{Inside the following scontents environment, you cannot use a \textbackslash include{filename} as the command rather than the file contents will end up in the for DiVA information. Additionally, you should not use a straight double quote character in the abstracts or keywords, use two single quote characters instead.}
 \begin{scontents}[store-env=abstracts,print-env=true]
 \generalExpl{Enter your Swedish abstract or summary here!}
-\sweExpl{Alla avhandlingar vid KTH \textbf{måste ha} ett abstrakt på både \textit{engelska} och \textit{svenska}.\\
-Om du skriver din avhandling på svenska ska detta göras först (och placera det som det första abstraktet) - och du bör revidera det vid behov.}
+% \sweExpl{Alla avhandlingar vid KTH \textbf{måste ha} ett abstrakt på både \textit{engelska} och \textit{svenska}.\\
+% Om du skriver din avhandling på svenska ska detta göras först (och placera det som det första abstraktet) - och du bör revidera det vid behov.}
 
-\engExpl{If you are writing your thesis in English, you can leave this until the draft version that goes to your opponent for the written opposition. In this way, you can provide the English and Swedish abstract/summary information that can be used in the announcement for your oral presentation.\\If you are writing your thesis in English, then this section can be a summary targeted at a more general reader. However, if you are writing your thesis in Swedish, then the reverse is true – your abstract should be for your target audience, while an English summary can be written targeted at a more general audience.\\This means that the English abstract and Swedish sammnfattning  
-or Swedish abstract and English summary need not be literal translations of each other.}
+% ----- EXPLANATION -----
+% \engExpl{If you are writing your thesis in English, you can leave this until the draft version that goes to your opponent for the written opposition. In this way, you can provide the English and Swedish abstract/summary information that can be used in the announcement for your oral presentation.\\If you are writing your thesis in English, then this section can be a summary targeted at a more general reader. However, if you are writing your thesis in Swedish, then the reverse is true – your abstract should be for your target audience, while an English summary can be written targeted at a more general audience.\\This means that the English abstract and Swedish sammnfattning  
+% or Swedish abstract and English summary need not be literal translations of each other.}
 
-\warningExpl{Do not use the \textbackslash glspl\{\} command in an abstract that is not in English, as my programs do not know how to generate plurals in other languages. Instead, you will need to spell these terms out or give the proper plural form. In fact, it is a good idea not to use the glossary commands at all in an abstract/summary in a language other than the language used in the \texttt{acronyms.tex file} - since the glossary package does \textbf{not} support use of more than one language.}
+% \warningExpl{Do not use the \textbackslash glspl\{\} command in an abstract that is not in English, as my programs do not know how to generate plurals in other languages. Instead, you will need to spell these terms out or give the proper plural form. In fact, it is a good idea not to use the glossary commands at all in an abstract/summary in a language other than the language used in the \texttt{acronyms.tex file} - since the glossary package does \textbf{not} support use of more than one language.}
 
-\engExpl{The abstract in the language used for the thesis should be the first abstract, while the Summary/Sammanfattning in the other language can follow}
+% \engExpl{The abstract in the language used for the thesis should be the first abstract, while the Summary/Sammanfattning in the other language can follow}
 \end{scontents}
 \subsection*{Nyckelord}
 \begin{scontents}[store-env=keywords,print-env=true]
@@ -512,166 +514,53 @@ or Swedish abstract and English summary need not be literal translations of each
 \babelpolyLangStop{swedish}
 
 \cleardoublepage
-%\selectlanguage{french}
-\generalExpl{If you are an exchange student, use the relevant language or languages for abstracts for your home university, as this will often avoid the need for writing another thesis for your home university.\\
-If you are fluent in other languages, feel free to add the abstracts in one or more of them.}
-\engExpl{Note that you may need to augment the set of languages used in \texttt{polyglossia} or
-\texttt{babel} (see the file \texttt{kththesis.cls}). The following languages include those languages that were used in theses at KTH in 2018-2019, except for one in Chinese.\\
-Remove those versions of abstracts that you do not need.\\
-If you add a new language, when specifying the language for the abstract, use the three-letter ISO 639-2 Code – specifically the "B" (bibliographic) variant of these codes (note that this is the same language code used in DiVA).}
+% ----- EXPLANATION -----
+% \generalExpl{If you are an exchange student, use the relevant language or languages for abstracts for your home university, as this will often avoid the need for writing another thesis for your home university.\\
+% If you are fluent in other languages, feel free to add the abstracts in one or more of them.}
+% \engExpl{Note that you may need to augment the set of languages used in \texttt{polyglossia} or
+% \texttt{babel} (see the file \texttt{kththesis.cls}). The following languages include those languages that were used in theses at KTH in 2018-2019, except for one in Chinese.\\
+% Remove those versions of abstracts that you do not need.\\
+% If you add a new language, when specifying the language for the abstract, use the three-letter ISO 639-2 Code – specifically the "B" (bibliographic) variant of these codes (note that this is the same language code used in DiVA).}
 
-\babelpolyLangStart{french}
-\begin{abstract}
-    \markboth{\abstractname}{}
-\begin{scontents}[store-env=lang]
-fre
-\end{scontents}
-\begin{scontents}[store-env=abstracts,print-env=true]
-Résumé en français.
-\end{scontents}
-\subsection*{Mots-clés}
-\begin{scontents}[store-env=keywords,print-env=true]
-% In languages other than Swedish and English, you simply enter the relevant keywords in this subsection
-5-6 mots-clés
-\end{scontents}
-\end{abstract}
-\babelpolyLangStop{french}
-\cleardoublepage
-\babelpolyLangStart{spanish}
-\begin{abstract}
-    \markboth{\abstractname}{}
-\begin{scontents}[store-env=lang]
-spa
-\end{scontents}
-\begin{scontents}[store-env=abstracts,print-env=true]
-Résumé en espagnol.
-\end{scontents}
-\subsection*{Palabras claves}
-\begin{scontents}[store-env=keywords,print-env=true]
-5-6 Palabras claves
-\end{scontents}
-\end{abstract}
-\babelpolyLangStop{spanish}
-\cleardoublepage
-\babelpolyLangStart{italian}
-\begin{abstract}
-    \markboth{\abstractname}{}
-\begin{scontents}[store-env=lang]
-ita
-\end{scontents}
-\begin{scontents}[store-env=abstracts,print-env=true]
-Sommario in italiano.
-\end{scontents}
-\subsection*{parole chiave}
-\begin{scontents}[store-env=keywords,print-env=true]
-5-6 parole chiave
-\end{scontents}
-\end{abstract}
-\babelpolyLangStop{italian}
-\cleardoublepage
-% note that a command is used to avoid Overleaf parsing problems
-\babelpolyLangStart{norsk}
-\begin{abstract}
-    \markboth{\abstractname}{}
-\begin{scontents}[store-env=lang]
-nor
-\end{scontents}
-\begin{scontents}[store-env=abstracts,print-env=true]
-Sammendrag på norsk.
-\end{scontents}
-\subsection*{Nøkkelord}
-\begin{scontents}[store-env=keywords,print-env=true]
-5-6 nøkkelord
-\end{scontents}
-\end{abstract}
-\babelpolyLangStop{norsk}
-\cleardoublepage
-% note that a command is used to avoid Overleaf parsing problems
-\babelpolyLangStart{ngerman}
-\begin{abstract}
-    \markboth{\abstractname}{}
-\begin{scontents}[store-env=lang]
-ger
-\end{scontents}
-\begin{scontents}[store-env=abstracts,print-env=true]
-Zusammenfassung in Deutsch.
-\end{scontents}
-\subsection*{Schlüsselwörter}
-\begin{scontents}[store-env=keywords,print-env=true]
-5-6 Schlüsselwörter
-\end{scontents}
-\end{abstract}
-\babelpolyLangStop{ngerman}
-\cleardoublepage
-\babelpolyLangStart{danish}
-\begin{abstract}
-    \markboth{\abstractname}{}
-\begin{scontents}[store-env=lang]
-dan
-\end{scontents}
-\begin{scontents}[store-env=abstracts,print-env=true]
-Abstrakt på dansk.
-\end{scontents}
-\subsection*{Søgeord}
-\begin{scontents}[store-env=keywords,print-env=true]
-5-6 Søgeord
-\end{scontents}
-\end{abstract}
-\babelpolyLangStop{danish}
-\cleardoublepage
-\babelpolyLangStart{dutch}
-\begin{abstract}
-    \markboth{\abstractname}{}
-\begin{scontents}[store-env=lang]
-dut
-\end{scontents}
-\begin{scontents}[store-env=abstracts,print-env=true]
-Samenvatting in het Nederlands.
-\end{scontents}
-\subsection*{Trefwoorden}
-\begin{scontents}[store-env=keywords,print-env=true]
-5-6 trefwoorden
-\end{scontents}
-\end{abstract}
-\babelpolyLangStop{dutch}
-\cleardoublepage
-\babelpolyLangStart{estonian}
-\begin{abstract}
-    \markboth{\abstractname}{}
-\begin{scontents}[store-env=lang]
-est
-\end{scontents}
-\begin{scontents}[store-env=abstracts,print-env=true]
-Eesti keeles kokkuvõte.
-\end{scontents}
-\subsection*{Märksõnad}
-\begin{scontents}[store-env=keywords,print-env=true]
-5-6 Märksõnad
-\end{scontents}
-\end{abstract}
-\babelpolyLangStop{estonian}
-\cleardoublepage
+% \babelpolyLangStart{spanish}
+% \begin{abstract}
+%     \markboth{\abstractname}{}
+% \begin{scontents}[store-env=lang]
+% spa
+% \end{scontents}
+% \begin{scontents}[store-env=abstracts,print-env=true]
+% Résumé en espagnol.
+% \end{scontents}
+% \subsection*{Palabras claves}
+% \begin{scontents}[store-env=keywords,print-env=true]
+% 5-6 Palabras claves
+% \end{scontents}
+% \end{abstract}
+% \babelpolyLangStop{spanish}
+% \cleardoublepage
 
 \section*{Acknowledgments}
 \markboth{Acknowledgments}{}
-\sweExpl{Författarnas tack}
 
-\engExpl{It is nice to acknowledge the people that have helped you. It is
-  also necessary to acknowledge any special permissions that you have gotten –
-  for example, getting permission from the copyright owner to reproduce a
-  figure. In this case, you should acknowledge them and this permission here
-  and in the figure’s caption. \\
-  Note: If you do \textbf{not} have the copyright owner’s permission, then you \textbf{cannot} use any copyrighted figures/tables/\ldots . Unless stated otherwise all figures/tables/\ldots are generally copyrighted.
-}
-\sweExpl{I detta kapitel kan du ev nämna något om
-  din bakgrund om det påverkar rapporten på något sätt. Har du t ex inte
-  möjlighet att skriva perfekt svenska för att du är nyanländ till landet kan
-  det vara på sin plats att nämna detta här. OBS, detta får dock inte vara en
-  ursäkt för att lämna in en rapport med undermåligt språk, undermålig grammatik och
-  stavning (t ex får fel som en automatisk stavningskontroll och
-  grammatikkontroll kan upptäcka inte förekomma)\\
-En dualism som måste hanteras i hela rapporten och projektet
-}
+% ----- EXPLANATION -----
+% \sweExpl{Författarnas tack}
+
+% \engExpl{It is nice to acknowledge the people that have helped you. It is
+%   also necessary to acknowledge any special permissions that you have gotten –
+%   for example, getting permission from the copyright owner to reproduce a
+%   figure. In this case, you should acknowledge them and this permission here
+%   and in the figure’s caption. \\
+%   Note: If you do \textbf{not} have the copyright owner’s permission, then you \textbf{cannot} use any copyrighted figures/tables/\ldots . Unless stated otherwise all figures/tables/\ldots are generally copyrighted.
+% }
+% \sweExpl{I detta kapitel kan du ev nämna något om
+%   din bakgrund om det påverkar rapporten på något sätt. Har du t ex inte
+%   möjlighet att skriva perfekt svenska för att du är nyanländ till landet kan
+%   det vara på sin plats att nämna detta här. OBS, detta får dock inte vara en
+%   ursäkt för att lämna in en rapport med undermåligt språk, undermålig grammatik och
+%   stavning (t ex får fel som en automatisk stavningskontroll och
+%   grammatikkontroll kan upptäcka inte förekomma)\\
+% En dualism som måste hanteras i hela rapporten och projektet
+% }
 
 I would like to thank xxxx for having yyyy. Or in the case of two authors:\\
 We would like to thank xxxx for having yyyy.
@@ -725,10 +614,10 @@ We would like to thank xxxx for having yyyy.
 \selectlanguage{english}
 \chapter{Introduction}
 \label{ch:introduction}
-\sweExpl{svensk: Introduktion}
+% \sweExpl{svensk: Introduktion}
 
 
-\sweExpl{Ofta kommer problemet och problemägaren från industrin där man önskar en specifik lösning på ett specifikt problem. Detta är ofta ”för smalt” definierat och ger ofta en ”för smal” lösning för att resultatet skall vara intressant ur ett mer allmänt ingenjörsperspektiv och med ”nya” erfarenheter som resultat. Fundera tillsammans med projektets intressenter (student, problemägare och akademi) hur man skulle kunna använda det aktuella problemet/förslaget för att undersöka någon ingenjörsaspekt och vars resultat kan ge ny eller kompletterande erfarenhet till ingenjörssamfundet och vetenskapen.\\slöser man en del eller hela delen av det ursprungliga problemet.\\Erfarenheten kommer ur en frågeställning som man i examensarbetet försöker besvara med tidigare och andras erfarenhet, egna eller modifierade metoder som ger ett resultat vilket kan användas för att diskutera ett svar på undersökningsfrågan.\\Detta stycke skall alltså, förutom det ursprungliga ”smala” problemet, innehålla  vad som skall undersökas för att skapa ny ingenjörserfarenhet och/eller vetenskap.}
+% \sweExpl{Ofta kommer problemet och problemägaren från industrin där man önskar en specifik lösning på ett specifikt problem. Detta är ofta ”för smalt” definierat och ger ofta en ”för smal” lösning för att resultatet skall vara intressant ur ett mer allmänt ingenjörsperspektiv och med ”nya” erfarenheter som resultat. Fundera tillsammans med projektets intressenter (student, problemägare och akademi) hur man skulle kunna använda det aktuella problemet/förslaget för att undersöka någon ingenjörsaspekt och vars resultat kan ge ny eller kompletterande erfarenhet till ingenjörssamfundet och vetenskapen.\\slöser man en del eller hela delen av det ursprungliga problemet.\\Erfarenheten kommer ur en frågeställning som man i examensarbetet försöker besvara med tidigare och andras erfarenhet, egna eller modifierade metoder som ger ett resultat vilket kan användas för att diskutera ett svar på undersökningsfrågan.\\Detta stycke skall alltså, förutom det ursprungliga ”smala” problemet, innehålla  vad som skall undersökas för att skapa ny ingenjörserfarenhet och/eller vetenskap.}
 
 \engExpl{The first paragraph after a heading is not indented, all of the
   subsequent paragraphs have their first line indented.}
@@ -740,10 +629,10 @@ goals of this thesis project, and outlines the structure of the thesis.\\
 
 % One can use either biblatex or bibtex - set as the option for the document at the top of this file
 \ifbiblatex
-\engExpl{We use the \emph{biblatex} package to handle our references.  We
-use the command \texttt{parencite} to get a reference in parenthesis, like
-this \textbackslash parencite\{heisenberg2015\} resulting in \parencite{heisenberg2015}.  It is also possible to include the author as part of the sentence using \texttt{textcite}, like talking about the work of \textbackslash textcite\{einstein2016\} resulting in \textcite{einstein2016}.\\
-This also means that you have to change the include files to include biblatex and change the way that the \texttt{reference.bib} file is included.}
+% \engExpl{We use the \emph{biblatex} package to handle our references.  We
+% use the command \texttt{parencite} to get a reference in parenthesis, like
+% this \textbackslash parencite\{heisenberg2015\} resulting in \parencite{heisenberg2015}.  It is also possible to include the author as part of the sentence using \texttt{textcite}, like talking about the work of \textbackslash textcite\{einstein2016\} resulting in \textcite{einstein2016}.\\
+% This also means that you have to change the include files to include biblatex and change the way that the \texttt{reference.bib} file is included.}
 \else
 \engExpl{We use the \emph{bibtex} package to handle our references.  We, therefore,
 use the command \textbackslash cite\{farshin\_make\_2019\}. For example, Farshin, \etal described how to improve LLC
@@ -759,7 +648,7 @@ assume that \glspl{LAN} include \glspl{WLAN}, such as \gls{WiFi}.
 
 \section{Background}
 \label{sec:background}
-\sweExpl{svensk: Bakgrund}
+% \sweExpl{svensk: Bakgrund}
 
 \generalExpl{Present the background for the area. Set the context for your project – so that your reader can understand both your project and this thesis. (Give detailed background information in Chapter 2 - together with related work.)
 Sometimes it is useful to insert a system diagram here so that the reader
@@ -772,10 +661,10 @@ As one can find in RFC 1235\,\cite{ioannidis_coherent_1991} multicast is useful 
 
 \section{Problem}
 \label{sec:problem}
-\sweExpl{svensk: Problemdefinition eller Frågeställning\\
-Lyft fram det ursprungliga problemet om det finns något och definiera därefter
-den ingenjörsmässiga erfarenheten eller/och vetenskapen som kan komma ur
-projektet. }
+% \sweExpl{svensk: Problemdefinition eller Frågeställning\\
+% Lyft fram det ursprungliga problemet om det finns något och definiera därefter
+% den ingenjörsmässiga erfarenheten eller/och vetenskapen som kan komma ur
+% projektet. }
 
 Longer problem statement\\
 If possible, end this section with a question as a problem statement.
@@ -783,31 +672,32 @@ If possible, end this section with a question as a problem statement.
 % Research Question
 \subsection{Original problem and definition}
 \label{sec:researchQuestion}
-\sweExpl{Ursprungligt problem och definition}
+% \sweExpl{Ursprungligt problem och definition}
 Some text
 
-\subsection{Scientific and engineering issues}\sweExpl{Vetenskaplig och ingenjörsmässig frågeställning}
+\subsection{Scientific and engineering issues}
+% \sweExpl{Vetenskaplig och ingenjörsmässig frågeställning}
 some text
 
 \section{Purpose}
-\sweExpl{Syfte}
-\sweExpl{Skilj på syfte och mål! Syfte är att förändra något till det bättre. I examensarbetet finns ofta två aspekter på detta. Dels vill problemägaren (företaget) få sitt problem löst till det bättre men akademin och ingenjörssamfundet vill också få nya erfarenheter och vetskap. Beskriv ett syfte som tillfredställer båda dessa aspekter.\\
-Det finns även ett syfte till som kan vara värt att beakta och det är att du som student skall ta examen och att du måste bevisa, i ditt examensarbete, att du uppfyller examensmålen. Dessa mål sammanfaller med kursmålen för examensarbetskursen. 
-}
+% \sweExpl{Syfte}
+% \sweExpl{Skilj på syfte och mål! Syfte är att förändra något till det bättre. I examensarbetet finns ofta två aspekter på detta. Dels vill problemägaren (företaget) få sitt problem löst till det bättre men akademin och ingenjörssamfundet vill också få nya erfarenheter och vetskap. Beskriv ett syfte som tillfredställer båda dessa aspekter.\\
+% Det finns även ett syfte till som kan vara värt att beakta och det är att du som student skall ta examen och att du måste bevisa, i ditt examensarbete, att du uppfyller examensmålen. Dessa mål sammanfaller med kursmålen för examensarbetskursen. 
+% }
 \generalExpl{State the purpose of your thesis and the purpose of your degree project.\\
 Describe who benefits and how they benefit if you achieve your goals. Include anticipated ethical, sustainability, social issues, etc. related to your project. (Return to these in your reflections in Section~\ref{sec:reflections}.)}
 
 
 
 \section{Goals}
-\sweExpl{Mål}
-\sweExpl{Skilj på syfte och mål. Syftet är att åstakomma en förändring i något. Målen är vad som konkret skall göras för att om möjligt uppnå den önskade förändringen (syfte). }
+% \sweExpl{Mål}
+% \sweExpl{Skilj på syfte och mål. Syftet är att åstakomma en förändring i något. Målen är vad som konkret skall göras för att om möjligt uppnå den önskade förändringen (syfte). }
 
 \generalExpl{State the goal/goals of this degree project.}
 
 The goal of this project is XXX. This has been divided into the following three sub-goals:
 \begin{enumerate}
-\item Subgoal 1 \sweExpl{för att tillfredsställa problemägaren – industrin?}
+\item Subgoal 1 \sweExpl{för att tillfredsstä2lla problemägaren – industrin?}
 \item Subgoal 2\sweExpl{för att tillfredsställa ingenjörssamfundet och vetenskapen – akademin) }
 \item Subgoal 3\sweExpl{eventuellt, för att uppfylla kursmålen – du som student}
 \end{enumerate}
@@ -1002,7 +892,7 @@ Carrier clouds have been suggested as a way to reduce the delay between the user
   use for your evaluation.}
 
 \cleardoublepage
-\chapter{Method or Methods}
+\chapter{Method}
 \label{ch:methods}
 \sweExpl{Metod eller Metodval}
 \generalExpl{This chapter is about Engineering-related
@@ -1052,21 +942,6 @@ Ofta kan man koppla ett antal följdfrågor till undersökningsfrågan och probl
 
 Figure~\ref{fig:researchprocess} shows the steps conducted to carry out this research. 
 
-\sweExpl{Figur~\ref{fig:researchprocess} visar de steg som utförs för att genomföra\\
-Beskriv, gärna med ett aktivitetsdiagram (UML?), din undersökningsprocess och utvecklingsprocess.  Du måste koppla ihop det akademiska intresset (undersökningsprocess) med ursprungsproblemet (utvecklingsprocess)
-denna forskning.\\
-Aktivitetsdiagram från t ex UML-standard}
-
-
- 
-\begin{figure}[!ht]
-  \begin{center}
-    \includegraphics[width=0.5\textwidth]{figures/researchprocess.png}
-  \end{center}
-  \caption{Research Process}
-  \label{fig:researchprocess}
-\end{figure}
-
 \generalExpl{Example of using customized item labels.}
 Some steps in the process:
 \begin{enumerate}[leftmargin=*, label=\textbf{Step \arabic*}, ref=Step \arabic*] %labelindent=1em for indent
@@ -1075,7 +950,7 @@ Some steps in the process:
     \item \label{x:s2} conduct experiment,
     \item \label{x:s3} analyze data from the experiment, and
     \item \label{x:s4} discuss the results of the analysis.
-\end{enumerate}
+\end{enumerate}   
 
 \sweExpl{Forskningsprocessen}
 
@@ -1087,23 +962,26 @@ Exempelvis\\
 Positivistisk (vad/hur fungerar det?) kvalitativ fallstudie med en deduktivt (förbestämd) vald ansats och ett induktivt(efterhand uppstår dataområden och data) insamlade av data och erfarenheter.}
 
 
-\section{Data Collection}
+\section{Data Collection and Preprocessing}
 \label{sec:dataCollection}
-\sweExpl{Datainsamling\\
-(Detta bör också visa att du är medveten om de sociala och etiska frågor som
-kan vara relevanta för dina data insamlingsmetod.)}
-\generalExpl{This should also show that you are aware of the social and ethical concerns that might be relevant to your data collection method.}
 
+For the development of the framework, the input data consists of images taken from the CheXpert dataset \cite{chexpert} and NIH Chest X-ray dataset \cite{nih}. For the implementation of segmentation-based regularizations, ChestXDet \cite{chestxdet}, an existing segmentation model was used to obtain segmentation labels. Concretely, the segmentation model identifies 13 categories: Atelectasis, Calcification, Cardiomegaly, Consolidation, Diffuse Nodule, Effusion, Emphysema, Fibrosis, Fracture, Mass, Nodule, Pleural Thickening, Pneumothorax. These labels represent smaller structures in the chest anatomy, and can be grouped according to similar expected attenuation coefficients. For the model, these groups are considered.
 
+\begin{table}[]
+    \centering
+    \begin{tabular}{c|c}
+        Group name & Grouped labels \\
+        Bone &  "Left Clavicle", "Right Clavicle", "Left Scapula", "Right Scapula", "Spine" \\
+        Lung &     "Left Lung", "Right Lung", "Left Hilus Pulmonis", "Right Hilus Pulmonis" \\
+        Soft tissue &  "Heart", "Aorta", "Mediastinum", "Facies Diaphragmatica", "Weasand"
+    \end{tabular}
+    \caption{Segmentation category groups}
+    \label{tab:segmentation_groups}
+\end{table}
 
-\subsection{Sampling}
-\sweExpl{Stickprovsundersökning}
+% TODO: Change this ref
+\ref{sec:implementationDetails} 
 
-\subsection{Sample Size}
-\sweExpl{Provstorleken}
-
-\subsection{Target Population}
-\sweExpl{Målgruppen}
 
 \section[Experimental design/Planned Measurements]{Experimental design and\\Planned Measurements}
 \label{sec:experimentalDesign}
