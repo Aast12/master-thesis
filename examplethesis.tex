@@ -613,755 +613,781 @@ We would like to thank xxxx for having yyyy.
 \renewcommand{\chaptermark}[1]{\markboth{#1}{}}
 \selectlanguage{english}
 \chapter{Introduction}
-\label{ch:introduction}
-% \sweExpl{svensk: Introduktion}
-
-
-% \sweExpl{Ofta kommer problemet och problemägaren från industrin där man önskar en specifik lösning på ett specifikt problem. Detta är ofta ”för smalt” definierat och ger ofta en ”för smal” lösning för att resultatet skall vara intressant ur ett mer allmänt ingenjörsperspektiv och med ”nya” erfarenheter som resultat. Fundera tillsammans med projektets intressenter (student, problemägare och akademi) hur man skulle kunna använda det aktuella problemet/förslaget för att undersöka någon ingenjörsaspekt och vars resultat kan ge ny eller kompletterande erfarenhet till ingenjörssamfundet och vetenskapen.\\slöser man en del eller hela delen av det ursprungliga problemet.\\Erfarenheten kommer ur en frågeställning som man i examensarbetet försöker besvara med tidigare och andras erfarenhet, egna eller modifierade metoder som ger ett resultat vilket kan användas för att diskutera ett svar på undersökningsfrågan.\\Detta stycke skall alltså, förutom det ursprungliga ”smala” problemet, innehålla  vad som skall undersökas för att skapa ny ingenjörserfarenhet och/eller vetenskap.}
-
-\engExpl{The first paragraph after a heading is not indented, all of the
-  subsequent paragraphs have their first line indented.}
-  
-This chapter describes the specific problem that this thesis addresses, the context of the problem, the
-goals of this thesis project, and outlines the structure of the thesis.\\
-
-\generalExpl{Give a general introduction to the area. (Remember to use appropriate references in this and all other sections.)}
-
-% One can use either biblatex or bibtex - set as the option for the document at the top of this file
-\ifbiblatex
-% \engExpl{We use the \emph{biblatex} package to handle our references.  We
-% use the command \texttt{parencite} to get a reference in parenthesis, like
-% this \textbackslash parencite\{heisenberg2015\} resulting in \parencite{heisenberg2015}.  It is also possible to include the author as part of the sentence using \texttt{textcite}, like talking about the work of \textbackslash textcite\{einstein2016\} resulting in \textcite{einstein2016}.\\
-% This also means that you have to change the include files to include biblatex and change the way that the \texttt{reference.bib} file is included.}
-\else
-\engExpl{We use the \emph{bibtex} package to handle our references.  We, therefore,
-use the command \textbackslash cite\{farshin\_make\_2019\}. For example, Farshin, \etal described how to improve LLC
-cache performance in \cite{farshin_make_2019} in the context of links running
-at \qty{200}{Gbps}.}
-\fi
-
-\engExpl{Use the glossaries package to help yourself and your readers.
-Add the acronyms and abbreviations to lib/acronyms.tex. Some examples are shown below:}
-In this thesis, we will examine the use of \glspl{LAN}. In this thesis, we will
-assume that \glspl{LAN} include \glspl{WLAN}, such as \gls{WiFi}.
-
 
 \section{Background}
-\label{sec:background}
-% \sweExpl{svensk: Bakgrund}
+Digital radiography systems are ubiquitous in modern healthcare but rely on expensive flat panel detectors. This project supports an alternative approach using scintillator-coupled computer vision cameras, where a small camera sensor images a chest-sized scintillator screen. While this approach could significantly reduce hardware costs, the raw images acquired with this camera system need more sophisticated software processing to reach diagnostic image quality \cite{prokop2003principles}.
 
-\generalExpl{Present the background for the area. Set the context for your project – so that your reader can understand both your project and this thesis. (Give detailed background information in Chapter 2 - together with related work.)
-Sometimes it is useful to insert a system diagram here so that the reader
-knows what are the different elements and their relationship to each
-other. This also introduces the names/terms/… that you are going to use
-throughout your thesis (be consistent). This figure will also help you later
-delimit what you are going to do and what others have done or will do.}
+As articulated in the project description, the challenge lies in the fact that equipment manufacturers (e.g., Siemens, Philips, GE) apply proprietary post-processing algorithms that include non-linear operations—likely including a combination of denoising, frequency filtering, and dynamic range adjustments. These operations form a "black-box" that varies across manufacturers represented in large image datasets like CheXpert.
 
-As one can find in RFC 1235\,\cite{ioannidis_coherent_1991} multicast is useful for xxxx. A number of different \glspl{OS} have been used in this work, such as the following \glspl{OS}: UNIX, Linux, Windows, etc. The main focus will be on one \gls{OS}, namely Linux.
+\section{Problem Statement}
+\subsection{Original Problem Definition}
+The core problem is to build an open-source X-ray detector that is cost-effective yet diagnostically useful. However, such systems typically have higher noise, distortions, and sensitivity issues compared to commercial systems. Existing diagnostic models trained on high-quality datasets like CheXpert may not perform adequately on images from these simpler systems.
 
-\section{Problem}
-\label{sec:problem}
-% \sweExpl{svensk: Problemdefinition eller Frågeställning\\
-% Lyft fram det ursprungliga problemet om det finns något och definiera därefter
-% den ingenjörsmässiga erfarenheten eller/och vetenskapen som kan komma ur
-% projektet. }
-
-Longer problem statement\\
-If possible, end this section with a question as a problem statement.
-
-% Research Question
-\subsection{Original problem and definition}
-\label{sec:researchQuestion}
-% \sweExpl{Ursprungligt problem och definition}
-Some text
-
-\subsection{Scientific and engineering issues}
-% \sweExpl{Vetenskaplig och ingenjörsmässig frågeställning}
-some text
+\subsection{Scientific and Engineering Challenges}
+The inverse problem we face has several critical challenges:
+\begin{itemize}
+    \item \textbf{Ill-posedness}: A single processed image can map back to multiple possible "realistic" transmission maps, making the inverse problem fundamentally ill-posed.
+    \item \textbf{Diversity of processing approaches}: Each manufacturer implements proprietary image processing pipelines that create different visual characteristics.
+    \item \textbf{Limited ground truth}: We lack labeled data showing the original transmission maps corresponding to processed images.
+    \item \textbf{Scaling requirements}: We need to process many images efficiently to build a representative dataset.
+\end{itemize}
 
 \section{Purpose}
-% \sweExpl{Syfte}
-% \sweExpl{Skilj på syfte och mål! Syfte är att förändra något till det bättre. I examensarbetet finns ofta två aspekter på detta. Dels vill problemägaren (företaget) få sitt problem löst till det bättre men akademin och ingenjörssamfundet vill också få nya erfarenheter och vetskap. Beskriv ett syfte som tillfredställer båda dessa aspekter.\\
-% Det finns även ett syfte till som kan vara värt att beakta och det är att du som student skall ta examen och att du måste bevisa, i ditt examensarbete, att du uppfyller examensmålen. Dessa mål sammanfaller med kursmålen för examensarbetskursen. 
-% }
-\generalExpl{State the purpose of your thesis and the purpose of your degree project.\\
-Describe who benefits and how they benefit if you achieve your goals. Include anticipated ethical, sustainability, social issues, etc. related to your project. (Return to these in your reflections in Section~\ref{sec:reflections}.)}
-
-
+This research aims to develop accessible X-ray detector technology for resource-limited settings. By creating an open-source computational pipeline that simulates how camera-based X-ray detectors capture chest radiographs, we can:
+\begin{itemize}
+    \item Enable more affordable diagnostic imaging in remote populations
+    \item Provide a common baseline for comparing different detector technologies
+    \item Support development of machine learning models specifically trained for low-cost imaging systems
+\end{itemize}
 
 \section{Goals}
-% \sweExpl{Mål}
-% \sweExpl{Skilj på syfte och mål. Syftet är att åstakomma en förändring i något. Målen är vad som konkret skall göras för att om möjligt uppnå den önskade förändringen (syfte). }
-
-\generalExpl{State the goal/goals of this degree project.}
-
-The goal of this project is XXX. This has been divided into the following three sub-goals:
+The specific goals of this research are to:
 \begin{enumerate}
-\item Subgoal 1 \sweExpl{för att tillfredsstä2lla problemägaren – industrin?}
-\item Subgoal 2\sweExpl{för att tillfredsställa ingenjörssamfundet och vetenskapen – akademin) }
-\item Subgoal 3\sweExpl{eventuellt, för att uppfylla kursmålen – du som student}
+    \item Identify properties shared by real X-ray transmission maps and define characteristics that make them "realistic"
+    \item Characterize the diversity of image processing pipelines applied to these maps in commercial systems
+    \item Develop and evaluate optimization algorithms that can recover plausible transmission maps from processed images
+    \item Create a framework that produces realistic simulated images for different detector configurations
 \end{enumerate}
 
-\generalExpl{In addition to presenting the goal(s), you might also state what the deliverables and results of the project are.}
+\section{Research Methodology}
+Our approach involves:
+\begin{itemize}
+    \item Investigating established image processing algorithms used in radiography
+    \item Identifying common properties in processed images and their corresponding transmission maps
+    \item Developing optimization algorithms with appropriate forward operators and loss functions
+    \item Evaluating recovered maps through comparison with known physics models and visual assessment
+\end{itemize}
 
-\section{Research Methodology}\sweExpl{Undersökningsmetod}
-\sweExpl{Här anger du vilken vilken övergripande undersökningsstrategi eller metod du skall använda för att försöka besvara den akademiska frågeställning och samtidigt lösa det e v ursprungliga problemet. Ofta kan man använda ”lösandet av ursprungsproblemet” som en fallstudie kring en akademisk frågeställning. Du undersöker någon intressant fråga i ”skarpt” läge och samlar resultat och erfarenhet ur detta.\\
-Tänk på att företaget ibland måste stå tillbaka i sin önskan och förväntan på projektets resultat till förmån för ny eller kompletterande ingenjörserfarenhet och vetenskap (ditt examensarbete). Det är du som student som bestämmer och löser fördelningen mellan dessa två intressen men se till att alla är informerade. }
-\generalExpl{Introduce your choice of methodology/methodologies and method/methods – and the reason why you chose them. Contrast them with and explain why you did not choose other methodologies or methods. (The details of the actual methodology and method you have chosen will be given in Chapter~\ref{ch:methods}. Note that in Chapter~\ref{ch:methods}, the focus could be research strategies, data collection, data analysis, and quality assurance.)\\
-In this section you should present your philosophical assumption(s), research method(s), and research approach(es).}
+\section{Thesis Structure}
+The remainder of this thesis is organized as follows: Chapter 2 presents background information on X-ray transmission, digital image processing, and relevant optimization methods. Chapter 3 describes our proposed method for solving the inverse problem. Chapter 4 details the implementation of our computational pipeline. Chapter 5 presents experimental results, and Chapter 6 discusses implications and directions for future work.
 
-\section{Delimitations}\sweExpl{Avgränsningar}
-\generalExpl{Describe the boundary/limits of your thesis project and what you are explicitly not going to do. This will help you bound your efforts – as you have clearly defined what is out of the scope of this thesis project. Explain the delimitations. These are all the things that could affect the study if they were examined and included in the degree project.}
-
-\section{Structure of the thesis}\sweExpl{ Rapportens disposition}
-Chapter~\ref{ch:background} presents relevant background information about xxx.  Chapter~\ref{ch:methods} presents the methodology and method used to solve the problem. …
-
-\cleardoublepage
 \chapter{Background}
-\label{ch:background}
-\sweExpl{Bakgrund}
 
-\generalExpl{When you do your literature study, you should have a nearly complete Chapters 1 and 2.\\
-You may also find it convenient to introduce the future work section into your report early – so that you can put things that you think about but decide not to do now into this section.\\
-Note that later you can move things between this future work section and what you have done as you may change your mind about what to do now versus what to put off to future work.
-}
-\generalExpl{What does a reader (another x student -- where x is your study line) need to know to understand your report?
-What have others already done? (This is the “related work”.) Explain what and
-how prior work/prior research will be applied on or used in the degree
-project/work (described in this thesis). Explain why and what is not used in
-the degree project and give valid reasons for rejecting the work/research.}
+\section{X-ray Transmission}
+\subsection{Beer's Law}
+X-ray transmission through matter follows Beer's Law, which describes how the intensity of radiation decreases as it passes through a material. For an X-ray beam passing through a homogeneous material, the intensity $I$ after passing through a thickness $x$ is given by:
 
-This chapter provides basic background information about xxx. Additionally, this chapter describes xxx. The chapter also describes related work xxxx.
+\begin{equation}
+I = I_0 e^{-\mu x}
+\end{equation}
+
+where $I_0$ is the incident intensity and $\mu$ is the linear attenuation coefficient of the material \cite{cullity2014elements}. 
+
+For heterogeneous materials like the human body, the equation becomes an integral along the beam path:
+
+\begin{equation}
+I(u,v) = I_0(u,v) \cdot \exp\left(-\int_L \mu(s)ds\right)
+\end{equation}
+
+where $(u,v)$ represents the detector coordinates, and the integral is taken along the linear path $L$ through the body.
+
+\subsection{Body Tissues and X-ray Attenuation}
+For the human body specifically, the relation between incident intensity $I_0$ and transmitted intensity $I_1$ can be modeled as:
+
+\begin{equation}
+I_1(x, y) = I_0(x, y) e^{-\mu_s d_s(x,y)} e^{-\mu_b d_b(x,y)} e^{-\mu_l d_l(x, y)}
+\end{equation}
+
+where $\mu$ and $d$ represent the attenuation coefficients and tissue thickness over a projected point $(x,y)$ for bone ($b$), lungs ($l$), and other soft tissue ($s$). This relationship forms the physical basis for interpreting chest radiographs, as different tissues create characteristic attenuation patterns \cite{prokop2003principles}.
+
+The beam quality also changes as it passes through tissue—a phenomenon known as "beam hardening," where lower energy photons are preferentially absorbed, resulting in objects closer to the detector having less contrast than objects further away \cite{bushberg2011essential}.
+
+\subsection{Transmission Map Definition}
+The transmission map is defined as the ratio of transmitted to incident intensity at each point, essentially capturing the exponential term from Beer's Law:
+
+\begin{equation}
+T(x,y) = \frac{I_1(x,y)}{I_0(x,y)} = e^{-\int \mu(x,y,z) dz}
+\end{equation}
+
+This map has values between 0 and 1, where 0 represents complete absorption and 1 represents no absorption. The transmission map is the fundamental input to any digital radiography processing pipeline, and recovering it is essential for simulating different detector configurations \cite{seibert2006flat}.
+
+\section{Digital Image Processing in Radiography}
+\subsection{Gradation Curves}
+Digital radiography systems apply various processing steps to the raw transmission map to produce diagnostically useful images. As described by \cite{prokop2003principles}, gradation curves map detector signals to display values. These include:
+
+\begin{itemize}
+    \item \textbf{Automated Signal Normalization}: Detects the collimated region and stretches the relevant histogram range to fit the available gray scale values. This process includes:
+    \begin{enumerate}
+        \item Detection of the collimated region to exclude direct, unattenuated radiation
+        \item Histogram analysis of pixel values within the collimated region
+        \item Linear mapping to exclude input values where the histogram is (close to) zero
+    \end{enumerate}
+    
+    \item \textbf{Gradational Adjustment}: Applies lookup tables to optimize contrast for different anatomical regions. Theoretical optimums like the Kanamori curve \cite{kanamori1966determination} have been proposed, but many radiologists prefer sigmoid-shaped curves that more closely match the appearance of conventional radiographs.
+\end{itemize}
+
+\subsection{Spatial Frequency Processing}
+\subsubsection{Unsharp Masking}
+Unsharp masking enhances edges and fine details in radiographs. The process involves:
+\begin{enumerate}
+    \item Creating a blurred version of the image using low-pass filtering
+    \item Subtracting this from the original to obtain high-frequency information
+    \item Combining the original with the weighted high-frequency image
+\end{enumerate}
+
+The resulting processed image can be expressed as:
+\begin{equation}
+I' = I + f \cdot (I - B)
+\end{equation}
+
+where $I$ is the original image, $B$ is the blurred version, and $f$ is an enhancement factor, typically around 0.5 for chest radiographs \cite{prokop2003principles}.
+
+Mathematically equivalent formulations include:
+\begin{equation}
+I' = I - f^* \cdot B
+\end{equation}
+where $f^* = \frac{f}{1+f}$, and:
+\begin{equation}
+I' = B + (1+f) \cdot (I - B)
+\end{equation}
+
+The effects of unsharp masking depend critically on the size of the filter kernel used to create the blurred image $B$. Kernels of 20-30mm typically give the best results for general chest imaging \cite{prokop1993improved}, as they enhance structures of diagnostic interest while avoiding suppression of relevant pathology.
+
+\subsubsection{Multiscale Processing}
+More advanced systems use multiscale decomposition, dividing the image into frequency bands that can be independently processed. As detailed by \cite{stahl2000digital}, this approach allows for:
+\begin{itemize}
+    \item Size-independent enhancement of structures
+    \item Better handling of dynamic range differences
+    \item More effective noise suppression
+\end{itemize}
+
+The Laplacian pyramid decomposition, introduced by \cite{burt1983laplacian}, is a hierarchical structure where the original image is repeatedly filtered and downsampled:
+
+\begin{enumerate}
+    \item The image is blurred with a low-pass filter (typically a 3×3 or 5×5 binomial kernel)
+    \item The blurred image is downsampled by a factor of 2 in each direction
+    \item The downsampled image is expanded back to the original size using interpolation
+    \item The expanded image is subtracted from the original to create a "detail" or bandpass image
+    \item The process repeats with the downsampled image as the new input
+\end{enumerate}
+
+This creates a series of bandpass images $\{B_0, B_1, ..., B_{n-2}\}$ plus a residual low-pass image $B_{n-1}$. The original image can be perfectly reconstructed by reversing the process:
+
+\begin{equation}
+I_{\text{original}} = B_{n-1} + \sum_{i=0}^{n-2} B_i
+\end{equation}
+
+For enhancement, each bandpass image can be processed independently before reconstruction. This allows for targeted enhancement of structures of specific sizes without affecting others, as implemented in commercial systems like MUSICA (Agfa) \cite{vuylsteke1994multiscale}, MFP (Fuji) \cite{ogoda1997unsharp}, and UNIQUE (Philips) \cite{stahl2000digital}.
+
+\subsubsection{Dynamic Range Reduction}
+Chest radiographs must cope with large attenuation differences between the lungs and mediastinum. Dynamic range reduction (DRR) or compression (DRC) harmonizes the image by reducing these differences while preserving local contrast \cite{cowen1988computer,prokop2003principles}.
+
+With unsharp masking, DRR is accomplished by nonlinear subtraction of a low-pass image with a large kernel (2-4cm). The subtraction weight varies with pixel values—minimal for lungs but substantial (e.g., 0.2) for the mediastinum—effectively increasing density in high-absorption areas without affecting well-exposed regions.
+
+In multiscale processing, DRR works by applying nonlinear transformations to the lowest frequency bands, which contain the large-area density differences \cite{stahl2000digital}.
+
+\subsection{Noise Characteristics and Management}
+Noise in radiographic images comes from multiple sources:
+\begin{itemize}
+    \item Quantum noise (Poisson-distributed, proportional to $\sqrt{N}$ where $N$ is the number of photons)
+    \item Detector structure noise
+    \item Electronic noise
+    \item Quantization noise
+\end{itemize}
+
+Noise power is distributed across spatial frequencies and varies with detector dose. After logarithmic processing and intensity inversion in storage phosphor systems, noise is most prominent in high-brightness (low optical density) regions \cite{hillen1987imaging,ogawa1995quantitative}.
+
+Subjectively, noise is most visible in areas with minimal texture or "activity." \cite{stahl2000digital} developed a noise containment approach where enhancement is reduced in noise-sensitive regions defined by spatial frequency, local image density, and local activity measures.
+
+Their blending technique can be expressed as:
+\begin{equation}
+S_{i, \text{robust}}(x,y) = b_D(x,y) \cdot b_A(x,y) \cdot S_{i, \text{fully\_enh}}(x,y) + (1 - b_D(x,y) \cdot b_A(x,y)) \cdot S_{i, \text{orig}}(x,y)
+\end{equation}
+
+where $b_D$ and $b_A$ are weighting factors dependent on local density and activity, respectively.
+
+\section{Nonlinear Optimization}
+\subsection{Gradient Descent Methods}
+Our approach to recovering transmission maps relies on gradient-based optimization. Given a forward model $F$ that maps transmission maps to processed images, we seek to find the transmission map $x$ that minimizes:
+
+\begin{equation}
+\arg\min_{x, \theta} \mathcal{L}(F(x, \theta), y)
+\end{equation}
+
+where $y$ is the observed processed image, $\theta$ represents parameters of the forward model, and $\mathcal{L}$ is a suitable loss function.
+
+The optimization uses automatic differentiation to compute gradients efficiently. We employ the Adam optimizer \cite{kingma2014adam}, which adapts the learning rate for each parameter based on estimates of first and second moments of the gradients:
+
+\begin{align}
+m_t &= \beta_1 m_{t-1} + (1 - \beta_1) g_t \\
+v_t &= \beta_2 v_{t-1} + (1 - \beta_2) g_t^2 \\
+\hat{m}_t &= \frac{m_t}{1 - \beta_1^t} \\
+\hat{v}_t &= \frac{v_t}{1 - \beta_2^t} \\
+\theta_t &= \theta_{t-1} - \alpha \frac{\hat{m}_t}{\sqrt{\hat{v}_t} + \epsilon}
+\end{align}
+
+where $g_t$ is the gradient, $m_t$ and $v_t$ are the biased first and second moment estimates, $\hat{m}_t$ and $\hat{v}_t$ are the bias-corrected estimates, and $\alpha$, $\beta_1$, $\beta_2$, $\epsilon$ are hyperparameters.
+
+\subsection{Regularization for Ill-Posed Problems}
+\subsubsection{Theory of Regularization}
+The inverse problem of finding $x$ such that $F(x) = y$ is ill-posed when:
+\begin{itemize}
+    \item A solution may not exist for all $y$
+    \item Solutions may not be unique
+    \item Solutions may not depend continuously on the data (small changes in $y$ can cause large changes in $x$)
+\end{itemize}
+
+Tikhonov regularization \cite{tikhonov1977solutions} addresses ill-posedness by adding a penalty term to the objective function:
+
+\begin{equation}
+\arg\min_x \{\|F(x) - y\|^2 + \lambda \|Rx\|^2\}
+\end{equation}
+
+where $R$ is a regularization operator and $\lambda > 0$ controls the regularization strength.
+
+\subsubsection{Total Variation Regularization}
+Total Variation (TV) regularization, introduced by \cite{rudin1992nonlinear}, penalizes the total variation of the solution:
+
+\begin{equation}
+TV(x) = \sum_{i,j} \sqrt{(x_{i+1,j} - x_{i,j})^2 + (x_{i,j+1} - x_{i,j})^2}
+\end{equation}
+
+This promotes piecewise smoothness while preserving edges, making it particularly suitable for images \cite{chambolle2004algorithm}. The regularized objective becomes:
+
+\begin{equation}
+\arg\min_x \{\|F(x) - y\|^2 + \lambda TV(x)\}
+\end{equation}
+
+In our JAX implementation, we compute TV as:
+\begin{equation}
+TV(x) = \frac{1}{2}\left(\|\nabla_x x\|_1 + \|\nabla_y x\|_1\right)
+\end{equation}
+
+where $\nabla_x$ and $\nabla_y$ are the horizontal and vertical finite difference operators, implemented using the `jnp.diff` function:
+
+\begin{align}
+\|\nabla_x x\|_1 &= \text{mean}(|\text{diff}(x, \text{axis}=0)|^2) \\
+\|\nabla_y x\|_1 &= \text{mean}(|\text{diff}(x, \text{axis}=1)|^2)
+\end{align}
+
+TV regularization is particularly effective for the transmission map reconstruction problem because:
+\begin{itemize}
+    \item Transmission maps are expected to be piecewise smooth, with discontinuities occurring at tissue boundaries
+    \item TV preserves these important boundaries while suppressing noise
+    \item It does not over-smooth the image, unlike Gaussian or L2 regularization
+\end{itemize}
+
+\subsubsection{Physics-Based Regularization}
+Beyond generic smoothness priors like TV, physics-based constraints can significantly improve reconstruction. These include:
+\begin{itemize}
+    \item \textbf{Value range constraints}: Transmission values must be between 0 and 1
+    \item \textbf{Anatomical constraints}: Different tissues have characteristic ranges of attenuation
+    \item \textbf{Segment-specific behavior}: Enforcing consistent properties within anatomical segments
+\end{itemize}
+
+Projection operators enforce these constraints during optimization:
+\begin{equation}
+x_{t+1} = P(x_t - \alpha \nabla f(x_t))
+\end{equation}
+
+where $P$ is a projection operator that maps to the feasible set. For example, the hypercube projection implemented in Optax \cite{optax2020github} ensures values remain within valid bounds:
+\begin{equation}
+P_{[a,b]}(x) = \max(a, \min(b, x))
+\end{equation}
 
 
+\section{Image Quality Metrics}
+\subsection{Mean Squared Error (MSE)}
+The mean squared error quantifies the average squared difference between pixel values:
+\begin{equation}
+\text{MSE}(x, y) = \frac{1}{N} \sum_{i=1}^N (x_i - y_i)^2
+\end{equation}
 
-\sweExpl{Vilken viktig litteratur och
-  (forsknings-)artiklar har du studerat inom området (litteraturstudie)? }
+While simple to compute, MSE does not always correlate well with perceived image quality.
 
-\section{Major background area 1}
-\sweExpl{Viktigt bakgrundsområde 1}
-There are xxx characteristics that distinguish yyy from other information and communication technology (ICT) system, as shown in Figure~\ref{fig:lotsofstars}. Table \ref{tab:tablecaracteristics} summarizes these characteristics.
+\subsection{Structural Similarity Index (SSIM)}
+SSIM \cite{wang2004image} better aligns with human perception by considering structural information:
+\begin{equation}
+\text{SSIM}(x, y) = \frac{(2\mu_x\mu_y + C_1)(2\sigma_{xy} + C_2)}{(\mu_x^2 + \mu_y^2 + C_1)(\sigma_x^2 + \sigma_y^2 + C_2)}
+\end{equation}
 
- 
-\begin{figure}[!ht]
-  \begin{center}
-    \includegraphics[width=0.5\textwidth]{figures/lots_of_stars.png}
-  \end{center}
-  \caption{Lots of stars  (Inspired by Figure x.y on page z of [xxx])}
-  \label{fig:lotsofstars}
-\end{figure}
-\sweExpl{Massor av stärnor (Inspirerad av figur x.y på sidan z i [xxx])}
+where $\mu_x$, $\mu_y$ are means, $\sigma_x$, $\sigma_y$ are standard deviations, $\sigma_{xy}$ is the covariance, and $C_1$, $C_2$ are constants to avoid instability.
 
+\subsection{Peak Signal-to-Noise Ratio (PSNR)}
+PSNR measures the ratio between the maximum possible power of a signal and the power of corrupting noise:
+\begin{equation}
+\text{PSNR}(x, y) = 10 \cdot \log_{10}\left(\frac{\text{MAX}_I^2}{\text{MSE}(x, y)}\right)
+\end{equation}
 
-\begin{table}[!ht]
-  \begin{center}
-    \caption{xxx characteristics}
-    \label{tab:tablecaracteristics}
-    \begin{tabular}{l|S[table-format=4.6]} % <-- Alignments: 1st column left, 2nd middle, with vertical lines in between
-      \textbf{Characteristics} & \textbf{Description}\\
-      $\alpha$ & $\beta$ \\
-      \hline
-      1 & 1110.1\\
-      2 & 10.1\\
-      3 & 23.113231\\
-    \end{tabular}
-  \end{center}
-\end{table}
-\sweExpl{Egenskaper}
-\sweExpl{Beskrivning}
+where $\text{MAX}_I$ is the maximum possible pixel value.
 
-\subsection{Subarea 1.1}
-Entangled states are an important part of quantum cryptography, but also relevant in other domains. This concept might be relevant for neutrinos, see for example \cite{kim_small-mass_2016}.
+\section{Available Chest X-ray Datasets}
+Several large datasets of chest radiographs are available, though none provide the raw transmission maps:
+\begin{itemize}
+    \item \textbf{CheXpert} \cite{irvin2019chexpert}: Over 200,000 images from Stanford Hospital, with labels for 14 different pathologies
+    \item \textbf{MIMIC-CXR} \cite{johnson2019mimic}: Over 377,000 chest radiographs from Beth Israel Deaconess Medical Center
+    \item \textbf{Open-i} \cite{demner2016preparing}: A collection from the National Library of Medicine with associated radiology reports
+    
+    \item \textbf{PLCO} \cite{gohagan2000prostate}: From the Prostate, Lung, Colorectal and Ovarian Cancer Screening Trial
+\end{itemize}
 
-\subsection{Subarea 1.1.2}
-Computational methods are increasingly used as a third method of carrying out
-scientific investigations. For example, computational experiments were used to
-find the amount of wear in a polyethylene liner of a hip prosthesis in \cite{maguire_jr_new_2014}.
-…
+None of these datasets report radiography hardware specifications or processing parameters, making the inverse problem challenging.
 
-\subsection{Subarea 1.1.2}
-Using the nearest data center may improve performance, see \cite{bogdanov_nearest_2015}
+\section{Related Work}
+\subsection{Digital Radiography Processing}
+Digital radiography processing has evolved from simple unsharp masking to sophisticated multiscale techniques. \cite{prokop2003principles} provides a comprehensive overview of the principles used in clinical systems, while \cite{stahl2000digital} details the nonlinear multiscale approach now common in commercial systems.
 
+\subsection{Inverse Problems in Medical Imaging}
+While image recovery from processed versions has been studied in photography \cite{moran2020deeptone}, similar work in medical imaging is limited. Most related work focuses on denoising, deblurring, or super-resolution rather than recovering physically meaningful quantities like transmission maps \cite{jin2017deep}.
 
-\subsection{Link layer Encapsulation}
-\label{sec:llencap}
+\subsection{Low-Cost X-ray Imaging}
+Several initiatives aim to develop affordable X-ray systems for resource-limited settings. The World Health Organization's specifications for basic radiographic systems \cite{who2014specifications} guide such efforts. \cite{mollura2010radiology} highlights the critical need for affordable diagnostic imaging in developing countries.
 
-See Figure~\ref{fig:ieee8023-data-packet} which uses the \textsf{bytefield}  \LaTeX\ package. 
-
-
-\begin{figure}[!ht]
-	\centering
-\begin{bytefield}{21}
-\bitbox[]{7}{} & \bitbox[]{3}{\tiny octets:} & \bitbox[]{4}{\tiny 6} & \bitbox[]{4}{\tiny 6} & \bitbox[]{3}{\tiny 2} & \bitbox[]{5}{\tiny 46 to 1500} & \bitbox[]{3}{\tiny 0 to 46} & \bitbox[]{2}{\tiny 4}\\ 
-
-\bitbox[]{8}{\textbf{ETHERNET \\[-1ex] \tiny{data link-layer}}} & \bitbox[]{2}{} & 
-
-\bitbox{4}{\tiny Destination Address} & \bitbox{4}{\tiny Source Address} & \bitbox{3}{\tiny Length/ Type} & 
-\bitbox{5}{\tiny Data Payload} & \bitbox{3}{\tiny Padding} &
-\bitbox{2}{\tiny CRC} \\
-
-\bitbox[]{1}{} &\bitbox[]{3}{\tiny octets:} & \bitbox[]{4}{\tiny 7} & \bitbox[]{2}{\tiny 1} & \bitbox[]{0}{$\vdots$ \\[1ex]} & \bitbox[]{16}{} & \bitbox[]{0}{$\vdots$ \\[1ex]} & \bitbox[]{5}{} & \bitbox[]{4}{\tiny Variable}\\
-
-\bitbox[]{4}{\textbf{MAC \\[-1ex] \tiny{packet}}} & \colorbitbox{lightgray}{4}{\tiny Preamble} & \colorbitbox{lightgray}{2}{\tiny SFD} & \colorbitbox{lightgray}{16}{\tiny MAC Client Data} & \colorbitbox{lightgray}{3}{\tiny Padding} &
-\colorbitbox{lightgray}{2}{\tiny CRC} & \colorbitbox{lightgray}{4}{\tiny Extension}
-\end{bytefield}
-     \caption{Ethernet data link layer protocol encapsulated into a IEEE~802.3 MAC packet}
-     \label{fig:ieee8023-data-packet}
-\end{figure}
-
-\subsection{IP packet headers}
-\label{sec:ipheaders}
-The data link layer will receive a packet from the IP layer. The layout of
-an IPv4 packet is shown in Figure~\ref{fig:ipv4-header}. This should be
-contrasted with the IPv6 header shown in Figure~\ref{fig:ipv6-header}.
-
-%
-% IPv4 packet header
-%
-\begin{figure}[!ht]
-	\centering
-\begin{bytefield}{32}
-\bitheader{0-31} \\
-\bitbox{4}{\footnotesize{Version}} & \bitbox{4}{IHL} & \bitbox{6}{\tiny{Type of Service}} & \bitbox{2}{{\scriptsize ECN}} \bitbox{16}{Total Length}\\
-\bitbox{16}{Identification} & \bitbox{3}{Flags} & \bitbox{13}{Fragment Offset}\\
-\bitbox{8}{Time to Live} & \bitbox{8}{Protocol} & \bitbox{16}{Header Checksum}\\
-\wordbox{1}{Source Address}\\
-\wordbox{1}{Destination Address}\\
-\colorbitbox{lightgray}{24}{Options} & \colorbitbox{lightgray}{8}{Padding}
-\end{bytefield}
-     \caption[IPv4 datagram header]{IPv4 datagram header. Light grey-colored fields are optional.}
-    \label{fig:ipv4-header} 
-\end{figure}
-
-%
-% IPv6 packet header
-%
-\begin{figure}[!ht]
-	\centering
-\begin{bytefield}{32}
-\bitheader{0-31} \\
-\bitbox{4}{\footnotesize{Version}} & \bitbox{8}{Traffic Class} & \bitbox{20}{Flow Label}\\
-\bitbox{16}{Payload Length} & \bitbox{8}{Next Header} & \bitbox{8}{Hop Limit}\\
-\wordbox{4}{Source Address}\\
-\wordbox{4}{Destination Address}\\
-\end{bytefield}
-     \caption{IPv6 datagram header}
-    \label{fig:ipv6-header}
-\end{figure}
-
-\subsection{Test for accessibility of formulas}
-
-As can be seen in these equations:
-$c=2 \cdot \pi \cdot r$ or \[ \int_{a}^{b} x^2 \,dx \] a chemical formula: $(C_5O_2H_8)_n$
-...
-\section{Major background area 2}\sweExpl{Viktigt bakgrundsområde 2}
-...
-\subsection{\glsentryshort{WLAN} Security}% you can't use the \gls() command in a heading - but you can get the short (\glsentryshort) or long version (\glsentryshort) or \glsentrylong or even the text entry (\glsentrytext) and then there is no problem - see https://tex.stackexchange.com/questions/198140/glossaries-and-custom-section-headings-broken
-
-\subsection{Network layer security}
-...
-
-\section{Related work area}\sweExpl{Relaterade arbeten}
-
-
-\subsection{Major related work 1}\sweExpl{Relaterade arbeten 1}
-Carrier clouds have been suggested as a way to reduce the delay between the users and the cloud server that is providing them with content. However, there is a question of how to find the available resources in such a carrier cloud. One approach has been to disseminate resource information using an extension to OSPF-TE, see Roozbeh, Sefidcon, and Maguire \cite{roozbeh_resource_2013}.
-
-
-\subsection{Major related work n}\sweExpl{Relaterade arbeten}
-
-\subsection{Minor related work 1}\sweExpl{Mindre relaterat arbete 1}
-
-
-…
-\subsection{Minor related work n}\sweExpl{Mindre relaterat arbete n}
-
-
-\section{Summary}\sweExpl{Sammanfattning}
-\sweExpl{Det är trevligt om detta kapitel
-  avslutas med en sammanfattning. Till exempel kan du inkludera en tabell som
-  sammanfattar andras idéer och fördelar och nackdelar med varje - så som
-  senare kan du jämföra din lösning till var och en av dessa. Detta kommer
-  också att hjälpa dig att definiera de variabler som du kommer att använda
-  för din utvärdering.}
-
-\engExpl{It is nice to have this chapter conclude with a summary. For
-  example, you can include a table that summarizes other people's ideas and
-  benefits and drawbacks with each - so as later you can compare your solution
-  to each of them. This will also help you define the variables that you will
-  use for your evaluation.}
-
-\cleardoublepage
+\section{Summary}
+The background presented establishes the foundation for our approach to transmission map recovery. We understand the physics of X-ray transmission, the typical processing steps applied in digital radiography, and the mathematical framework for tackling the inverse problem. Our approach leverages advanced optimization techniques, appropriate regularization, and insights from the literature on digital radiography processing to recover physically plausible transmission maps from processed images.
 \chapter{Method}
-\label{ch:methods}
 
-% \generalExpl{This chapter is about Engineering-related
-%   content, Methodologies and Methods.  Use a self-explaining title.\\The
-%   contents and structure of this chapter will change with your choice of
-%   methodology and methods.}
-% \generalExpl{Describe the engineering-related contents (preferably with models) and the research methodology and methods that are used in the degree project.\\
-% Give a theoretical description of the scientific or engineering methodology  you are going to use and why have you chosen this method. What other methods did you consider and why did you reject them?\\
-% In this chapter, you describe what engineering-related and scientific skills you are going to apply, such as modeling, analyzing, developing, and evaluating engineering-related and scientific content. The choice of these methods should be appropriate for the problem. Additionally, you should be conscious of aspects relating to society and ethics (if applicable). The choices should also reflect your goals and what you (or someone else) should be able to do as a result of your solution - which could not be done well before you started.}
+\section{Mathematical Model}
+This master's thesis explores a general model for recovering X-ray transmission maps from processed images:
 
-The purpose of this chapter is to provide an overview of the research method
-used in this thesis. Section~\ref{sec:researchProcess} describes the research
-process. Section~\ref{sec:researchParadigm} details the research
-paradigm. Section~\ref{sec:dataCollection} focuses on the data collection
-techniques used for this research. Section~\ref{sec:experimentalDesign}
-describes the experimental design. Section~\ref{sec:assessingReliability}
-explains the techniques used to evaluate the reliability and validity of the
-data collected. Section~\ref{sec:plannedDataAnalysis} describes the method
-used for the data analysis. Finally, Section~\ref{sec:evaluationFramework}
-describes the framework selected to evaluate xxx.
+Let us define:
+\begin{itemize}
+    \item $N$ as the size of the image dataset
+    \item $Y = \{ y_{1}, y_{2}, \dots, y_{N} \}$ as the set of processed chest X-ray images
+    \item $X = \{x_{1}, x_{2}, \dots, x_{N}\}$ as the corresponding set of unknown transmission maps
+    \item $\theta$ as the parameters that govern the image processing operator
+    \item $F(X, \theta)$ as the known, parameterized operator that maps transmission maps $X$ to the domain of $Y$
+\end{itemize}
 
-% \sweExpl{Vilka vetenskaplig eller ingenjörs-metodik ska du använda och varför har du valt den här metoden. Vilka andra metoder gjorde du övervägde du och varför du avvisar dem.
-% Vad är dina mål? (Vad ska du kunna göra som ett resultat av din lösning - vilken inte kan göras i god tid innan du började)
-% Vad du ska göra? Hur? Varför? Till exempel, om du har implementerat en artefakt vad gjorde du och varför? Hur kommer du utvärdera den.
-% Syftet med detta kapitel är att ge en översikt över forsknings metod som
-% används i denna avhandling. Avsnitt~\ref{sec:researchProcess} beskriver forskningsprocessen. Avsnitt~\ref{sec:researchParadigm} beskriver forskningsparadigmen detaljerat. Avsnitt~\ref{sec:dataCollection} fokuserar på datainsamlingstekniker som används för denna forskning. Avsnitt~\ref{sec:experimentalDesign} beskriver experimentell
-% design. Avsnitt~\ref{sec:assessingReliability} förklarar de tekniker som används för att utvärdera
-% tillförlitligheten och giltigheten av de insamlade uppgifterna. Avsnitt~\ref{sec:plannedDataAnalysis}
-% beskriver den metod som används för dataanalysen. Slutligen, Avsnitt~\ref{sec:evaluationFramework}
-% beskriver ramverket som valts för att utvärdera xxx.\\
-% Ofta kan man koppla ett antal följdfrågor till undersökningsfrågan och problemlösningen t ex\\
-% (1) Vilken process skall användas för konstruktion av lösningen och vilken process skall kopplas till denna för att svara på undersökningsfrågan?\\
-% (2) Hur och vilket resultat (storheter) skall presenteras både för att redovisa svar på undersökningsfrågan (resultatkapitlet i denna rapport) och redovisa resultat av problemlösningen (prototypen, ofta dokument som bilagor men vilka dokument och varför?).\\
-% (3) Vilken teori/teknik skall väljas och användas både för undersökningen (taxonomi, matematik, grafer, storheter mm)  och  problemlösning (UML, UseCases, Java mm) och varför?\\
-% (4) Vad behöver du som student leverera för att uppnå hög kvaliet (minimikrav) eller mycket hög kvalitet på examensarbetet?\\
-% (5) Frågorna kopplar till de följande underkapitlen.\\
-% (6) Resonemanget bygger på att studenter på hing-programmet ofta skall konstruera något åt problemägaren och att man till detta måste koppla en intressant ingenjörsfråga. Det finns hela tiden en dualism mellan dessa aspekter i exjobbet.
-% }
+The general problem to solve can be modeled as the optimization problem:
 
-\section{Research Process}
-\label{sec:researchProcess}
+\begin{equation}
+\min_{X, \theta} \ell(Y, F(X, \theta)) + \lambda R(X)
+\end{equation}
 
-Figure~\ref{fig:researchprocess} shows the steps conducted to carry out this research. 
+where $\ell$ is a loss function measuring the discrepancy between the processed versions of our estimated transmission maps and the observed processed images, $R$ is a regularization term applied to $X$, and $\lambda$ controls the weight of regularization.
 
-\generalExpl{Example of using customized item labels.}
-Some steps in the process:
-\begin{enumerate}[leftmargin=*, label=\textbf{Step \arabic*}, ref=Step \arabic*] %labelindent=1em for indent
-    \itemsep0em
-    \item \label{x:s1} plan experiment,
-    \item \label{x:s2} conduct experiment,
-    \item \label{x:s3} analyze data from the experiment, and
-    \item \label{x:s4} discuss the results of the analysis.
-\end{enumerate}   
+\section{Data Collection}
+Our method utilizes several data sources:
+\begin{itemize}
+    \item \textbf{Chest phantoms}: Provide some ground truth for validation
+    \item \textbf{CheXpert dataset}: Large collection of processed chest X-rays
+    \item \textbf{Segmentation datasets}: Used to identify anatomical regions for applying physics-based constraints
+\end{itemize}
 
+We note that unlike supervised learning approaches, our method does not require train/test splits since we are solving an unsupervised inverse problem for each image independently.
 
-\section{Research Paradigm}
-\label{sec:researchParadigm}
-% \sweExpl{Undersökningsparadigm\\
-% Exempelvis\\
-% Positivistisk (vad/hur fungerar det?) kvalitativ fallstudie med en deduktivt (förbestämd) vald ansats och ett induktivt(efterhand uppstår dataområden och data) insamlade av data och erfarenheter.}
+\section{Analysis of Transmission Map Properties}
+To constrain our solution space, we analyze properties of transmission maps:
+\begin{itemize}
+    \item \textbf{Value range}: Transmission values must lie between 0 and 1
+    \item \textbf{Anatomical constraints}: Different tissues have characteristic ranges of attenuation values
+    \item \textbf{Spatial coherence}: Transmission values generally vary smoothly except at tissue boundaries
+    \item \textbf{Histogram characteristics}: Transmission maps typically show multi-modal distributions corresponding to different tissue types
+\end{itemize}
 
+\section{Forward Operator Models}
+Based on our literature review of digital radiography processing, we model the forward operator $F$ as a composition of several transformations:
 
-\section{Data Collection and Preprocessing}
-\label{sec:dataCollection}
+\begin{equation}
+F = F_n \circ F_{n-1} \circ \cdots \circ F_1
+\end{equation}
 
-\begin{description}
-    \item[Transmission Maps] There is a limited amount 
-    of real samples taken 
-    \item[Diagnostic chest X-ray images] For the development of 
-    the framework, the input data consists of images taken from 
-    the CheXpert dataset \cite{chexpert} and NIH Chest X-ray dataset \cite{nih}.
-    \item[Segmentation] For the implementation of segmentation-based regularizations, 
-    ChestXDet \cite{chestxdet}, an existing segmentation model was used to obtain segmentation 
-    labels. Concretely, the segmentation model identifies 13 categories: Atelectasis, 
-    Calcification, Cardiomegaly, Consolidation, Diffuse Nodule, Effusion, Emphysema, 
-    Fibrosis, Fracture, Mass, Nodule, Pleural Thickening, Pneumothorax. These labels represent 
-    smaller structures in the chest anatomy, and can be grouped according to similar expected 
-    attenuation coefficients. For the model, these groups are considered.
-\end{description}
+where the component transformations include:
+\begin{itemize}
+    \item \textbf{Negative logarithm}: $F_1(x) = -\log(x + \epsilon)$, where $\epsilon$ is a small constant to avoid numerical issues
+    \item \textbf{Windowing}: $F_2(x) = \frac{1}{1+e^{-(x-c)/w}}$, with center $c$ and width $w$
+    \item \textbf{Range normalization}: $F_3(x) = \frac{x - \min(x)}{\max(x) - \min(x)}$
+    \item \textbf{Unsharp masking}: $F_4(x) = x + \alpha \cdot (x - G_\sigma * x)$, where $G_\sigma$ is a Gaussian kernel with standard deviation $\sigma$
+    \item \textbf{Clipping}: $F_5(x) = \min(\max(x, 0), 1)$
+\end{itemize}
 
-\begin{table}[]
-    \centering
-    \begin{tabular}{l l}
-        \textbf{Group name} & \textbf{Grouped labels} \\
-        \hline
-        Bone &  Left Clavicle\\
-            & Right Clavicle \\
-            & Left Scapula\\
-            &Right Scapula\\
-            &Spine \\
-        \hline
-        Lung &  Left Lung \\
-            & Right Lung \\
-            & Left Hilus Pulmonis \\
-            & Right Hilus Pulmonis \\
-        \hline
-        Soft tissue &  Heart \\
-        & Aorta \\
-        & Mediastinum \\
-        & Facies Diaphragmatica \\
-        & Weasand
-    \end{tabular}
-    \caption{Segmentation category groups}
-    \label{tab:segmentation_groups}
-\end{table}
+The parameter vector $\theta$ includes all parameters of these transformations, such as $\{c, w, \alpha, \sigma\}$.
 
-% TODO: Change this ref
-\ref{sec:implementationDetails} 
+\section{Optimization Approach}
+\subsection{Loss Function Design}
+We employ a composite loss function:
+\begin{equation}
+\ell(Y, F(X, \theta)) = \ell_{MSE}(Y, F(X, \theta))
+\end{equation}
 
+where $\ell_{MSE}$ is the mean squared error:
+\begin{equation}
+\ell_{MSE}(Y, F(X, \theta)) = \frac{1}{N} \sum_{i=1}^N \|y_i - F(x_i, \theta)\|_2^2
+\end{equation}
 
-\section[Experimental design/Planned Measurements]{Experimental design and\\Planned Measurements}
-\label{sec:experimentalDesign}
-\sweExpl{Experimentdesign/Mätuppställning}
+\subsection{Regularization Terms}
+We incorporate several regularization terms:
+\begin{equation}
+R(X) = R_{TV}(X) + R_{seg}(X)
+\end{equation}
 
-\subsection{Test environment/test bed/model}
-\engExpl{Describe everything that someone else would need to reproduce your test environment/test bed/model/… .}
-\sweExpl{Testmiljö/testbädd/modell\\
-Beskriv allt att någon annan skulle behöva återskapa din testmiljö / testbädd / modell / …}
+where:
+\begin{itemize}
+    \item $R_{TV}(X)$ is the total variation regularization that promotes piece-wise smoothness while preserving edges
+    \item $R_{seg}(X)$ incorporates physics-based constraints derived from anatomical segmentation
+\end{itemize}
 
-\subsection{Hardware/Software to be used}
-\sweExpl{Hårdvara / programvara som ska användas}
+\subsection{Algorithmic Variants}
+We explore two main variants of our approach:
+\begin{itemize}
+    \item \textbf{Model A: Per-batch optimization} - Finding a single set of parameters $\theta$ that works well for a batch of images
+    \item \textbf{Model B: Per-image optimization} - Optimizing both $x_i$ and $\theta$ for each image individually
+\end{itemize}
 
+\subsection{Optimization Procedure}
+We employ the JAX-based optimization framework with the following steps:
+\begin{enumerate}
+    \item Initialize $X$ and $\theta$ with reasonable values
+    \item Compute forward process $F(X, \theta)$
+    \item Calculate loss and gradients
+    \item Update parameters using Adam optimizer
+    \item Apply projection to enforce constraints on $X$ and $\theta$
+    \item Repeat until convergence or maximum iterations
+\end{enumerate}
 
-\section{Assessing reliability and validity of the data collected}
-\label{sec:assessingReliability}
-\sweExpl{Bedömning av validitet och reliabilitet hos använda metoder och insamlade data }
+\section{Evaluation Methodology}
+We evaluate our method using several metrics:
+\begin{itemize}
+    \item \textbf{Image quality metrics}: SSIM, PSNR between reconstructed processed images and originals
+    \item \textbf{Forward reconstruction error}: MSE between $F(X, \theta)$ and $Y$
+    \item \textbf{Physics compliance}: How well the recovered maps adhere to physical constraints
+    \item \textbf{Visual assessment}: Qualitative evaluation by medical imaging experts
+\end{itemize}
 
+For the limited cases where ground truth is available (e.g., from phantoms), we also calculate direct error metrics on the recovered transmission maps.
+\chapter{Implementation}
 
-\subsection{Validity of method}
-\label{sec:validtyOfMethod}
-\sweExpl{Giltigheten av metoder\\
-  Har dina metoder gett dig de rätta svaren och lösningarna? Var metoderna korrekta?}
+\section{Software Architecture}
+Our implementation is structured as a Python package with the following components:
+\begin{itemize}
+    \item \textbf{Data loading and preprocessing}: Modules for handling datasets and preparing images
+    \item \textbf{Forward operators}: Differentiable implementations of radiographic processing steps
+    \item \textbf{Optimization core}: JAX-based optimization framework with automatic differentiation
+    \item \textbf{Regularization functions}: Total variation and other constraints
+    \item \textbf{Evaluation metrics}: Functions for assessing reconstruction quality
+    \item \textbf{Visualization utilities}: Tools for displaying and analyzing results
+\end{itemize}
 
-\engExpl{How will you know if your results are valid?}
-\engExpl{Remember that validity is about the \textit{accuracy} of a measurement while reliability is about the \textit{consistency} of the measurement values under the same conditions (\ie repeatability).}
+The code is built using JAX for efficient optimization with automatic differentiation and GPU acceleration.
 
-\subsection{Reliability of method}
-\label{sec:reliabilityOfMethod}
-\sweExpl{Tillförlitlighet av för metoder\\
-Hur bra är dina metoder, finns det bättre metoder? Hur kan du förbättra dem?}
-\engExpl{How will you know if your results are reliable?}
+\section{JAX-Based Optimization Framework}
+Our implementation is built around JAX \cite{jax2018github}, which significantly influenced our design decisions and approach to the optimization problem.
 
-\subsection{Data validity}
-\label{sec:dataValidity}
-\sweExpl{Giltigheten av uppgifter\\
-Hur vet du om dina resultat är giltiga? Är ditt resultat rättvisande?}
+\subsection{Automatic Differentiation Requirements}
+JAX's automatic differentiation capabilities require all operations in the forward model to be differentiable. This constraint directly impacted our design:
 
-\subsection{Reliability of data}
-\label{sec:reliabilityOfData}
-\sweExpl{Tillförlitlighet av data\\
-Hur vet du om dina resultat är tillförlitliga? Hur bra är dina resultat?}
-
-
-\section{Planned Data Analysis}
-\label{sec:plannedDataAnalysis}
-\sweExpl{Metod för analys av data}
-
-
-\subsection{Data Analysis Technique}
-\label{sec:dataAnalysisTechnique}
-\sweExpl{Dataanalysteknik}
-
-\subsection{Software Tools}
-\label{sec:softwareTools}
-\sweExpl{Mjukvaruverktyg}
-
-
-\section{Evaluation framework}
-\label{sec:evaluationFramework}
-\sweExpl{Utvärdering och ramverk\\
-Metod för utvärdering, jämförelse mm. Kopplar till kapitel~\ref{ch:resultsAndAnalysis}.}
-
-\section{System documentation}
-\label{sec:systemDocumentation}
-\sweExpl{Systemdokumentation\\
-Med vilka dokument och hur skall en konstruerad prototyp dokumenteras? Detta blir ofta bilagor till rapporten och det som problemägaren till det ursprungliga problemet (industrin) ofta vill ha.\\
-Bland dessa bilagor återfinns ofta, och enligt någon angiven standard, kravdokument, arkitekturdokument, designdokumnet, implementationsdokument, driftsdokument, testprotokoll mm.}
-\generalExpl{If this is going to be a complete document consider putting it in as an appendix, then just put the highlights here.}
-
-
-\cleardoublepage
-\chapter{What you did}\engExpl{Choose your own chapter title to describe this}
-\label{ch:whatYouDid}
-\sweExpl{[Vad gjorde du? Hur gick det till? – Välj lämplig rubrik (“Genomförande”, “Konstruktion”, ”Utveckling”  eller annat]}
-
-
-\engExpl{What have you done? How did you do it? What design decisions did you make? How did what you did help you to meet your goals?}
-\sweExpl{Vad du har gjort? Hur gjorde du det? Vilka designval gjorde du?\\
-Hur kom det du hjälpte dig att uppnå dina mål?}
-
-% the following sets the TOC entry to break after the & - note you have to include the first letter of the following word as it get swolled by the \texorpdfstring{}{} processing
-\section[Hardware/Software design …/Model/Simulation model \&\texorpdfstring{\\}{ p} parameters/…]{Hardware/Software design …/Model/Simulation model \& parameters/…}
-\sweExpl{Hårdvara / Mjukvarudesign ... / modell / Simuleringsmodell och parametrar / …}
-
-Figure~\ref{fig:homepageicon} shows a simple icon for a home page. The time
-to access this page when served will be quantified in a series of
-experiments. The configurations that have been tested in the test bed are
-listed in Table~\ref{tab:configstested}. In \SI{7.0}{\percent} of cases, there was an error indicating xxxxx.
-
-\sweExpl{Figur~\ref{fig:homepageicon}  visar en enkel ikon för en hemsida. Tiden för att få tillgång till den här sidan när den laddas kommer att kvantifieras i en serie experiment. De konfigurationer som har testats i provbänk listas ini tabell~\ref{tab:configstested}.\\
-Vad du har gjort? Hur gjorde du det? Vilka designval gjorde du?}
- 
-\begin{figure}[!ht]
-  \begin{center}
-    \includegraphics[width=0.25\textwidth]{figures/Homepage-icon.png}
-  \end{center}
-  \caption{Homepage icon}
-  \label{fig:homepageicon}
-\end{figure}
-
-\begin{table}[!ht]
-  \begin{center}
-    \caption{Configurations tested}
-    \label{tab:configstested}
-    \resizebox{\columnwidth}{!}{%
-    \begin{tabular}{l|c} % <-- Alignments: 1st column left, 2nd middle and 3rd right, with vertical lines in between
-      \textbf{Configuration} & \textbf{Description} \\
-      \hline
-      1 & Simple test with one server\\
-      2 & Simple test with one server\\
-    \end{tabular}
-    }
-  \end{center}
-\end{table}
-\sweExpl{Testade konfigurationer}
-
-\section{Implementation …/Modeling/Simulation/…}
-\label{sec:implementationDetails}
-\sweExpl{Implementering … / modellering / simulering / …}
-
-Two commonly used simulators are:
-\begin{description}[labelwidth =\widthof{\textbf{ns-2 or ns-3 simulator}}, leftmargin = !]
-    \item[\textbf{Mininet}] This simulator uses traffic control (\texttt{tc}) to simulate network devices connected by links with specific bandwidth, packet loss rates, qdisc methods, etc.
+\begin{itemize}
+    \item \textbf{Smooth approximations}: We replaced non-differentiable operations with differentiable approximations. For example, we use sigmoid functions instead of hard thresholds.
     
+    \item \textbf{Avoiding discontinuities}: Operations like rounding or thresholding were avoided in favor of continuous alternatives.
     
-    \item[\textbf{ns-2 or ns-3 simulator}] These simulators are very useful for simulating wireless communication links between moving devices. You can specify the mobility patterns of the nodes.
-\end{description}
+    \item \textbf{Epsilon terms}: Small constants were added to prevent numerical instabilities:
+    \begin{lstlisting}[language=Python]
+    def negative_log(image, eps=1e-6):
+        return -jnp.log(jnp.maximum(image, eps))
+    \end{lstlisting}
+\end{itemize}
 
-\subsection{Some examples of coding}
-\engExpl{This section is simply to show some example of how you can include code in your thesis - this is not a section you would have in your thesis.}
-\sweExpl{Det här avsnittet är helt enkelt för att visa ett exempel på hur du kan inkludera kod i ditt examensarbete - det här är inte ett avsnitt du skulle ha i ditt examensarbete.}
+\subsection{Vectorization and Performance Optimization}
+JAX's vectorization capabilities allowed us to efficiently process batches of images:
 
-Listing~\ref{lst:helloWorldInC} shows an example of a simple program written
-in C code.
+\begin{lstlisting}[language=Python]
+# Create a vectorized version of our forward function
+batched_forward = jax.vmap(forward, in_axes=(0, None))
 
-\begin{lstlisting}[language={C}, caption={Hello world in C code}, label=lst:helloWorldInC]
-int main() {
-printf("hello, world");
-return 0;
+# Create a vectorized version of our loss function
+def get_batch_mean_loss(unbatched_loss, in_axes=(0, None, 0, 0), **vmap_args):
+    def loss_fn(*args):
+        batched_loss = jax.vmap(unbatched_loss, in_axes=in_axes, **vmap_args)
+        loss_val = batched_loss(*args)
+        return jnp.mean(loss_val)
+    return loss_fn
+\end{lstlisting}
+
+\subsection{Pure Function Requirements}
+JAX requires pure functions without side effects, influencing our implementation:
+
+\begin{itemize}
+    \item \textbf{Immutable state}: All state changes are handled through function returns rather than in-place modifications.
+    \item \textbf{Deterministic operations}: Random operations use explicitly managed PRNG keys:
+    \begin{lstlisting}[language=Python]
+    key = jax.random.PRNGKey(hyperparams["PRNGKey"])
+    txm0 = jax.random.uniform(
+        key, minval=minval, maxval=maxval, shape=batch_shape
+    )
+    \end{lstlisting}
+\end{itemize}
+
+\section{Data Loading and Preprocessing}
+\subsection{CheXpert Dataset Handler}
+We implemented a dataloader for the CheXpert dataset, focusing on frontal chest radiographs:
+
+\begin{lstlisting}[language=Python, caption=CheXpert dataset loader implementation]
+def load_chexpert(
+    root_dir: str,
+    df_meta_path: str | None = None,
+    img_dir: str | None = None,
+    chexpert_version: str = "240401",
+    limit: int | None = None
+) -> list[ChexpertMeta]:
+    df_meta_path = (
+        df_meta_path
+        if df_meta_path is not None
+        else os.path.join(root_dir, f"df_chexpert_plus_{chexpert_version}.csv")
+    )
+    img_dir = img_dir if img_dir is not None else os.path.join(root_dir, "PNG")
+
+    df_meta_path = os.path.abspath(df_meta_path)
+    img_dir = os.path.abspath(img_dir)
+
+    df_meta = pd.read_csv(df_meta_path)
+    df_meta = df_meta[df_meta["frontal_lateral"] == "Frontal"]
+
+    images: list[ChexpertMeta] = []
+
+    for idx, row in df_meta.iterrows():
+        img_path = f"{img_dir}/{row['path_to_image']}"
+        patient_id = str(row["deid_patient_id"])
+
+        if not os.path.exists(img_path):
+            # chexpert csv reporting jpgs instead of pngs
+            img_path = img_path.replace(".jpg", ".png")
+            if not os.path.exists(img_path):
+                continue
+
+        if limit and len(images) >= limit:
+            break
+
+        img_label = img_path.split("/")[-1]
+        study = img_path[img_path.find("study") :][:6]
+
+        images.append(
+            {
+                "image": cv2.imread(img_path, cv2.IMREAD_UNCHANGED) / 255.0,
+                "image_path": img_path,
+                "patient_id": patient_id,
+                "study": study,
+                "image_label": img_label,
+            }
+        )
+
+    return images
+\end{lstlisting}
+
+\subsection{Image Preprocessing}
+Images are preprocessed to ensure consistent dimensions and value ranges:
+
+\begin{lstlisting}[language=Python, caption=Image preprocessing function]
+def preprocess_chexpert_batch(
+    images, target_size=(512, 512)
+) -> Float[Array, "batch rows cols"]:
+    """
+    Preprocess a batch of CheXpert images with NumPy.
+
+    Args:
+        images: Batch of images with shape (batch_size, height, width) or (batch_size, height, width, channels)
+        target_size: Target size (height, width) for all images
+
+    Returns:
+        Batch of preprocessed images with consistent dimensions
+    """
+    return np.array([center_crop_with_aspect_ratio(img, target_size) for img in images])
+\end{lstlisting}
+
+\section{Forward Operators Implementation}
+We implemented several operators to model the post-processing pipeline used in digital radiography, ensuring all operations are differentiable for compatibility with JAX:
+
+\begin{lstlisting}[language=Python, caption=Core forward operators]
+def negative_log(image: Float[Array, "rows cols"], eps=1e-6):
+    return -jnp.log(jnp.maximum(image, eps))
+
+def windowing(image, window_center, window_width, gamma):
+    x = image
+    x = (x - window_center) / window_width
+    x = jax.nn.sigmoid(x) ** gamma
+    return x
+
+def unsharp_masking(image, sigma, enhance_factor):
+    x = jnp.expand_dims(image, axis=2)
+    kernel_size = 2 * sigma
+    blurred = gaussian_blur(x, sigma, kernel_size, padding="SAME")
+    x = (x - enhance_factor * blurred) / (1.0 - enhance_factor)
+    return x.squeeze()
+
+def clipping(image):
+    return jnp.clip(image, 0.0, 1.0)
+
+def range_normalize(image):
+    x = image
+    return (x - x.min()) / (x.max() - x.min())
+\end{lstlisting}
+
+\section{Optimization Core}
+The core optimization function implements gradient descent with support for various optimizers and regularization terms. The optimization process leverages JAX's automatic differentiation to efficiently compute gradients:
+
+\begin{lstlisting}[language=Python, caption=Base optimization function]
+def base_optimize(
+    target: BatchT,
+    txm0: BatchT,
+    w0: WeightsT,
+    loss_fn: LossFnT,
+    forward_fn: ForwardFnT,
+    project_fn: ProjectFnT | None = None,
+    optimizer_builder=optax.adam,
+    constant_weights=False,
+    lr=0.001,
+    n_steps=500,
+    loss_logger=None,
+    eps=1e-8,
+) -> OptimizationRetT:
+    def loss_call(weights, tx_maps, target):
+        pred = forward_fn(tx_maps, weights)
+        loss = loss_fn(tx_maps, weights, pred, target)
+
+        if loss_logger:
+            loss_logger(loss.item(), tx_maps, weights, pred, target)
+
+        assert pred.shape == target.shape, (
+            f"Shapes do not match: {pred.shape} != {target.shape}"
+        )
+
+        return loss
+
+    optimizer = optimizer_builder(learning_rate=lr)
+    state = (txm0, w0)
+    opt_state = optimizer.init(state)
+    losses = []
+    prev_state = (None, None)
+
+    def update(state, opt_state, target):
+        original_state = (state, opt_state)
+        tx_maps, weights = state
+
+        loss_value_and_grad = jax.value_and_grad(loss_call, argnums=(0, 1))
+        loss, (weight_grads, tx_grads) = loss_value_and_grad(weights, tx_maps, target)
+        grads = (tx_grads, weight_grads)
+
+        updates, new_opt_state = optimizer.update(grads, opt_state)
+        updates_txm, updates_weights = updates
+
+        txm_new_state = optax.apply_updates(tx_maps, updates_txm)
+        weights_new_state = weights
+        if not constant_weights:
+            weights_new_state = optax.apply_updates(weights, updates_weights)
+
+        new_state = (txm_new_state, weights_new_state)
+        if project_fn:
+            new_state = project_fn(txm_new_state, weights_new_state)
+
+        if jnp.isnan(loss):
+            new_state, new_opt_state = original_state
+
+        return loss, new_state, new_opt_state
+
+    for step in range(n_steps):
+        if step > 2 and jnp.abs(losses[-1] - losses[-2]) < eps:
+            wandb.log({"convergence_steps": step})
+            print(f"Converged after {step} steps")
+            break
+
+        loss, state, opt_state = update(state, opt_state, target)
+        losses.append(loss)
+
+        if jnp.isnan(loss):
+            state, loss = prev_state
+            print("Loss is NaN. Last loss:", loss)
+            break
+
+        if step % 100 == 0:
+            print(f"\nStep {step}, Loss: {loss:.6f}")
+
+        prev_state = (state, loss)
+
+    if state is None:
+        return None, losses
+
+    return state, losses
+\end{lstlisting}
+
+\section{Constraint Enforcement}
+We use Optax's projection operators to enforce constraints while maintaining differentiability:
+
+\begin{lstlisting}[language=Python, caption=Projection function for constraint enforcement]
+def projection(txm_state, weights_state):
+    new_txm_state = optax.projections.projection_hypercube(txm_state)
+    new_weights_state = optax.projections.projection_non_negative(weights_state)
+    new_weights_state["low_sigma"] = optax.projections.projection_box(
+        weights_state["low_sigma"], 0.1, 10
+    )
+    new_weights_state["low_enhance_factor"] = optax.projections.projection_box(
+        new_weights_state["low_enhance_factor"], 0.1, 1.0
+    )
+    return new_txm_state, new_weights_state
+\end{lstlisting}
+
+\section{Loss Functions and Metrics}
+We implemented several loss functions and metrics for evaluation:
+
+\begin{lstlisting}[language=Python, caption=Loss functions and metrics]
+def mse(pred, target):
+    return jnp.mean((pred - target) ** 2)
+
+def total_variation(image):
+    reg = (jnp.diff(image, axis=0) ** 2).mean() + (jnp.diff(image, axis=1) ** 2).mean()
+    return 0.5 * reg
+
+def ssim(x, y, L=1.0):
+    C1 = (0.01 * L) ** 2
+    C2 = (0.03 * L) ** 2
+
+    mu_x = jnp.mean(x)
+    mu_y = jnp.mean(y)
+
+    sigma_x = jnp.mean((x - mu_x) ** 2)
+    sigma_y = jnp.mean((y - mu_y) ** 2)
+    sigma_xy = jnp.mean((x - mu_x) * (y - mu_y))
+
+    num = (2 * mu_x * mu_y + C1) * (2 * sigma_xy + C2)
+    den = (mu_x**2 + mu_y**2 + C1) * (sigma_x + sigma_y + C2)
+
+    return jnp.clip(num / den, 0.0, 1.0)
+\end{lstlisting}
+
+\section{Hyperparameter Search Configuration}
+We use Weights \& Biases for hyperparameter search:
+
+\begin{lstlisting}[language=Python, caption=Hyperparameter sweep configuration]
+sweep_config = {
+    "name": "unknown-transform-sweep-v2",
+    "method": "bayes",
+    "metric": {"name": "mse", "goal": "minimize"},
+    "parameters": {
+        "lr": {"min": 1e-5, "max": 1e-1},
+        "n_steps": {"values": [500, 700, 1200]},
+        "total_variation": {"values": [0.0, 0.1, 0.01, 0.001]},
+        "PRNGKey": {"values": [0, 42]},
+        "tm_distribution": {"values": ["uniform", "normal"]},
+        "tm_init_range": {
+            "values": [
+                (1e-6, 0.1),
+                (1e-6, 0.5),
+                (1e-6, 1.0),
+                (0.5, 1.0),
+            ]
+        },
+        # Fixed/metadata parameters
+        "loss": {"value": "MSE + TV"},
+        "initialization": {"value": "uniform random"},
+        "window_center_init_range": {"value": [0.1, 0.9]},
+        "window_width_init_range": {"value": [0.1, 0.9]},
+        "gamma_init_range": {"value": [0.1, 3.0]},
+        "eps": {"value": 1e-6},
+    },
 }
 \end{lstlisting}
 
-\engExpl{This template uses the package \texttt{lstlistings} for many different listings. Alternatively, one could use the \texttt{minited} package together with the \texttt{listings} environment, see, for example, \href{https://www.overleaf.com/learn/latex/Code_Highlighting_with_minted}{Code Highlighting with minted}. }
+\section{Experimental Setup}
+Our experiments are configured to explore different models and hyperparameters:
 
-In contrast, Listing~\ref{lst:programmes} is an example of code in Python to
-get a list of all of the programs at KTH. Note that on {\DTMsetdatestyle{iso}\DTMdisplaydate{2025}{6}{1}{-1}} the KOPPS API will no longer work.
-\engExpl{Note that the change to the iso date format was done in a group so that afterwards the date style returns to what it was, resulting in \DTMdisplaydate{2025}{6}{1}{-1}.}
+\begin{itemize}
+    \item \textbf{Known vs. Unknown Transformation}: We compare scenarios where the forward transformation is known versus when it must be inferred
+    \item \textbf{Single vs. Batch Processing}: We evaluate optimizing for individual images versus batches
+    \item \textbf{Regularization Strength}: We vary the total variation regularization parameter
+    \item \textbf{Initialization Strategies}: We test different initialization methods for the transmission maps
+\end{itemize}
 
-\lstset{extendedchars=true}  %% This allows character codes in the range 128-255
-\begin{lstlisting}[language={Python}, caption={Using a python program to
-    access the KTH API to get all of the programs at KTH}, label=lst:programmes]
-KOPPSbaseUrl = 'https://www.kth.se'
-
-def v1_get_programmes():
-    global Verbose_Flag
-    #
-    # Use the KOPPS API to get the data
-    # note that this returns XML
-    url = "{0}/api/kopps/v1/programme".format(KOPPSbaseUrl)
-    if Verbose_Flag:
-        print("url: " + url)
-    #
-    r = requests.get(url)
-    if Verbose_Flag:
-        print("result of getting v1 programme: {}".format(r.text))
-    #
-    if r.status_code == requests.codes.ok:
-        return r.text           # simply return the XML
-    #
-    return None
-\end{lstlisting}
-\FloatBarrier
-
-In \Cref{lst:exampleUsingMinted}, line \ref{listinline:ExcelWriter} shows the use of the \texttt{ExcelWriter} function. Line \ref{listinline:UsingToexcel} writes a panda dataframe (named \texttt{comp}) to the spreadsheet, while line \ref{listinline:closingWriter} closes the open spreadsheet.
-
-\begin{listing}[!ht]
-\begin{minted}[linenos,breaklines, escapeinside=||]{python}
-import pandas as pd
-def make_spreadsheet_of_differences(pds):
-    global school
-    publishers=set()
-    writer = pd.ExcelWriter(f'/tmp/{school}_compare_duplicates.xlsx', engine='xlsxwriter') |\label{listinline:ExcelWriter}|
-    print("starting")
-    for idx, p in enumerate(pds):
-        p0=list(p)[0]
-        p1=list(p)[1]
-        print(f"\nfor {p0} and {p1}")
-        comp, publisher1, publisher2=compare_two_records_silent(p0, p1)
-        sheet_name=f'{p0}'.split(':')[1]
-        print(f'Wrote {sheet_name=}')|\label{listinline:UsingToexcel}|
-        comp.to_excel(writer, sheet_name=sheet_name)
-        publishers.add(publisher1)
-        publishers.add(publisher2)
-    
-    # Close the Pandas Excel writer and output the Excel file.
-    writer.close()|\label{listinline:closingWriter}|
-    print(f"{publishers=}")
-    return publishers
-\end{minted}
-\caption{Example of using \texttt{minted} with python code}
-\label{lst:exampleUsingMinted}
-\end{listing}
-
-\FloatBarrier
-
-
-\subsection{Some examples of figures in tikz}
-\engExpl{This section is simply to show some example of how you can draw your own figures for in your thesis - this is not a section you would have in your thesis.}
-\sweExpl{Det här avsnittet är helt enkelt för att visa ett exempel på hur du kan rita dina egna figurer i ditt examensarbete – det här är inte ett avsnitt du skulle ha i ditt examensarbete.}
-
-\Needspace*{5\baselineskip}
-These figures are just some examples to show that you can draw your own figures for your thesis. This has two advantages: \first you do not have to worry about copyrights -- as these are your own figures and \Second the text is now readable and not simply a picture of text -- so screen readers can read the figure's contents to someone who is listening to the contents of your thesis.
-
-\subsubsection{Azure's Form Recognizer}
-\Cref{fig:processAnInvoice} shows the processing of key-value extraction from a PDF document using Azure's Form Recognizer. 
-
-\tikzset{
-    processBox/.style={rectangle, rounded corners, minimum width=3cm, minimum height=1cm,text centered, font=\sffamily, draw=black, fill=red!20},
-    largeBox/.style={rectangle, rounded corners, minimum width=3cm, minimum height=4cm,text centered, draw=black}
-}
-\begin{figure}[!ht]
-\resizebox{1.1\textwidth}{!}{%
-\begin{tikzpicture}
-[align=left,node distance=2cm]
-
-\node (document) [tape,tape bend top=none,draw,font=\sffamily] {PDF\\Document};
-\node (GDM) [processBox,  right=0.5cm of document] {OCR};
-\node (OCRoutput) [largeBox, right=1cm of GDM] {OCR output};
-
-\node (kvp) [tape,tape bend top=none,draw,font=\sffamily, below=0.25cm of OCRoutput.north] {key-value\\pairs};
-\node (entities) [tape,tape bend top=none,draw,font=\sffamily, above=0.35cm of OCRoutput.south] {Entities};
-\node (Manual) [processBox, right=1cm of kvp] {Analyze the extracted\\key-value pairs};
-\draw [-latex](document) --  (GDM);
-\draw [-latex](kvp) --  (Manual);
-\path[ draw
-     , -latex'] let \p1=(GDM.east), \p2=(kvp.west) in (GDM.east) -- +(0.25*\x2-0.25*\x1, \y1) -- +(0.5*\x2-0.5*\x1, \y2) -- (kvp.west);
-\path[ draw
-     , -latex'] let \p1=(GDM.east), \p2=(kvp.west), \p3=(entities.west) in (GDM.east) --  +(0.25*\x2-0.25*\x1, \y1) -- +(0.5*\x3-0.5*\x1, \y3) -- (entities.west);
-\end{tikzpicture}
-}
-\caption{The processing of key-value extraction from a PDF document using Azure's Form Recognizer}
-  \label{fig:processAnInvoice}
-\end{figure}
-\FloatBarrier
-\subsubsection{Hyper-V with Containers}
- \Cref{fig:hyperVcontainers} shows how Hyper-V deals with containers.
- 
- \tikzset{
-    container/.style={rectangle, rounded corners, minimum width=2cm, minimum height=1cm,text centered, draw=black, fill=blue!20},
-    containerization/.style={rectangle, rounded corners, minimum width=13.25cm, minimum height=1cm,text centered, draw=black, fill=blue!20},
-    hypervisor/.style={rectangle, rounded corners, minimum width=13.25cm, minimum height=1cm,text centered, draw=black, fill=red!20},
-    os/.style={rectangle, rounded corners, minimum width=13.25cm, minimum height=1cm,text centered, draw=black, fill=orange!20},
-    guestos/.style={rectangle, rounded corners, minimum width=2cm, minimum height=1cm,text centered, draw=black, fill=orange!40},
-    infrastructure/.style={rectangle, rounded corners, minimum width=13.25cm, minimum height=1cm,text centered, draw=black, fill=green!20},
-    hos/.style={rectangle, rounded corners, minimum width=6cm, minimum height=1cm,text centered, draw=black, fill=orange!20},
-    kernel/.style={rectangle, rounded corners, minimum width=6cm, minimum height=1cm,text centered, draw=black, fill=purple!20},
-    services/.style={rectangle, rounded corners, minimum width=3cm, minimum height=1cm,text centered, draw=black, fill=pink!20]}
-}
-
-\begin{figure}[ht!]
-    \centering
-\resizebox{1\textwidth}{!}{%
-\begin{tikzpicture}
-[align=center,node distance=2cm]
-
-\node (Infrastructure) [infrastructure, text width=13cm, text centered] {Infrastructure};
-\node (OS1) [hos, anchor=north west, align=left, above=1.5cm of Infrastructure.north west, anchor=north west, text width=6cm, text centered] {Host OS};
-
-\node (OS2) [hos, anchor= west, align=left, right=0.5cm of OS1.east, text width=6cm, anchor= west, text centered] {Host OS};
-
-\node (Kernel1) [kernel, anchor=north west, align=left, above=1.5cm of OS1.north east, anchor=north east, text width=3cm, text centered] {Kernel};
-
-\node (Kernel2) [kernel, anchor=north west, align=left, above=1.5cm of OS2.north east, anchor=north east, text width=3cm, text centered] {Kernel};
-
-\node (ServiceA) [container, anchor=east, above=1 cm of Kernel1.east, anchor=east] {Services};
-\node (AppA) [container,  left=0.25cm of ServiceA] {App 1};
-
-\node (ServiceB) [container, anchor=east, above=1 cm of Kernel2.east, anchor=east] {Services};
-\node (AppB) [container,  left=0.25cm of ServiceB] {App 2};
-%\node (AppC) [container,  right=0.25cm of AppB] {App 3};
-
-\draw[black,thick,dashed] ($(OS2.north west)+(-0.3,3.75)$)  rectangle ($(OS2.south east)+(0.5,-0.3)$);
-\node[text width=5cm, text=red, above=0.1cm of ServiceB] 
-    {\textbf{Container}};
-
-\draw[red,thick,dotted] ($(Kernel2.north west)+(-0.3,1.6)$)  rectangle ($(Kernel2.south east)+(0.3,-0.3)$);
-\node[text width=5cm, text=black, above=0.8cm of ServiceB] 
-    {\textbf{VM}};
-\end{tikzpicture}
-}
-    \caption{Hyper-V with containers}
-    \label{fig:hyperVcontainers}
-\end{figure}
-\FloatBarrier
-\subsubsection{\glsfmtshort{VM} versus Containers}
-\Cref{fg:vmsVersusContainers} shows a comparison of virtual machines (VMs) versus containers.
-
-\begin{figure*}[ht!]
-    \centering
-    \begin{subfigure}[t]{0.5\textwidth}
-        \centering
-\resizebox{1\textwidth}{!}{%
-\begin{tikzpicture}
-[align=left,node distance=2cm]
-
-\node (AppA) [container,align=left] {App 1};
-\node (AppB) [container,  right=0.25cm of AppA] {App 2};
-\node (AppC) [container,  right=0.25cm of AppB] {App 3};
-
-\node (GosA) [guestos,align=left,  below=0.25cm of AppA.south west,anchor=north west] {Guest OS};
-\node (GosB) [guestos,  right=0.25cm of GosA] {Guest OS};
-\node (GosC) [guestos,  right=0.25cm of GosB] {Guest OS};
-
-\draw [decoration={brace,amplitude=0.5em},decorate, ultra thick,gray, transform canvas={xshift = 0.5cm}]
-       (AppC.north -| AppC.east) -- (GosC.south -| AppC.east);
-\node[text width=5cm,  right=1cm of GosC.north east] 
-    {\textbf{VMs}};
-
-\node (Hypervisor) [hypervisor, anchor=north west, align=left, below=0.25cm of GosA.south west, anchor=north west, text width=13cm, text centered] {Hypervisor};
-
-\node (OS) [os, anchor=north west, align=left, below=0.25cm of Hypervisor.south west, anchor=north west, text width=13cm, text centered] {Host OS};
-
-\node (Infrastructure) [infrastructure, anchor=north west, align=left, below=0.25cm of OS.south west, anchor=north west, text width=13cm, text centered] {Infrastructure};
-
-
-\end{tikzpicture}
-}
-        \caption{VM}
-    \end{subfigure}%
-    ~ 
-    \begin{subfigure}[t]{0.5\textwidth}
-        \centering
-        \resizebox{1\textwidth}{!}{%
-\begin{tikzpicture}
-[align=left,node distance=2cm]
-
-\node (AppA) [container,align=left] {App 1};
-\node (AppB) [container,  right=0.25cm of AppA] {App 2};
-\node (AppC) [container,  right=0.25cm of AppB] {App 3};
-\node[text width=5cm,  right=0.25cm of AppC] 
-    {\textbf{Apps running in Containers}};
-
-
-\node (Containerization) [containerization, anchor=north west, align=left, below=0.25cm of AppA.south west, anchor=north west, text width=13cm, text centered] {Docker Engine};
-
-\node (OS) [os, anchor=north west, align=left, below=0.25cm of Containerization.south west, anchor=north west, text width=13cm, text centered] {Host OS};
-
-\node (Infrastructure) [infrastructure, anchor=north west, align=left, below=0.25cm of OS.south west, anchor=north west, text width=13cm, text centered] {Infrastructure};
-
-
-\end{tikzpicture}
-}
-        \caption{Containers}
-    \end{subfigure}
-    \caption{Virtual machines (VMs) versus Containers}
-    \label{fg:vmsVersusContainers}
-\end{figure*}
-
-\cleardoublepage
+Each experiment is run with multiple random seeds to ensure robustness, and results are logged to Weights \& Biases for analysis.
 \chapter{Results and Analysis}
 \label{ch:resultsAndAnalysis}
 \sweExpl{svensk: Resultat och Analys}
