@@ -56,6 +56,8 @@
 \disablepackage{transparent}{}
 \fi
 
+
+
 %% The template is designed to handle a thesis in English or Swedish
 % set the default language to english or swedish by passing an option to the documentclass - this handles the inside title page
 % To optimize for digital output (this changes the color palette add the option: digitaloutput
@@ -65,10 +67,12 @@
 %\documentclass[swedish, biblatex]{kththesis}
 % if pdflatex \usepackage[utf8]{inputenc}
 
+\usepackage{todonotes}
+
 %% Conventions for todo notes:
 % Informational
 %% \generalExpl{Comments/directions/... in English}
-\newcommand*{\generalExpl}[1]{\todo[inline]{#1}}                
+\newcommand*{\generalExpl}[1]{\todo[inline]{#1}}
 
 % Language-specific information (currently in English or Swedish)
 \newcommand*{\engExpl}[1]{\todo[inline, backgroundcolor=kth-lightgreen40]{#1}} %% \engExpl{English descriptions about formatting}
@@ -175,7 +179,7 @@ morekeywords={begin, todo, textbf, textit, texttt}
     bookmarksopen=false,    % Do not automatically open the bookmarks in the PDF reading program
     pdfpagemode=UseNone,    % None, UseOutlines, UseThumbs, or FullScreen
     destlabel,              % better naming of destinations
-    pdfencoding=auto,       % for unicode in 
+    pdfencoding=auto,       % for unicode in
     ]{hyperref}
     \makeatletter
     \ltx@ifpackageloaded{attachfile2}{
@@ -274,7 +278,7 @@ nopostdot]{glossaries}
 \input{lib/pdf_related_includes}
 
 
-% the custom colors and the commands are defined in defines.tex    
+% the custom colors and the commands are defined in defines.tex
 \hypersetup{
 	colorlinks  = true,
 	breaklinks  = true,
@@ -300,7 +304,7 @@ nopostdot]{glossaries}
 
 %
 % The commands below are to configure JSON listings
-% 
+%
 % format for JSON listings
 \colorlet{punct}{red!60!black}
 \definecolor{delim}{RGB}{20,105,176}
@@ -446,7 +450,7 @@ Choice of typeface with \textbackslash textit, \textbackslash textbf, and \textb
 
 Text superscripts and subscripts with \textbackslash textsubscript and \textbackslash textsuperscript: A\textsubscript{x} and A\textsuperscript{x}.
 
-Some symbols that you might find useful are available, such as: \textbackslash textregistered, \textbackslash texttrademark, and \textbackslash textcopyright. For example, 
+Some symbols that you might find useful are available, such as: \textbackslash textregistered, \textbackslash texttrademark, and \textbackslash textcopyright. For example,
 the copyright symbol: \textbackslash textcopyright Maguire 2022 results in \textcopyright Maguire 2022. Additionally, here are some examples of text superscripts (which can be combined with some symbols): \textbackslash textsuperscript\{99m\}Tc, A\textbackslash textsuperscript\{*\}, A\textbackslash textsuperscript\{\textbackslash textregistered\}, and A\textbackslash texttrademark resulting in \textsuperscript{99m}Tc, A\textsuperscript{*}, A\textsuperscript{\textregistered}, and A\texttrademark. Two examples of subscripts are: H\textbackslash textsubscript\{2\}O and CO\textbackslash textsubscript\{2\} which produce  H\textsubscript{2}O and CO\textsubscript{2}.
 
 You can use simple environments with begin and end: itemize and enumerate and within these use instances of \textbackslash item.
@@ -480,7 +484,7 @@ the IEEE Taxonomy ({\small \url{https://www.ieee.org/publications/services/thesa
   \item Spell out acronyms and abbreviations.
   \item Avoid "stop words" - as they generally carry little or no information.
   \item List your keywords separated by commas (``,'').
-\end{itemize}    
+\end{itemize}
 Since you should have both English and Swedish keywords - you might think of ordering the keywords in corresponding order (\ie, so that the n\textsuperscript{th} word in each list correspond) - this makes it easier to mechanically find matching keywords.
 \end{abstract}
 \cleardoublepage
@@ -497,7 +501,7 @@ swe
 % Om du skriver din avhandling på svenska ska detta göras först (och placera det som det första abstraktet) - och du bör revidera det vid behov.}
 
 % ----- EXPLANATION -----
-% \engExpl{If you are writing your thesis in English, you can leave this until the draft version that goes to your opponent for the written opposition. In this way, you can provide the English and Swedish abstract/summary information that can be used in the announcement for your oral presentation.\\If you are writing your thesis in English, then this section can be a summary targeted at a more general reader. However, if you are writing your thesis in Swedish, then the reverse is true – your abstract should be for your target audience, while an English summary can be written targeted at a more general audience.\\This means that the English abstract and Swedish sammnfattning  
+% \engExpl{If you are writing your thesis in English, you can leave this until the draft version that goes to your opponent for the written opposition. In this way, you can provide the English and Swedish abstract/summary information that can be used in the announcement for your oral presentation.\\If you are writing your thesis in English, then this section can be a summary targeted at a more general reader. However, if you are writing your thesis in Swedish, then the reverse is true – your abstract should be for your target audience, while an English summary can be written targeted at a more general audience.\\This means that the English abstract and Swedish sammnfattning
 % or Swedish abstract and English summary need not be literal translations of each other.}
 
 % \warningExpl{Do not use the \textbackslash glspl\{\} command in an abstract that is not in English, as my programs do not know how to generate plurals in other languages. Instead, you will need to spell these terms out or give the proper plural form. In fact, it is a good idea not to use the glossary commands at all in an abstract/summary in a language other than the language used in the \texttt{acronyms.tex file} - since the glossary package does \textbf{not} support use of more than one language.}
@@ -568,7 +572,7 @@ We would like to thank xxxx for having yyyy.
 \acknowlegmentssignature
 
 \fancypagestyle{plain}{}
-\renewcommand{\chaptermark}[1]{ \markboth{#1}{}} 
+\renewcommand{\chaptermark}[1]{ \markboth{#1}{}}
 \tableofcontents
   \markboth{\contentsname}{}
 
@@ -671,7 +675,7 @@ X-ray transmission through matter follows Beer's Law, which describes how the in
 I = I_0 e^{-\mu x}
 \end{equation}
 
-where $I_0$ is the incident intensity and $\mu$ is the linear attenuation coefficient of the material \cite{cullity2014elements}. 
+where $I_0$ is the incident intensity and $\mu$ is the linear attenuation coefficient of the material \cite{cullity2014elements}.
 
 For heterogeneous materials like the human body, the equation becomes an integral along the beam path:
 
@@ -712,7 +716,7 @@ Digital radiography systems apply various processing steps to the raw transmissi
         \item Histogram analysis of pixel values within the collimated region
         \item Linear mapping to exclude input values where the histogram is (close to) zero
     \end{enumerate}
-    
+
     \item \textbf{Gradational Adjustment}: Applies lookup tables to optimize contrast for different anatomical regions. Theoretical optimums like the Kanamori curve \cite{kanamori1966determination} have been proposed, but many radiologists prefer sigmoid-shaped curves that more closely match the appearance of conventional radiographs.
 \end{itemize}
 
@@ -917,7 +921,7 @@ Several large datasets of chest radiographs are available, though none provide t
     \item \textbf{CheXpert} \cite{irvin2019chexpert}: Over 200,000 images from Stanford Hospital, with labels for 14 different pathologies
     \item \textbf{MIMIC-CXR} \cite{johnson2019mimic}: Over 377,000 chest radiographs from Beth Israel Deaconess Medical Center
     \item \textbf{Open-i} \cite{demner2016preparing}: A collection from the National Library of Medicine with associated radiology reports
-    
+
     \item \textbf{PLCO} \cite{gohagan2000prostate}: From the Prostate, Lung, Colorectal and Ovarian Cancer Screening Trial
 \end{itemize}
 
@@ -935,37 +939,110 @@ Several initiatives aim to develop affordable X-ray systems for resource-limited
 
 \section{Summary}
 The background presented establishes the foundation for our approach to transmission map recovery. We understand the physics of X-ray transmission, the typical processing steps applied in digital radiography, and the mathematical framework for tackling the inverse problem. Our approach leverages advanced optimization techniques, appropriate regularization, and insights from the literature on digital radiography processing to recover physically plausible transmission maps from processed images.
+
 \chapter{Method}
 
 \section{Mathematical Model}
-This master's thesis explores a general model for recovering X-ray transmission maps from processed images:
 
-Let us define:
+
+For this thesis project, a family of methods \todo{is this the right term} are explored to recover transmission maps under the lack of prior knowledge about the ground truth, and the
+diversity of black-box models that are used in practice to process radiographic images. The motivations \todo{can we say this?} driving the design of the methods can be summarized as follows:
+
 \begin{itemize}
-    \item $N$ as the size of the image dataset
-    \item $Y = \{ y_{1}, y_{2}, \dots, y_{N} \}$ as the set of processed chest X-ray images
-    \item $X = \{x_{1}, x_{2}, \dots, x_{N}\}$ as the corresponding set of unknown transmission maps
-    \item $\theta$ as the parameters that govern the image processing operator
-    \item $F(X, \theta)$ as the known, parameterized operator that maps transmission maps $X$ to the domain of $Y$
+    \item If all images are processed to match a same visual profile \todo{cite DIP paper or reference to section}, we could model all black boxes using a single,
+        although parameterized, image processing algorithm.
+    \item If we recover an appropriate forward model (image processing algorithm) \todo{express forward model and image processing are synonims}, we can reconstruct a
+        'realistic' transmission map from the processed images.
 \end{itemize}
 
-The general problem to solve can be modeled as the optimization problem:
+Given the previous knowledge, we can formulate a general optimization problem using the following notation:
+
+\begin{itemize}
+    \item $N$ as the size of the image dataset.
+    \item $d$ is the number of parameters of the image processing operator.
+    \item $r, c$ as the fixed row and columns in pixels, respectively, of all images in the dataset.
+    \item $Y = \{ y_1, y_2, \dots, y_N \}, y_i \in [0, 1]^{r, c}$ is the given set of processed X-ray images.
+    \item $X=\{x_{1}, x_{2}, \dots, x_{N}\} $ as the corresponding set of unknown transmission maps, with $x_i \in [0,1]^{r,c}$ for all $i \in \{1,2,\dots,N\}$. \todo{Image formal notation?}
+    \item $F:[0,1]^{r, c} \times \mathbb{R}^d \to [0, 1]^{r, c}$ \todo{can we specify domain sets?} as a known image processing algorithm with parameters $\theta \in \mathbb{R}^d$.
+\end{itemize}
+
+Then, we formulate the optimization problem to recover $X$ and $\theta$
 
 \begin{equation}
-\min_{X, \theta} \ell(Y, F(X, \theta)) + \lambda R(X)
+    \min_{X, \theta} \frac{1}{N}\sum_{i=1}^{N} \ell(y_i, F(x_i, \theta)) + \lambda R(X)
 \end{equation}
 
-where $\ell$ is a loss function measuring the discrepancy between the processed versions of our estimated transmission maps and the observed processed images, $R$ is a regularization term applied to $X$, and $\lambda$ controls the weight of regularization.
+where $\ell$ is a loss function measuring the discrepancy between the processed versions of our estimated transmission
+maps and the observed processed images, $R$ is a regularization term applied to $X$, with weights $\lambda$.
 
-\section{Data Collection}
-Our method utilizes several data sources:
-\begin{itemize}
-    \item \textbf{Chest phantoms}: Provide some ground truth for validation
-    \item \textbf{CheXpert dataset}: Large collection of processed chest X-rays
-    \item \textbf{Segmentation datasets}: Used to identify anatomical regions for applying physics-based constraints
-\end{itemize}
+Furthermore, the following concrete models can be considered:
 
-We note that unlike supervised learning approaches, our method does not require train/test splits since we are solving an unsupervised inverse problem for each image independently.
+\begin{description}
+    \item[Known parameters] If we assume there is a known set of parameters for the operator $F$ that can model all the observed processed images, then we get
+    \begin{equation}
+        \min_{X} \frac{1}{N}\sum_{i=1}^{N} \ell(y_i, F(x_i, \theta)) + \lambda R(X)
+    \end{equation}
+    such that $\theta \in \mathbb{R}^d$ is known.
+    \item[Common operator parameters] If we assume that there exists a single set of parameters $\theta$ (yet unknown) for all processed
+    images, i.e. $F(x_i, \theta) = y_i$ for all $i = \{1,\dots,N\}$. Then the problem can be modeled as
+    \begin{equation}
+        \min_{X, \theta} \frac{1}{N}\sum_{i=1}^{N} \ell(y_i, F(x_i, \theta)) + \lambda R(X).
+    \end{equation}
+    \item[Per-image operator parameters] If we assume we can model all the observed processed images with $F$, but not necessarily with the same parameters on an image bases,
+    i.e. $F(x_i, \theta_i) = y_i$ for all $i = \{1,\dots,N\}$, with  $\theta = \{ \theta_1, \theta_2, \dots, \theta_N \}$. Then we aim to solve
+    \begin{equation}
+        \min_{X, \{\theta_i\}_{i=1}^{N}} \frac{1}{N}\sum_{i=1}^{N} \ell(y_i, F(x_i, \theta_i)) + \lambda R(X),
+    \end{equation}
+    where we now have a set of parameters $\theta = \{\theta_1, \theta_2, \dots, \theta_N\} \text{ with }\theta_i \in \mathbb{R}^{d}$.
+\end{description}
+
+
+The method employed in this project involved an iterative process of defining a loss function and regularization, which can be applied to all described model variations,
+and finding a framework that can yield results considered realistic.
+
+\section{Data Collection and Preprocessing}
+\label{sec:dataCollection}
+
+\begin{description}
+    \item[Transmission Maps] There is a limited amount of real samples taken
+
+    \item[Diagnostic chest X-ray images] For the development of the framework, the input data consists of images taken from
+    the CheXpert dataset \cite{chexpert} and NIH Chest X-ray dataset \cite{nih}.
+
+    \item[Segmentation] For the implementation of segmentation-based regularizations,
+    ChestXDet \cite{chestxdet}, an existing segmentation model was used to obtain segmentation
+    labels. Concretely, the segmentation model identifies 13 categories: Atelectasis,
+    Calcification, Cardiomegaly, Consolidation, Diffuse Nodule, Effusion, Emphysema,
+    Fibrosis, Fracture, Mass, Nodule, Pleural Thickening, Pneumothorax. These labels represent
+    smaller structures in the chest anatomy, and can be grouped according to similar expected
+    attenuation coefficients. For the model, these groups are considered.
+\end{description}
+
+\begin{table}[]
+    \centering
+    \begin{tabular}{l l}
+        \textbf{Group name} & \textbf{Grouped labels} \\
+        \hline
+        Bone &  Left Clavicle\\
+            & Right Clavicle \\
+            & Left Scapula\\
+            &Right Scapula\\
+            &Spine \\
+        \hline
+        Lung &  Left Lung \\
+            & Right Lung \\
+            & Left Hilus Pulmonis \\
+            & Right Hilus Pulmonis \\
+        \hline
+        Soft tissue &  Heart \\
+        & Aorta \\
+        & Mediastinum \\
+        & Facies Diaphragmatica \\
+        & Weasand
+    \end{tabular}
+    \caption{Segmentation category groups}
+    \label{tab:segmentation_groups}
+\end{table}
 
 \section{Analysis of Transmission Map Properties}
 To constrain our solution space, we analyze properties of transmission maps:
@@ -1069,9 +1146,9 @@ JAX's automatic differentiation capabilities require all operations in the forwa
 
 \begin{itemize}
     \item \textbf{Smooth approximations}: We replaced non-differentiable operations with differentiable approximations. For example, we use sigmoid functions instead of hard thresholds.
-    
+
     \item \textbf{Avoiding discontinuities}: Operations like rounding or thresholding were avoided in favor of continuous alternatives.
-    
+
     \item \textbf{Epsilon terms}: Small constants were added to prevent numerical instabilities:
     \begin{lstlisting}[language=Python]
     def negative_log(image, eps=1e-6):
@@ -1421,7 +1498,7 @@ The delay has been computed from the time the GET request is received until the 
 
 Table \ref{tab:ping_results} shows the measurement of round trip times from four hosts to and from a server.
 \begin{table}[ht!]
-\caption[RTT for 4 hosts]{Result for the ping measurements of RTT for 4 hosts} 
+\caption[RTT for 4 hosts]{Result for the ping measurements of RTT for 4 hosts}
 \label{tab:ping_results}
 \vspace{1em}
 \centering
@@ -1526,13 +1603,13 @@ Figure \ref{fig:processing_vs_payload_length} shows an example of the performanc
 \caption[A GNUplot figure]{Processing time vs. payload length}\vspace{0.5cm}
 \label{fig:processing_vs_payload_length}
 \end{figure}
-\FloatBarrier		
+\FloatBarrier
 
 Given these measurements, we can calculate our processing bit rate as the inverse of the time it takes to process an additional byte divided by 8 bits per byte:
 
 \[
 	\text{bit rate} = \frac{1}{\frac{\text{time}_{\text{byte}}}{8}} = 20.03 \quad kb/s
-\] 
+\]
 
 \Cref{tab:majorMarkupLMDetailedResult} shows another table in which some values have been set in bold (using \textbackslash B) to emphasize them. Note how the \texttt{S} formatting has been modified so that it considers the weight of the characters and this is able to decimal align even these hold-faced numbers with the numbers in the column above them.
 
@@ -1589,7 +1666,7 @@ rustc 55.01 24.80 11.54 6.16 2.49
             color=black,
             font=\small,
             name=X,
-%            shift={    
+%            shift={
 %                (50pt,25pt)
 %                },
             xshift={50pt},
@@ -1668,7 +1745,7 @@ Förbättringsförslag?}
 \engExpl{Describe the conclusions (reflect on the whole introduction given in Chapter 1).}
 
 
-  
+
 \engExpl{Discuss the positive effects and the drawbacks.\\
 Describe the evaluation of the results of the degree project.\\
 Did you meet your goals?\\
@@ -1732,7 +1809,7 @@ energy required to process each packet while at the same time reducing the
 time required to process each packet.
 
 The thesis contributes to the \gls{UN}\enspace\glspl{SDG} numbers 1 and 9 by
-xxxx. 
+xxxx.
 
 
 
@@ -1775,7 +1852,7 @@ Your reader can access the attached (embedded) files using a PDF tool such as Ad
 
 An argument for including supporting material in the PDF file is that it will be available to anyone who has a copy of the PDF file. As a result, they do not have to look elsewhere for this material. This comes at the cost of a larger PDF file. However, the embedded files are encoded into a compressed stream within the PDF file; thus, reducing the number of additional bytes. For example, the references.bib file that was used in this example is \SI{10617}{\byte} in size but only occupies \SI{4261}{\byte} in the PDF file.
 
-\warningExpl{DiVA is limited to $\approx$\SI{1}{\giga\byte} for each supporting file. If you have very large amounts of supporting material, you will probably want to use one of the data repositories. For additional help with this, contact KTH Library via 
+\warningExpl{DiVA is limited to $\approx$\SI{1}{\giga\byte} for each supporting file. If you have very large amounts of supporting material, you will probably want to use one of the data repositories. For additional help with this, contact KTH Library via
 \href{mailto:researchdata@kth.se}{researchdata@kth.se}.\\As of Spring 2024, there are plans to migrate this supporting data from DiVA to a research data repository.
 }
 
