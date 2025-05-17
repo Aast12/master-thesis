@@ -1,4 +1,4 @@
-\documentclass[examplethesis.tex]{subfiles}
+\documentclass[main.tex]{subfiles}
 \begin{document}
 \ifxeorlua
 \lstdefinestyle{latexExampleForAuthors}{
@@ -78,7 +78,7 @@ Fundamental to the design of the template are several key factors:
 \label{sec:authors}
 One of the hardest problems an author faces is getting started writing, \ie the blank sheet of paper -- empty file barrier. The template provides a \mbox{non-blank} starting point; hence, avoiding the blank paper barrier. Additionally, the template provides some initial structure, basically, an Introduction, Methods, Results, and Discussion (IMRAD) structure, so that there are hints of where to place material. Moreover, there are places (and notes) about material that the student should consider adding; for example, the ``required reflections'' section in the final chapter.
 
-The template (located in the file \texttt{examplethesis.tex}) also provides some examples of commonly occurring types of content, so that one can easily find examples of how to include a figure, table, code listing, \etc. These examples are not meant to be exhaustive and quite often the student will probably need to learn new \LaTeX\  commands in the course of writing their thesis.
+The template (located in the file \texttt{main.tex}) also provides some examples of commonly occurring types of content, so that one can easily find examples of how to include a figure, table, code listing, \etc. These examples are not meant to be exhaustive and quite often the student will probably need to learn new \LaTeX\  commands in the course of writing their thesis.
 
 As an author, the first step is to configure the \LaTeX\  engine that you will use to process the files - see \Cref{sec:latexEngine}. The second step will be to configure the template - see \Cref{sec:authorConfigs}. The third step will be to make sure that the information about you, your supervisor(s), and the examiner are correct in the file \texttt{custom\_configuration.tex} - this information uses the macros described in \Cref{sec:authorMacros}. Now that you have a lot of the administrative details taken care of it is time to start to write - see \Cref{sec:startingToWrite}.
 
@@ -88,17 +88,17 @@ Note that if you are using Overleaf:
     If you have opened the template from a URL, in the upper left-hand corner, click on \textbf{Menu}. Then select \textbf{Copy Project} - this will give you your own private copy.
 
 \item[Use a helpful project name]
-    I suggest you include your name in the project name so that when you share it with your supervisor(s) and examiner, they will know it is your project. 
-\item[Invite your supervisor(s9 and examiner to your project] 
+    I suggest you include your name in the project name so that when you share it with your supervisor(s) and examiner, they will know it is your project.
+\item[Invite your supervisor(s9 and examiner to your project]
     You can invite your supervisor(s) and examiner to your project and they can directly comment on and correct your drafts.
-\item[Log in to Overleaf with your KTH account] 
+\item[Log in to Overleaf with your KTH account]
 If you log in to Overleaf with your KTH account, you get a version of Overleaf that lets you turn on ``Track changes'' which is very useful (particularly if you have invited your supervisor(s) and examiner to join your project). It also gives you a bit more of a time budget to compile (which can be useful if you have a lot of Tikz figures or other things that take a lot of time for the LaTeX engine to render).
 \end{description}
 
 .
 
 
-If you have more detailed questions about the template itself - 
+If you have more detailed questions about the template itself -
 \iflabelexists{ch:READMEnotes}{see \Cref{ch:READMEnotes}.}
 {You have to include the \texttt{README\_notes/README\_notes.tex} file when compiling.}
 
@@ -180,10 +180,10 @@ One of the first things that the author(s) will want to do is add the working ti
 \altsubtitle{Detta är den svenska översättningen av undertiteln}
 % alternative, if the thesis is in Swedish, then give an English title
 %\alttitle{This is the English translation of the title}
-%\altsubtitle{This is the English translation of the subtitle}   
+%\altsubtitle{This is the English translation of the subtitle}
 \end{lstlisting}
 
-Setting these values once and then using them in many places reduces the work to change them while at the same time ensuring consistency. 
+Setting these values once and then using them in many places reduces the work to change them while at the same time ensuring consistency.
 
 Some additional configuration that the author(s) might do is to set the values of the macros related to the course cycle, course code, date of the thesis, number of credits, degree/exam name, subject area, and if the degree is done external to KTH to set the host information (see the file \textit{custom\_configuration.text}). Consider the snippet below for a student admitted to the ``Bachelor's Programme in Information and Communication Technology (TCOMK)'' program and enrolled in the degree project course ``IA150X Degree Project in Information and Communication Technology, First Cycle 15.0 credits'' and working at a company ``Företaget AB'':
 \begin{lstlisting}[style=latexExampleForAuthors]
@@ -415,11 +415,11 @@ As you write you will notice "todo" notes in the template. They follow the follo
 \sweExpl{warnings}
 \end{lstlisting}
 
-If you do not want to see these notes, you can, of course, redefine the above macros to output nothing. If you do not want to see any notes, then add the option \textbf{final} to the \textbackslash documentclass arguments near the top of the file \texttt{examplethesis.tex}.
+If you do not want to see these notes, you can, of course, redefine the above macros to output nothing. If you do not want to see any notes, then add the option \textbf{final} to the \textbackslash documentclass arguments near the top of the file \texttt{main.tex}.
 
 \subsection{Working abstract}
 \label{sec:wrtingFirstAbstract}
-I generally recommend that every student start by writing a working abstract, this will help you keep your focus. To find where you can start to enter your abstract, look in the \texttt{examplethesis.tex} file for the line:
+I generally recommend that every student start by writing a working abstract, this will help you keep your focus. To find where you can start to enter your abstract, look in the \texttt{main.tex} file for the line:
 \begin{lstlisting}[style=latexExampleForAuthors]
 \generalExpl{Enter your abstract here!}
 \end{lstlisting}
@@ -520,9 +520,9 @@ For example, if you are not interested in the Swedish language \texttt{todo} not
 
 \subsection{Removing the README\_notes}
 At some point you will no longer want this README information. You can remove it by removing the line
-\textbackslash include\{README\_notes/README\_notes\} -- from the \textit{examplethesis.tex} file. You can then remove the \textbf{README\_notes} directory.
+\textbackslash include\{README\_notes/README\_notes\} -- from the \textit{main.tex} file. You can then remove the \textbf{README\_notes} directory.
 
-Unless you are an examiner or an administrator you can delete the file: \texttt{README\_notes/README\_examiner\_notes.tex} and delete the include of this file from near the end of the template (\ie \textit{examplethesis.tex}. You can also delete the directory \textbf{README\_notes/README\_examiner-figures}.
+Unless you are an examiner or an administrator you can delete the file: \texttt{README\_notes/README\_examiner\_notes.tex} and delete the include of this file from near the end of the template (\ie \textit{main.tex}. You can also delete the directory \textbf{README\_notes/README\_examiner-figures}.
 
 
 \section[Copyright or Creative Commons License]{Copyright or Creative Commons\\ License}

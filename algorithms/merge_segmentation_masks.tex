@@ -1,0 +1,62 @@
+\begin{algorithm}[htbp]
+\scriptsize
+\SetAlgoLined
+% \DontPrintSemicolon
+\allowdisplaybreaks
+\setlength{\algomargin}{5pt}
+\sloppy
+\KwIn{$pred$ - Batch of prediction masks with shape (batch, labels, height, width)}
+\KwIn{$threshold$ - Optional threshold value}
+\KwOut{$ordered\_groups$ - List of mask group identifiers}
+\KwOut{$exclusive\_masks$ - Array of exclusive masks with shape (batch, reduced\_labels, height, width)}
+
+\BlankLine
+\SetKwFunction{FBatchGetExclusiveMasks}{BatchGetExclusiveMasks}
+\SetKwProg{Fn}{Function}{:}{}
+\Fn{\FBatchGetExclusiveMasks{$pred$, $threshold$}}{
+    $complete\_masks \leftarrow [$ $]$\;
+
+    \ForEach{$group \in \text{MASK\_GROUPS}$}{
+        $group\_mask \leftarrow \text{GetGroupMask}(pred, group, threshold)$\;\\
+        Concatenate on labels axis $group\_mask$ to $complete\_masks$\;
+    }
+
+    \BlankLine
+    $exclusive\_masks \leftarrow \text{Copy}(complete\_masks)$\;
+
+    $groups_count \leftarrow \text{len}(\text{MASK\_GROUPS})$\;
+
+    \tcc{Masks are substracted in specific order, denser groups last}\\
+    \For{$i \leftarrow 0$ \KwTo $groups\_count - 1$}{
+        \For{$j \leftarrow 0$ \KwTo $groups\_count -1$}{
+            \If{$j < i$}{
+                \tcc{Subtract already exclusive masks}
+                $exclusive\_masks[:, i] \leftarrow \text{SubtractMask}($\\
+                \hspace*{2.5cm}$exclusive\_masks[:, i], exclusive\_masks[:, j])$\;
+            }
+            \eIf{$j > i$}{
+                \tcc{Subtract entire masks}
+                $exclusive\_masks[:, i] \leftarrow \text{SubtractMask}($\\
+                \hspace*{2.5cm}$exclusive\_masks[:, i], complete\_masks[:, j])$\;
+            }
+        }
+    }
+    \KwRet{$ordered\_groups, exclusive\_masks$}\;
+}
+
+\BlankLine
+\SetKwFunction{FGetGroupMask}{GetGroupMask}
+\Fn{\FGetGroupMask{$pred$, $group$, $threshold$}}{
+    \tcc{Select only the labels in the group}\\
+    $group\_masks \leftarrow \text{FilterPredMasks}(pred, group)$\;\\
+    $normalized\_masks \leftarrow \text{Sigmoid}(group\_masks)$\;\\
+    \tcc{Indicator function: 1 where condition is true, 0 otherwise}\\
+    $thresholded\_masks \leftarrow \mathbb{1}(normalized\_masks > threshold)$\;\\
+    $joined\_masks \leftarrow \text{sum}(thresholded\_masks, axis=1)$\;\\
+    \KwRet{$\text{clip}(thresholded\_masks, 0.0, 1.0)$}\;
+}
+
+\caption{Algorithms for creating exclusive non-overlapping segmentation masks}
+\label{alg:mergeSegmentationMasks}
+\end{algorithm}
+\vspace{-3mm}

@@ -1,4 +1,4 @@
-%\documentclass[../examplethesis.tex]{subfiles}
+%\documentclass[../main.tex]{subfiles}
 %\begin{document}
 \chapter{DiVA administrator viewpoint}
 \label{ch:adminViewpoint}
@@ -117,7 +117,7 @@ JSON is a standard way of representing structured data as text. An example of th
 \begin{lstlisting}[language=json, numbers=left,
     stepnumber=1, escapechar=|, caption={Text version of the top of the For DIVA output (reformatted to bring out the structure and improve readability - line numbers are added just in the listing)}, label=lst:forDIVAtop]
 {
-"Author1": { 
+"Author1": {
     "Last name": "Student",
     "First name": "Fake A.", |\label{line:firstName}|
     "Local User Id": "u100001",
@@ -185,7 +185,7 @@ Note that the program can be given an argument of either \texttt{\hbox{–-Engli
 
 The number of pages of the preface and body of the document is taken from the result of the page references to the two bookmarks as generated in the “For DIVA” data. One cannot derive this data directly but only by extracting the data from the word/document.xml file (\textit{after} the word processing package has generated the textual representation for these markers – since their values depends upon the layout and pagination of the document).
 
-A major limitation is that this program only supports extracting English and Swedish abstracts (and keywords); hence abstracts in other languages are \textbf{not} extracted. Additionally, the support for HTML markup in the abstracts is limited to paragraphs. 
+A major limitation is that this program only supports extracting English and Swedish abstracts (and keywords); hence abstracts in other languages are \textbf{not} extracted. Additionally, the support for HTML markup in the abstracts is limited to paragraphs.
 
 
 \generalExpl{Should the student submit the \texttt{output.json} file via Canvas (along with their PDF file)?}
@@ -196,11 +196,11 @@ If all you have is a ``PDF using template file'' then one can extract the inform
 \begin{enumerate}
     \item Save the PDF file of the thesis, for example: \texttt{oscar.pdf}
     \item Extract the “For DIVA” information as JSON, as shown in \Cref{lst:AdminextractPseudoJSONFromPDFforOscarFileToJSON}
-    
+
     If acronyms are used in the abstracts, you can add the “--acronyms acronyms.tex” argument to the extract command line and the program will process the acronyms from the acronyms.tex file (this means that you will also need this file). The output of the program is a JSON file (oscar.json) that can subsequently be used to make an announcement.
 \end{enumerate}
 \Needspace*{7\baselineskip}
-\begin{lstlisting}[basicstyle=\footnotesize, language={bash}, caption={Commands to extract pseudo JSON from the PDF file for Oscar}, label=lst:AdminextractPseudoJSONFromPDFforOscarFileToJSON]    
+\begin{lstlisting}[basicstyle=\footnotesize, language={bash}, caption={Commands to extract pseudo JSON from the PDF file for Oscar}, label=lst:AdminextractPseudoJSONFromPDFforOscarFileToJSON]
 ./extract_pseudo_JSON-from\_PDF.py --pdf oscar.pdf --json oscar.json
 ./JSON_to_MODS.py --json oscar.json
 \end{lstlisting}
@@ -208,7 +208,7 @@ If all you have is a ``PDF using template file'' then one can extract the inform
 \generalExpl{Should the student submit the \texttt{xxxx.json} file and possibly the acronyms.text file via Canvas (along with their PDF file)?}
 
 \subsection{TRITA}
-Unless the Office of Student Affairs is going to assign TRITA numbers before the thesis has a cover made, then I think that the Office of Student Affairs has to assign the TRITA number and then \textbf{make and apply the cover}. The current method of making and applying covers before the PDF is submitted to the Office of Student Affairs is foolish and unnecessary. It is easy to specify the TRITA string as an argument when making the MODS file, as shown in \Cref{lst:specifyTRITA}. 
+Unless the Office of Student Affairs is going to assign TRITA numbers before the thesis has a cover made, then I think that the Office of Student Affairs has to assign the TRITA number and then \textbf{make and apply the cover}. The current method of making and applying covers before the PDF is submitted to the Office of Student Affairs is foolish and unnecessary. It is easy to specify the TRITA string as an argument when making the MODS file, as shown in \Cref{lst:specifyTRITA}.
 \begin{lstlisting}[basicstyle=\footnotesize, language={bash}, caption={Command to make a MODS file with a specified TRITA string}, label=lst:specifyTRITA]
 ./JSON_to_MODS.py --json fordiva.json --trita "TRITA-EECS-EX-2021:219"
 \end{lstlisting}
@@ -247,7 +247,7 @@ Note that this program uses the \texttt{ladok3} python library but extends it wi
     breakatwhitespace=true,          % sets if automatic breaks should only happen at whitespace
     breakindent=0em,
     caption={Using the extracted JSON to produce a LADOK entry for a student in the DA231X degree project course}, label=lst:usingExtractedJSONtoProduceLADOKentry1]
-./JSON_to_ladok.py --json xxx.json 
+./JSON_to_ladok.py --json xxx.json
 ...
 author={'Last name': 'xxx', 'First name': 'yyy', 'Local User Id': 'u1xxxx', 'E-mail': 'oxxx@kth.se', 'organisation': {'L1': 'School of Electrical Engineering and Computer Science '}}
 Canvas user_id=dddd

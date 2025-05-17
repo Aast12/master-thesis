@@ -95,7 +95,7 @@
     %\usepackage[language=english,bibstyle=authoryear,citestyle=authoryear, maxbibnames=99]{biblatex}
     % Alternatively you might use another style, such as IEEE and use citestyle=numeric-comp  to put multiple citations in a single pair of square brackets
     \usepackage[style=ieee,citestyle=numeric-comp]{biblatex}
-    \addbibresource{references.bib}
+    \addbibresource{references}
     %\DeclareLanguageMapping{norsk}{norwegian}
 \else
     % The line(s) below are for BibTeX
@@ -943,7 +943,7 @@ The background presented establishes the foundation for our approach to transmis
 \chapter{Method}
 
 \section{Mathematical Model}
-
+\label{sec:mathematicalModel}
 
 For this thesis project, a family of methods \todo{is this the right term} are explored to recover transmission maps under the lack of prior knowledge about the ground truth, and the
 diversity of black-box models that are used in practice to process radiographic images. The motivations \todo{can we say this?} driving the design of the methods can be summarized as follows:
@@ -991,34 +991,63 @@ Furthermore, the following concrete models can be considered:
     \item[Per-image operator parameters] If we assume we can model all the observed processed images with $F$, but not necessarily with the same parameters on an image bases,
     i.e. $F(x_i, \theta_i) = y_i$ for all $i = \{1,\dots,N\}$, with  $\theta = \{ \theta_1, \theta_2, \dots, \theta_N \}$. Then we aim to solve
     \begin{equation}
-        \min_{X, \{\theta_i\}_{i=1}^{N}} \frac{1}{N}\sum_{i=1}^{N} \ell(y_i, F(x_i, \theta_i)) + \lambda R(X),
+        \min_{X, \theta} \frac{1}{N}\sum_{i=1}^{N} \ell(y_i, F(x_i, \theta_i)) + \lambda R(X),
     \end{equation}
     where we now have a set of parameters $\theta = \{\theta_1, \theta_2, \dots, \theta_N\} \text{ with }\theta_i \in \mathbb{R}^{d}$.
 \end{description}
 
 
-The method employed in this project involved an iterative process of defining a loss function and regularization, which can be applied to all described model variations,
-and finding a framework that can yield results considered realistic.
+The method employed in this project involved an iterative process of defining a loss function and regularization,
+which can be applied to all described model variations, and finding a framework that can yield results considered realistic.
+In the following sections, we will discuss the choices made for the functions $F$, $\ell$ and $R$, and how these contribute
+to the reconstruction of transmission maps.
 
 \section{Data Collection and Preprocessing}
 \label{sec:dataCollection}
 
-\begin{description}
-    \item[Transmission Maps] There is a limited amount of real samples taken
 
-    \item[Diagnostic chest X-ray images] For the development of the framework, the input data consists of images taken from
-    the CheXpert dataset \cite{chexpert} and NIH Chest X-ray dataset \cite{nih}.
+\subsection{Transmission Maps}
+To our knowledge, there are currently no open datasets of X-ray transmission maps.
+We had access to, precisely, two images taken from the same chest phantom at the Hard X-ray lab in KTH, one paired with a processed
+image produced by a clinical detector \todo{is it correct to say the image comes from the detector}. Figure \ref{fig:chestPhantomImages} shows the obtained sample pair of transmission map and
+processed image.
+\todo{proper source of the transmission maps}
 
-    \item[Segmentation] For the implementation of segmentation-based regularizations,
-    ChestXDet \cite{chestxdet}, an existing segmentation model was used to obtain segmentation
-    labels. Concretely, the segmentation model identifies 13 categories: Atelectasis,
-    Calcification, Cardiomegaly, Consolidation, Diffuse Nodule, Effusion, Emphysema,
-    Fibrosis, Fracture, Mass, Nodule, Pleural Thickening, Pneumothorax. These labels represent
-    smaller structures in the chest anatomy, and can be grouped according to similar expected
-    attenuation coefficients. For the model, these groups are considered.
-\end{description}
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[t]{0.45\textwidth}
+        \includegraphics[width=\textwidth]{figures/comm_unprocessed_sample.jpg}
+        \caption{Real transmission map.}
+    \end{subfigure}
+    \begin{subfigure}[t]{0.45\textwidth}
+        \includegraphics[width=\textwidth]{figures/comm_processed_sample.jpg}
+        \caption{Processed X-ray image (commercial detector).}
+    \end{subfigure}
+    \caption{Sample pair of images from chest phantom}
+    \label{fig:chestPhantomImages}
+\end{figure}
 
-\begin{table}[]
+
+\subsection{Diagnostic chest X-ray images}
+
+Throughout the experiments, data was collected from the CheXpert dataset
+\cite{chexpert} and NIH Chest X-ray dataset \cite{nih}. The motivation to use these datasets is the diagnostic
+labels they include, which can be tied to the simulated transmission maps. However, these labels are not used for
+the model. \todo{refer to implementation for transformation details}.
+
+\subsection{Segmentation}
+
+For the implementation of segmentation-based regularizations,
+the ChestXDet \cite{chestxdet} model was used to obtain segmentation
+labels. Concretely, the segmentation model identifies 13 categories, which are grouped in 3 groups. These groups and their corresponding
+labels are listed in Table \ref{tab:segmentationGroups}.
+
+The motivation of the selected groups is the similar absorption coefficients among the different body tissues, which
+vary by about 2\% of the dynamic range of an X-ray measurement \todo{maybe the terminology isn't quite right} \cite[p.~34]{epsteinIntroductionMathematicsMedical2008}.
+Thus, if we expect certain ranges of X-ray intensities over different chest regions, these will depend on the absorption coefficients of all tissues transversed.
+It is assumed that the projected intensities can vary significantly across regions where: bones are present, lungs are present (air content), and only soft tissues are transversed \todo{I feel I'm not explaining myself}.
+
+\begin{table}[H]
     \centering
     \begin{tabular}{l l}
         \textbf{Group name} & \textbf{Grouped labels} \\
@@ -1041,8 +1070,30 @@ and finding a framework that can yield results considered realistic.
         & Weasand
     \end{tabular}
     \caption{Segmentation category groups}
-    \label{tab:segmentation_groups}
+    \label{tab:segmentationGroups}
 \end{table}
+
+
+\subsubsection{Mask groups}
+
+To compute the segmentation masks, the ChestXdet model returns confidence values on a 0 to 1 range. To get hard masks, we include in our
+model a threshold parameter. The threshold is used to create binary masks where the values are above it, then the segmentation targets
+are joined according to the groups described in Table \ref{tab:segmentationGroups}. The join operation is performed by taking the logical
+OR of the masks.
+
+Since the mask groups may contain overlapping regions, a difference is applied to obtain exclusive masks. This is done in an ordered manner,
+starting from the groups with higher absorption (bone) up to lower absorption values (lung). This ensures that each pixel is assigned to
+the mask that produces the higher attenuation. The complete merging operation is described in algorithm \ref{alg:mergeSegmentationMasks}. Figure
+\ref{fig:segmentationMasks} shows a sample set of the processed segmentation masks over a CheXpert image using a 0.5 threshold.
+
+\input{algorithms/merge_segmentation_masks.tex}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\textwidth]{figures/segmentation_masks.png}
+    \caption{Segmentation masks}
+    \label{fig:segmentationMasks}
+\end{figure}
 
 \section{Analysis of Transmission Map Properties}
 To constrain our solution space, we analyze properties of transmission maps:

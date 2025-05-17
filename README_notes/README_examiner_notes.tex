@@ -1,4 +1,4 @@
-%\documentclass[../examplethesis.tex]{subfiles}
+%\documentclass[../main.tex]{subfiles}
 %\begin{document}
 \lstdefinestyle{PDF}{
 language=[LaTeX]{TeX},
@@ -95,11 +95,11 @@ An earlier 1\textsuperscript{st} cycle thesis  looked at the automation of enter
 \begin{description}[labelwidth =\widthof{\textbf{Hypothesis}}, leftmargin = !]
 \item[Hypothesis] Incorporating the relevant data into the thesis document will facilitate both announcements and DiVA data entry.
 
-\item[Approach] Make this data readily available via the template and collect \& output it in a 
+\item[Approach] Make this data readily available via the template and collect \& output it in a
 “For DIVA” set of information at the end of the Portable Document Format (PDF) document. Additionally, try to minimize the need to manually enter information by taking information from the Canvas course room.
 \end{description}
 
-Given the hypothesis stated above, the overall flow is shown in \Cref{fig:LogicalOverviewOfWhatIsDone}. 
+Given the hypothesis stated above, the overall flow is shown in \Cref{fig:LogicalOverviewOfWhatIsDone}.
 \tikzset{
     processBox/.style={rectangle, rounded corners, minimum width=3cm, minimum height=1cm,text centered, font=\sffamily, draw=black, fill=red!20},
     destinationBox/.style={rectangle, rounded corners, minimum width=3cm, minimum height=1cm,text centered, draw=black, fill=green!10},
@@ -220,7 +220,7 @@ Canvas sections are a very powerful mechanism for organizing students. A student
 \begin{figure}[!ht]
   \begin{center}
     \small
-    \begin{tabular}{p{9cm} p{2cm}} 
+    \begin{tabular}{p{9cm} p{2cm}}
     XXXXX, XXXXXXX & Student \\
     Maguire Jr, Gerald Quentin & Student \\
     Section for the course DA231X VT22-2 Degree Project in Computer Science and Engineering, Second Cycle & Student \\
@@ -231,7 +231,7 @@ Canvas sections are a very powerful mechanism for organizing students. A student
 \end{figure}
 
 This greatly simplifies the work for the examiner and supervisor as now they can choose to view the gradebook and only need to see their students, as shown in \Cref{fig:examinersViewOfGradebook}.
- 	
+
 \begin{figure}[!ht]
   \begin{center}
     \includegraphics[width=0.99\textwidth]{README_notes/README-examiner-figures/part-of-my-students-Screenshot_20220325_152422-edited.png}
@@ -267,7 +267,7 @@ The grading standard for examiners (and even one for teachers as supervisors) is
 ./insert_teachers_grading_standard.py –-examiners 33514
 \end{lstlisting}
 \else
-\begin{lstlisting}[%language={bash}, 
+\begin{lstlisting}[%language={bash},
   basicstyle=\ttfamily, extendedchars=false,
 caption={insert\_teachers\_grading\_standard.py}, label=lst:insertTeachersGradingStandard]
 ./insert_teachers_grading_standard.py –-examiners 33514
@@ -280,7 +280,7 @@ So clearly we can have information about the student, supervisors (who are teach
 
 \subsection{How can we associate students with examiners and supervisors?}
 In the case of the computer science (CS) students the exjobb coordinator XXXXX\footnote{The person's name has been removed, to avoid issues with GDPR.} has a spreadsheet with the student’s name, working title, examiner, and supervisors in it. It has a sheet named “Closed” that contains information about the students who have been assigned an examiner and supervisor. \Cref{fig:spreadsheetOfCSStudents} shows the column headings of the spreadsheet “Masters\_thesis\_proposals-CS-P3-2022a.xlx” (this is my local file name for the spreadsheet).
-	
+
 \begin{figure}[!ht]
   \begin{center}
     \includegraphics[width=0.99\textwidth]{README_notes/README-examiner-figures/sheet-columns-Screenshot_20220325_155622.png}
@@ -292,10 +292,10 @@ In the case of the computer science (CS) students the exjobb coordinator XXXXX\f
 \Needspace*{6\baselineskip}
 A script takes the data from this spreadsheet and adds the information to the Canvas gradebook with the command shown in \Cref{lst:insertExaminersAndSupervisorsFromSpreadsheet}.
 \begin{lstlisting}[language={bash}, caption={insert-examiners-and-supervisors-from-spreadsheet.py}, label=lst:insertExaminersAndSupervisorsFromSpreadsheet]
-./insert-examiners-and-supervisors-from-spreadsheet.py  33514   "Masters_thesis_proposals-CS-P3-2022a.xlsx"  
+./insert-examiners-and-supervisors-from-spreadsheet.py  33514   "Masters_thesis_proposals-CS-P3-2022a.xlsx"
 \end{lstlisting}
 The script uses the student’s e-mail address to look up the student in the Canvas course room, then adds the student to the examiner’s section and updates the “Examiner” grade for this student to show this assigned examiner. It also adds the contents of “Proposal” field from the spreadsheet as text in a custom column in the gradebook called “Tentative\_title” and adds the list of supervisors to the custom column called “Supervisors” – see \Cref{fig:examinersViewOfGradebook}. Note that this program uses a JavaScript Object Notation (JSON) file, \texttt{spreadsheet\_aliases-33514.json}, containing aliases for each of the examiners and supervisors. \Cref{lst:aliasFile} shows part of the alias file.
-\Needspace*{15\baselineskip}	
+\Needspace*{15\baselineskip}
 \begin{lstlisting}[language={Python}, caption={Some of the contents of an alias file for a course}, label=lst:aliasFile]
 {
     "examiners": {
@@ -306,7 +306,7 @@ The script uses the student’s e-mail address to look up the student in the Can
 
     },
     "teachers": {
-    
+
     }
 }
 \end{lstlisting}
@@ -317,8 +317,8 @@ The availability of information in Canvas also suggests that some of the argumen
 \Needspace*{8\baselineskip}
 \subsection[What happens if I do not have such a spreadsheet?]{What happens if I do not have such\\ a spreadsheet?}
 
-A Canvas administrator can add students to the examiner’s and supervisor’s sections, as shown in \Cref{fig:sectionEntrollments}. Note that the input field can do partial matches on the text that you enter and will give you a list of the partially matching entries and then you can click on one and then click on Update. 
- 	
+A Canvas administrator can add students to the examiner’s and supervisor’s sections, as shown in \Cref{fig:sectionEntrollments}. Note that the input field can do partial matches on the text that you enter and will give you a list of the partially matching entries and then you can click on one and then click on Update.
+
 \begin{figure}[!ht]
   \begin{center}
     \includegraphics[width=0.99\textwidth]{README_notes/README-examiner-figures/edit-sections-Screenshot_20220325_161529.png}
@@ -336,7 +336,7 @@ To get the Section Enrollments editing box popup (shown above) – you go to the
   \caption{Search people box on People page}
   \label{fig:peopleSearchbox}
 \end{figure}
-	
+
 \begin{figure}[!ht]
   \begin{center}
     \includegraphics[width=0.5\textwidth]{README_notes/README-examiner-figures/edit-section-cmd-Screenshot_20220325_162252.png}
@@ -358,19 +358,19 @@ When the examiner has set a time, place, \ldots for the student's oral presentat
 \begin{enumerate}
     \item Save the PDF file of the thesis, for example \texttt{oscar.pdf}
     \item Extract the “For DIVA” information as JSON, as shown in \Cref{lst:extractPseudoJSONFromPDFforOscarFileToJSON}\footnote{For information about an alternative way to get the JSON file, see \Cref{sec:optimizeJSONToMods}.}
-    
+
     If acronyms are used in the abstracts, you can add the “--acronyms acronyms.tex” argument to the extract command line and the program will process the acronyms from the acronyms.tex file (this means that you will also need this file). The output of the program is a JSON file (oscar.json) that can subsequently be used to make an announcement.
-    
+
     \item Make the announcement for a Canvas course room (in this case, for a Canvas course room with course\_id 11), as shown in \Cref{lst:jsonToCalenarforOscar1}.
-    
+
     Replace 11 with the course\_id of the Canvas course room, for example, 33514 for the EECS 2\textsuperscript{nd} cycle degree projects during 2022.
 \end{enumerate}
 \Needspace*{7\baselineskip}
-\begin{lstlisting}[language={bash}, caption={extract\_pseudo\_JSON-from\_PDF.py for Oscar}, label=lst:extractPseudoJSONFromPDFforOscarFileToJSON]    
+\begin{lstlisting}[language={bash}, caption={extract\_pseudo\_JSON-from\_PDF.py for Oscar}, label=lst:extractPseudoJSONFromPDFforOscarFileToJSON]
    ./extract_pseudo_JSON-from_PDF.py --pdf oscar.pdf --json oscar.json
 \end{lstlisting}
 
-\begin{lstlisting}[language={bash}, caption={JSON\_to\_calendar.py for Oscar}, label=lst:jsonToCalenarforOscar1] 
+\begin{lstlisting}[language={bash}, caption={JSON\_to\_calendar.py for Oscar}, label=lst:jsonToCalenarforOscar1]
 ./JSON_to_calendar.py -c 11 --json oscar.json
 \end{lstlisting}
 The command line shown in \Cref{lst:jsonToCalenarforOscar1} will publish the announcement in \first Canvas course 11, \Second in the Canvas course’s calendar, and \third (eventually) in the KTH Calendar. To publish a KTH calendar event, the software supports the development version of the KTH Cortina API. However, this is API not yet in production and requires a KTH Cortina Access Key.
@@ -381,12 +381,12 @@ The command line shown in \Cref{lst:jsonToCalenarforOscar1} will publish the ann
 \label{sec:makingACover}
 As of December 2021, there is a new cover for 1\textsuperscript{st} and 2\textsuperscript{nd} cycle theses at KTH. Information about this is at \url{https://intra.kth.se/en/administration/kommunikation/mallar/avhandlingarochexamensarbeten/skapa-ett-omslag-till-ditt-exjobb-1.479838}.
 
-When the student is writing their thesis, they can set up the title and subtitle in English and Swedish by simply editing the relevant lines in the \LaTeX~file, see \Cref{lst:titleSubtitleEtc}. This is further described in detail in \Cref{sec:putInformationIntoLatexTemplate}  
+When the student is writing their thesis, they can set up the title and subtitle in English and Swedish by simply editing the relevant lines in the \LaTeX~file, see \Cref{lst:titleSubtitleEtc}. This is further described in detail in \Cref{sec:putInformationIntoLatexTemplate}
 \iflabelexists{ch:READMEnotes}{and \Cref{ch:READMEnotes}}
 {- You have to include the \texttt{README\_notes/README\_notes.tex} file when compiling to get additional information.}
 
 \Needspace*{12\baselineskip}
-\begin{lstlisting}[language={[LaTeX]TeX}, caption={Title and subtitle in the two languages}, label=lst:titleSubtitleEtc] 
+\begin{lstlisting}[language={[LaTeX]TeX}, caption={Title and subtitle in the two languages}, label=lst:titleSubtitleEtc]
 \title{This is the title in the language of the thesis}
 \subtitle{A subtitle in the language of the thesis}
 
@@ -414,14 +414,14 @@ Assuming that a student has submitted a thesis with the information in the “Fo
 
 The same steps as described in \Cref{sec:makingACover} are made to save the PDF file and extract the “For DIVA” information as JSON\footnote{For information about an alternative way to get the JSON file, see \Cref{sec:optimizeJSONToMods}.}. This JSON file is then used to make a MODS file via the command shown in \Cref{lst:jsonToMODSforOscar}. Note that in this case, we assume that the person running the program knows the TRITA number; otherwise, the value of the TRITA number in the JSON file is used.
 \Needspace*{4\baselineskip}
-\begin{lstlisting}[language={bash}, caption={JSON\_to\_MODS.py for Oscar}, label=lst:jsonToMODSforOscar] 
+\begin{lstlisting}[language={bash}, caption={JSON\_to\_MODS.py for Oscar}, label=lst:jsonToMODSforOscar]
 ./JSON\_to\_MODS.py -c 11   --json oscar.json --trita "TRITA-EECS-EX-2021:xxxx"
 \end{lstlisting}
 
 One way of getting the JSON information to make the MODS file is given in \Cref{sec:optimizeJSONToMods}. A description of how the JSON is converted to a MODS file is given in \Cref{sec:JSONtoMODSfile}.
 
 \section{Can someone else use these programs?}
-The source code is at \url{https://github.com/gqmaguirejr/E-learning}. Get the programs from the github, then create a config.json file to provide your Canvas access token and the URL of the Canvas instance you want to use, for details see \url{https://canvas.kth.se/courses/11/pages/making-a-config-dot-json-file-to-make-life-simpler} 
+The source code is at \url{https://github.com/gqmaguirejr/E-learning}. Get the programs from the github, then create a config.json file to provide your Canvas access token and the URL of the Canvas instance you want to use, for details see \url{https://canvas.kth.se/courses/11/pages/making-a-config-dot-json-file-to-make-life-simpler}
 
 To run the program to make announcements and calendar entries for a course room requires the program and appropriate permissions  to post announcements in a course and insert course calendar events (for example, if the user is a Teacher in the specific Canvas course room or as a Canvas administrator). To make the entry in the KTH Calendar requires a KTH Cortina access key. Making the MODS file does not require any specific permissions as the program is run locally.
 
@@ -431,7 +431,7 @@ To change sections (adding/removing/\ldots a user to/from a section) requires th
 \section{\LaTeX~template in Overleaf}
 A \LaTeX~template in Overleaf is at \url{https://www.overleaf.com/read/qxvttmmqbgdt} - this is the version used by many EECS students.
 
-Details about using the template are in  
+Details about using the template are in
 \iflabelexists{ch:READMEnotes}{\Cref{ch:READMEnotes}.}
 {xxxx - You have to include the \texttt{README\_notes/README\_notes.tex} file when compiling to get additional information.}
 Note that the rest of this document goes into deep detail about \textit{how} the \textbf{template} works and \textit{how} the \textbf{programs} work. The primary intention is to give the information necessary so that someone else can take over the template and programs. Also note that \Cref{sec:accessibility} addresses issues about accessibility.
@@ -450,7 +450,7 @@ Note that the rest of this document goes into deep detail about \textit{how} the
 \end{figure}
 \clearpage
 
-For the current documentation of the template for these details, please see the file “README\_notes.tex” in the template itself - 
+For the current documentation of the template for these details, please see the file “README\_notes.tex” in the template itself -
 \iflabelexists{ch:READMEnotes}{\Cref{ch:READMEnotes}.}
 {You have to include the \texttt{README\_notes/README\_notes.tex} file when compiling to get additional information.}
 What follows includes some older examples – so there may be differences in the details between these examples and the current template.
@@ -460,13 +460,13 @@ For the purpose of this document, the following information is present in the or
 Information about the title and the student author(s) of the thesis is entered via the set of commands as shown in Listings~\ref{lst:titles} and \ref{lst:authors}. Note that you can have either one or two authors (the latter should generally only occur in the case of a 1\textsuperscript{st} cycle degree project). There are several other elements of metadata collected about the student (primarily driven by the current author metadata fields in DiVA). A brief description of them and why they are there are given below:
 \begin{itemize}
     \item One might question why have an e-mail address (when under the current policy is that the student will lose their e-mail address upon graduation)? One of the main reasons is so that the library (\ie KTHB) can notify the student that the thesis has be stored in DiVA. A second reason is if the library needs to contact the student.
-    
+
     \item One might also wonder, why include the student’s \texttt{kthid} (\ie their internal to KTH ID). The main reason is that this identifier \textit{uniquely identifies} this author within KTH, so that all of their publications can be found in a DiVA search. Note that a number of KTH students go on to write papers related to their thesis and a number of these are registered in DiVA. Without a unique identifier, it would not be possible to connect these different documents.
-    
+
     \item A very questionable field is \texttt{authorsSchool}. In a discussion with DiVA administrators at KTH on 2021-04-29, the consensus was that this should be the school of the thesis examiner, since 1\textsuperscript{st} and 2\textsuperscript{nd} cycle students are in \textbf{programs of study} and not schools, department, \etc.
-    
+
     \item Next there is \texttt{programcode} – this is used to generate the degree information just above the other data on the title page and is also used to compute the “lead” for the calendar entry (which differs depending upon whether it is a 1\textsuperscript{st} or 2\textsuperscript{nd} cycle degree project presentation).
-    
+
     \item Finally, the \texttt{degreeName} and \texttt{subjectArea}, \eg \textbackslash degreeName{Bachelors degree} \textbackslash subjectArea{Technology }- provide information that is used later when generating the color KTH cover.
 \end{itemize}
 \textbf{NB}: A limitation of the current template is that I do not handle the case of two students who are in different programs.
@@ -488,7 +488,7 @@ An example of information about the title and student authors for a thesis is sh
 %\altsubtitle{This is the English translation of the subtitle}
 \end{lstlisting}
 \Needspace*{32\baselineskip}
-\begin{lstlisting}[language={[LaTeX]TeX}, caption={Information about the student authors of the thesis}, label=lst:authors] 
+\begin{lstlisting}[language={[LaTeX]TeX}, caption={Information about the student authors of the thesis}, label=lst:authors]
 \authorsLastname{Student}
 \authorsFirstname{Fake A.}
 \email{a@kth.se}
@@ -521,10 +521,10 @@ An example of information about the title and student authors for a thesis is sh
 
 
 \Cref{lst:hostcompany} shows how to enter data about where the thesis is being done if outside of KTH.
-\textbf{NB}: A limitation of the current template is that I do not handle multiple companies, as I assume that there is a single host company. However, you can have a list of names within the two text fields (but only a single \textbackslash hostcompany or a single \textbackslash hostorganization should be included). As of the DiVA administrators meeting of 2022-03-25, if there are a list of names, they should be separated by a semicolon or vertical bar (\ie the `|' character) and the information should be entered in an uniform manner (\ie ``på ett enhetligt sätt''). However, there is not yet a list of the partner names in canonical form. Moreover, it was also noted that if the name of the company or organization is confidential, then the field should contain the string ``Confidential'' and when the DiVA entry is made the actual name or the company or organization should be entered in the ``Internal'' information field (\ie ``intern kommentar'') in DiVA. Unfortunately, it is not clear how the DiVA administrator would know this information. However, 
+\textbf{NB}: A limitation of the current template is that I do not handle multiple companies, as I assume that there is a single host company. However, you can have a list of names within the two text fields (but only a single \textbackslash hostcompany or a single \textbackslash hostorganization should be included). As of the DiVA administrators meeting of 2022-03-25, if there are a list of names, they should be separated by a semicolon or vertical bar (\ie the `|' character) and the information should be entered in an uniform manner (\ie ``på ett enhetligt sätt''). However, there is not yet a list of the partner names in canonical form. Moreover, it was also noted that if the name of the company or organization is confidential, then the field should contain the string ``Confidential'' and when the DiVA entry is made the actual name or the company or organization should be entered in the ``Internal'' information field (\ie ``intern kommentar'') in DiVA. Unfortunately, it is not clear how the DiVA administrator would know this information. However,
 the KTHB bibliometrics unit is interested in this data, as is the GVS unit working with industrial relations.
 \Needspace*{5\baselineskip}
-\begin{lstlisting}[language={[LaTeX]TeX}, caption={Information about where the thesis is taking place}, label=lst:hostcompany] 
+\begin{lstlisting}[language={[LaTeX]TeX}, caption={Information about where the thesis is taking place}, label=lst:hostcompany]
 \hostcompany{Företaget AB} % Remove this line if the project was not done at a host company
 %\hostorganization{CERN}   % if there was a host organization
 \date{\today}
@@ -532,7 +532,7 @@ the KTHB bibliometrics unit is interested in this data, as is the GVS unit worki
 \Needspace*{17\baselineskip}
 \Cref{lst:oralpresentatioOpponents} collects the information regarding the time, place, and language of the presentation. Note that the opponents' names are simply separated by ‘\&’ – so it is easy to have one more opponent.
 \ifxeorlua
-\begin{lstlisting}[language={[LaTeX]TeX}, caption={Information relevant to the oral presentation (both the location and the opponent or opponents)}, label=lst:oralpresentatioOpponents] 
+\begin{lstlisting}[language={[LaTeX]TeX}, caption={Information relevant to the oral presentation (both the location and the opponent or opponents)}, label=lst:oralpresentatioOpponents]
 %%%%% For the oral presentation
 %% Add this information once your examiner has scheduled your oral presentation
 \presentationDateAndTimeISO{2022-03-15 13:00}
@@ -547,7 +547,7 @@ the KTHB bibliometrics unit is interested in this data, as is the GVS unit worki
 \nationalsubjectcategories{10201, 10206}
 \end{lstlisting}
 \else
-\begin{lstlisting}[language={[LaTeX]TeX}, extendedchars=false, caption={Information relevant to the oral presentation (both the location and the opponent or opponents)}, label=lst:oralpresentatioOpponents] 
+\begin{lstlisting}[language={[LaTeX]TeX}, extendedchars=false, caption={Information relevant to the oral presentation (both the location and the opponent or opponents)}, label=lst:oralpresentatioOpponents]
 %%%%% For the oral presentation
 %% Add this information once your examiner has scheduled your oral presentation
 \presentationDateAndTimeISO{2022-03-15 13:00}
@@ -564,7 +564,7 @@ the KTHB bibliometrics unit is interested in this data, as is the GVS unit worki
 \fi
 \Needspace*{12\baselineskip}
 Finally, \Cref{lst:nationalSubjects} collects the information regarding the National Subject Categories – this is simply a list of 3 or 5 digit numbers separated by commas. The numbers come from \url{https://www.scb.se/contentassets/10054f2ef27c437884e8cde0d38b9cc4/oversattningsnyckel-forskningsamnen.pdf} while the Swedish and English versions are given in \url{https://www.scb.se/contentassets/3a12f556522d4bdc887c4838a37c7ec7/standard-for-svensk-indelning--av-forskningsamnen-2011-uppdaterad-aug-2016.pdf}. This information is for a required field in DiVA. Note that 5 digit codes are preferred over 3 digit codes.
-\begin{lstlisting}[language={[LaTeX]TeX}, caption={Information relevant to the oral presentation (both the location and the opponent or opponents}, label=lst:nationalSubjects] 
+\begin{lstlisting}[language={[LaTeX]TeX}, caption={Information relevant to the oral presentation (both the location and the opponent or opponents}, label=lst:nationalSubjects]
 \nationalsubjectcategories{10201, 10206}
 \end{lstlisting}
 
@@ -575,7 +575,7 @@ The program \texttt{create\_customized\_JSON\_file.py} tries to guess the Nation
 The template also supports a number of other languages (based on the languages used for abstracts in undergraduate theses in 2020). It is straightforward to add an additional language as necessary. One of the reasons for having abstracts in additional languages is so that dual degree students do not have to write another document for their home/other university. While the template includes a number of placeholders for these other abstracts, if they are unused they can simply be deleted.
 The three-character code used for the language is the ISO 639-2 Code – specifically, the "B" (bibliographic) variant of these codes --- as these seem to be the codes used in DiVA when one accesses the MODS formatted metadata for publications. In the example below we see “eng” being stored into a scontents buffer called “lang”.
 \Needspace*{5\baselineskip}
-\begin{lstlisting}[language={[LaTeX]TeX}, caption={Storing the language in a scontents buffer named "lang"}, label=lst:EnglishAbstractLang] 
+\begin{lstlisting}[language={[LaTeX]TeX}, caption={Storing the language in a scontents buffer named "lang"}, label=lst:EnglishAbstractLang]
 \begin{scontents}[store-env=lang]
 eng
 \end{scontents}
@@ -626,8 +626,8 @@ Canvas Learning Management System, Docker containers, performance tuning
 
 
 \Needspace*{40\baselineskip}
-\begin{lstlisting}[language={[LaTeX]TeX}, caption={\LaTeX~input to produce the Swedish abstract}, label=lst:SwedishAbstract] 
- \selectlanguage{swedish} 
+\begin{lstlisting}[language={[LaTeX]TeX}, caption={\LaTeX~input to produce the Swedish abstract}, label=lst:SwedishAbstract]
+ \selectlanguage{swedish}
 \begin{abstract}
     \markboth{\abstractname}{}
 \begin{scontents}[store-env=lang]
@@ -641,7 +641,7 @@ If you are writing your thesis in English, you can leave this until the final ve
 
 If you are writing your thesis in English, this section can be a summary targeted at a more general reader. However, if you are writing your thesis in Swedish, then the reverse is true – your abstract should be for your target audience. Similarly, an English summary can be written targeted at a more general audience.
 
-This means that the English abstract and Swedish sammnfattning  
+This means that the English abstract and Swedish sammnfattning
 or Swedish abstract and English summary need not be literal translations of each other.
 
 The abstract in the language used for the thesis should be the first abstract, while the Summary/Sammanfattning in the other language can follow.
@@ -779,7 +779,7 @@ The \textbackslash divainfo command that generates the For DiVA information page
 
 The \textbackslash typestored command that the scontents package provides will not take a variable argument, \ie it only takes a constant, such as \textbackslash typestored[2]{abstracts}. Unfortunately, I need to have a loop to handle the variable number of abstracts that could be used. To do this required a new command \textbackslash typestoredx that evaluates the variable and then calls the internal function that gets the contents of the correct scontents buffer! This new command is shown in \Cref{lst:languages} – it uses ExplSyntax – see the \LaTeX~package \texttt{expl3}. The quad euro symbols are used as markers to avoid problems with quotation marks in the abstract itself. I have assumed that such a combination of characters will \textbf{never} occur in an abstract.
 \Needspace*{11\baselineskip}
-\begin{lstlisting}[language={[LaTeX]TeX}, caption={Code in \textbackslash divainfo command to output the abstracts and keywords }, label=lst:languages] 
+\begin{lstlisting}[language={[LaTeX]TeX}, caption={Code in \textbackslash divainfo command to output the abstracts and keywords }, label=lst:languages]
     "Number of lang instances": \textquotedbl\relax\countsc{lang}\textquotedbl\relax,\\
     \foreach \i in {1,...,\countsc{lang}} {
       "Abstract[\getstored[\i]{lang}]": €€€€\\
@@ -793,7 +793,7 @@ The \textbackslash typestored command that the scontents package provides will n
 
 \Cref{lst:setupTypestoreedx} shows how to configure the listings environment to put the abstract into. One of the tricks here is that it was important to reduce the hyphenation penalty to enable the abstract text to nicely wrap text on the page. As an added benefit, the \LaTeX~syntax highlighting is on – so one can easily see the \LaTeX~commands that are used – as they might need manual editing before the event is announced. The \LaTeX~code for the English and Swedish abstracts is shown in \Cref{lst:latexAbtractsExampleEnglish} and \Cref{lst:latexAbtractsExampleSwedish} (respectively).
 
-\begin{lstlisting}[language={[LaTeX]TeX}, caption={Code in the document file to set up the command \textbackslash typestoredx and to configure the listing environment to put the abstract into}, label=lst:setupTypestoreedx] 
+\begin{lstlisting}[language={[LaTeX]TeX}, caption={Code in the document file to set up the command \textbackslash typestoredx and to configure the listing environment to put the abstract into}, label=lst:setupTypestoreedx]
 \ExplSyntaxOn
 \newcommand\typestoredx[2]{\expandafter\__scontents_typestored_internal:nn\expandafter{#1} {#2}}
 \ExplSyntaxOff
@@ -825,7 +825,7 @@ The \textbackslash typestored command that the scontents package provides will n
 \end{lstlisting}
 \clearpage
 
-\begin{lstlisting}[language={[LaTeX]TeX}, caption={\LaTeX~code for the English abstract}, label=lst:latexAbtractsExampleEnglish] 
+\begin{lstlisting}[language={[LaTeX]TeX}, caption={\LaTeX~code for the English abstract}, label=lst:latexAbtractsExampleEnglish]
 \engExpl{All theses at KTH are \textbf{required} to have an
 abstract in both \textit{English} and \textit{Swedish}.}
 \engExpl{Exchange students many want to include one or more
@@ -921,7 +921,7 @@ In the case of an Overleaf project, when compiling the \LaTeX~\ as a side-effect
 Now all you have to do is rename the XML file that was produced to \texttt{xxx.mods} and you are all set to upload it into DiVA!
 
 To find the \texttt{fordiva.json} file, look for the “Other logs and files” button shown at the bottom of the log output window. This button is shown in \Cref{fig:otherLogfiles}. After clicking this button you will see a list of log and other files, such as shown in \ref{fig:filesProduced}.
-	
+
 \begin{figure}[!ht]
   \begin{center}
     \fbox{\includegraphics[width=0.80\textwidth]{README_notes/README-examiner-figures/otherlog_files.png}}
@@ -943,7 +943,7 @@ The details for how the \texttt{fordiva.json} file is generated are given in \Cr
 
 \section{What can we do with the JSON file?}
 \label{sec:whatCanweDoWithTheJSONfile}
-Now that we have a JSON file, you can edit the HTML in the abstracts to deal with equations and things that were not automatically processed by the extraction program. Once you are happy with the JSON file’s contents, the next step is to generate something interesting with this data – for this we use the program JSON\_to\_calendar.py. 
+Now that we have a JSON file, you can edit the HTML in the abstracts to deal with equations and things that were not automatically processed by the extraction program. Once you are happy with the JSON file’s contents, the next step is to generate something interesting with this data – for this we use the program JSON\_to\_calendar.py.
 
 
 
@@ -1019,7 +1019,7 @@ I also edited the \texttt{event.json} to create an event on the following date. 
   \caption{English version of the calendar}
   \label{fig:cortinaPicture2}
 \end{figure}
-\FloatBarrier	
+\FloatBarrier
 
 \begin{figure}[!ht]
   \begin{center}
@@ -1091,7 +1091,7 @@ Note that the entry was made on 2021-06-17, but the event was earlier. This entr
   \label{fig:actualAnnouncementBottom}
 \end{figure}
 \FloatBarrier
-	
+
 \begin{figure}[!ht]
   \begin{center}
     \fbox{\includegraphics[width=1\textwidth]{README_notes/README-examiner-figures/oscar-course-calendar-Screenshot_20210617_143054.png}}
@@ -1099,7 +1099,7 @@ Note that the entry was made on 2021-06-17, but the event was earlier. This entr
   \caption{Opened version in course calendar}
   \label{fig:actualCalendarOpenned}
 \end{figure}
-\FloatBarrier	
+\FloatBarrier
 
 \begin{figure}[!ht]
   \begin{center}
@@ -1136,7 +1136,7 @@ Note that the entry was made on 2021-06-17, but the event was earlier. This entr
 "National Subject Categories": "10201, 10206"}, "Number of lang instances": "2", "abstracts": {"eng": "<p>In 2020, the world was struck by the Covid-19 pandemic. …negative effects.</p>",
 "swe": "<p>Under början av året 2020 drabbades världen av Covid-19 pandemin. … ett liknande experiment.</p>"},
 "keywords": {"eng": "\n\fAppendix B: Surveys results | 117\n\nRemote work, Work from home, Social well-being, Covid-19 pandemic, Digital social interactions, Information and Communication\nTechnologies ",
-"swe": "Distansarbete, Hemarbete, Socialt välmående, Covid-19 pandemin, Digitala sociala interaktioner, Informations- och kommunikationsteknik\n"}}	
+"swe": "Distansarbete, Hemarbete, Socialt välmående, Covid-19 pandemin, Digitala sociala interaktioner, Informations- och kommunikationsteknik\n"}}
 \end{lstlisting}
 
 
@@ -1161,7 +1161,7 @@ If you are writing your thesis in English, you can leave this until the draft ve
 
 If you are writing your thesis in English, then this section can be a summary targeted at a more general reader. However, if you are writing your thesis in Swedish, then the reverse is true – your abstract should be for your target audience, while an English summary can be written targeted at a more general audience.
 
-This means that the English abstract and \foreignlanguage{swedish}{sammnfattning} 
+This means that the English abstract and \foreignlanguage{swedish}{sammnfattning}
 or Swedish abstract and English summary need not be literal translations of each other.
 
 The abstract in the language used for the thesis should be the first abstract, while the Summary/Sammanfattning in the other language can follow.
@@ -1173,7 +1173,7 @@ Canvas Lärplattform,Dockerbehållare, prestandajustering
 \end{abstract}
 \babelpolyLangStop{swedish}
 \end{lstlisting}
-	
+
 
 \begin{lstlisting}[language={[LaTeX]TeX}, caption={Second example of the revised format for entering an abstract}, label=lst:babelSecondExample]
 \generalExpl{Use the relevant language for abstracts for your home university.\\
@@ -1216,7 +1216,7 @@ Résumé en français.
 
 \section{Adding keywords and PDF metadata}
 \label{sec:addingKeywordsAndMetaDataToPDF}
-In an effort to add the PDF metadata via the \texttt{hyperref} package, I also decided to add the keywords part of the PDF metadata. However, in order to do this I had to have the keywords \textit{before} the \textbackslash begin\{document\} command in the \LaTeX~file. To do so, I added three new commands to the \texttt{kththesis.cls} file, as shown in \Cref{lst:keywords}. The commands are used in the \texttt{examplethesis.tex} file to set up the keywords in both English and Swedish as well as include a new set of \LaTeX~commands to store the PDF metadata (as shown in \Cref{lst:storingkeywords}) using a file called \texttt{lib/pdf\_related\_includes.tex} (shown in \Cref{lst:informationforPDFfile}). Later the keywords that have been stored are inserted into the \LaTeX~after their respective language abstracts as shown in \Cref{lst:keywordsSection} and \Cref{lst:keywordsSectionSwedish}. The title page of the thesis and the PDF metadata are shown in \Cref{fig:pdfMetadata}. Note that both the English and Swedish version of the keywords are included in the metadata. Finally, the keywords appear (as expected) in the For DiVA data at the end of the PDF file as shown in \Cref{lst:keywordsFromForDIVA}.
+In an effort to add the PDF metadata via the \texttt{hyperref} package, I also decided to add the keywords part of the PDF metadata. However, in order to do this I had to have the keywords \textit{before} the \textbackslash begin\{document\} command in the \LaTeX~file. To do so, I added three new commands to the \texttt{kththesis.cls} file, as shown in \Cref{lst:keywords}. The commands are used in the \texttt{main.tex} file to set up the keywords in both English and Swedish as well as include a new set of \LaTeX~commands to store the PDF metadata (as shown in \Cref{lst:storingkeywords}) using a file called \texttt{lib/pdf\_related\_includes.tex} (shown in \Cref{lst:informationforPDFfile}). Later the keywords that have been stored are inserted into the \LaTeX~after their respective language abstracts as shown in \Cref{lst:keywordsSection} and \Cref{lst:keywordsSectionSwedish}. The title page of the thesis and the PDF metadata are shown in \Cref{fig:pdfMetadata}. Note that both the English and Swedish version of the keywords are included in the metadata. Finally, the keywords appear (as expected) in the For DiVA data at the end of the PDF file as shown in \Cref{lst:keywordsFromForDIVA}.
 
 Note that \textbackslash makeatletter and \textbackslash makeatother are use to include the character “@” as a letter and then return “@” to being a punctuation code. This use of “@” protects the internal names from being accessed outside of these two commands. More explicitly, \textbackslash EnglishKeywords is a function that takes one argument, the text of the English keywords, and then stores them into “@EnglishKeywords”. Later the text can be retrieved with the command \textbackslash InsertKeywords\{english\} or \textbackslash InsertKeywords\{swedish\}.
 \Needspace*{15\baselineskip}
@@ -1281,7 +1281,7 @@ As a result of adding support for the PDF metadata for copyright notice, the tem
 % Note that \hyxmp@comma is used explicitly rather than \xmpcomma
 % As the latter will simply turn into a comma in this context.
 \StrSubstitute{\@authorsLastname}{,}{\hyxmp@comma}[\@authorsLastname]
-    \newcommand{\myauthor}{\xmpquote{\@authorsFirstname\space\@authorsLastname}} 
+    \newcommand{\myauthor}{\xmpquote{\@authorsFirstname\space\@authorsLastname}}
 \else
 % Note that \hyxmp@comma is used explicitly rather than \xmpcomma
 % As the latter will simply turn into a comma in this context.
@@ -1292,7 +1292,7 @@ As a result of adding support for the PDF metadata for copyright notice, the tem
 \fi
 }{
 \ifx\@secondAuthorsLastname\@empty
-    \newcommand{\myauthor}{\@authorsFirstname\space\@authorsLastname} 
+    \newcommand{\myauthor}{\@authorsFirstname\space\@authorsLastname}
 \else
     \newcommand{\myauthor}{\@authorsFirstname\space\@authorsLastname,
 \space\@secondAuthorsFirstname\space\@secondAuthorsLastname}
@@ -1314,7 +1314,7 @@ As a result of adding support for the PDF metadata for copyright notice, the tem
     \else
     \newcommand{\myalttitle}{\@alttitle\xspace – \xspace\@altsubtitle}
     \fi
-    
+
 \fi
 
 \hypersetup{
@@ -1342,7 +1342,7 @@ As a result of adding support for the PDF metadata for copyright notice, the tem
 
 \hypersetup{
      pdfkeywords={\mykeywords}        % Keywords field
-}        
+}
 \end{lstlisting}
 \clearpage
 \begin{lstlisting}[language={[LaTeX]TeX}, caption={Including the English language keywords below the English abstract}, label=lst:keywordsSection]
@@ -1380,9 +1380,9 @@ As a result of adding support for the PDF metadata for copyright notice, the tem
   \caption{The title page of the thesis and the PDF metadata}
   \label{fig:pdfMetadata}
 \end{figure}
-\FloatBarrier	
+\FloatBarrier
 \Needspace*{7\baselineskip}
-\begin{lstlisting}[language={[LaTeX]TeX}, caption={The keywords appear as expected in the For DiVA data at the end of the PDF file}, label=lst:keywordsFromForDIVA]	
+\begin{lstlisting}[language={[LaTeX]TeX}, caption={The keywords appear as expected in the For DiVA data at the end of the PDF file}, label=lst:keywordsFromForDIVA]
 ”Keywords[eng ]”: €€€€
 Canvas Learning Management System, Docker containers, Performance tuning €€€€,
 
@@ -1458,13 +1458,13 @@ This program has been extended to be able to take the TRITA number information f
 The process of importing the MODS data into DiVA begins with the extracted JSON file (note that I have changed some of the formatting of the pseudo JSON information and added the export of the program code). An example of the JSON information is shown in \Cref{lst:test12.json}. The resulting MODS file is shown in \Cref{lst:test12.mods}.
 
 \begin{lstlisting}[language={json}, caption={test12.json (manually reformatted)}, label=lst:test12.json]
-{"Author1": {"Last name": "Student", "First name": "Fake A.", "Local User Id": "u100001", "E-mail": "a@kth.se", "organisation": {"L1": "School of Electrical Engineering and Computer Science "}}, 
-"Author2": {"Last name": "Student", "First name": "Fake B.", "Local User Id": "u100002", "E-mail": "b@kth.se", "organisation": {"L1": "School of Architecture and the Built Environment "}}, 
+{"Author1": {"Last name": "Student", "First name": "Fake A.", "Local User Id": "u100001", "E-mail": "a@kth.se", "organisation": {"L1": "School of Electrical Engineering and Computer Science "}},
+"Author2": {"Last name": "Student", "First name": "Fake B.", "Local User Id": "u100002", "E-mail": "b@kth.se", "organisation": {"L1": "School of Architecture and the Built Environment "}},
 "Degree": {"Educational program": "Bachelor’s Programme in Information and Communication Technology", "programcode": "TCOMK", "Level": "1", "Course code": "IA150X", "Credits": "15.0", "Exam": "Bachelors degree", "subjectArea": "Information and Communication Technology"},
 "Title": {"Main title": "This is the title in the language of the thesis", "Subtitle": "An subtitle in the language of the thesis", "Language": "eng"},
 "Alternative title": {"Main title": "Detta är den svenska översättningen av titeln", "Subtitle": "Detta är den svenska översättningen av undertiteln", "Language": "swe"},
 "Supervisor1": {"Last name": "Supervisor", "First name": "A. Busy", "Local User Id": "u100003", "E-mail": "sa@kth.se", "organisation": {"L1": "School of Electrical Engineering and Computer Science ", "L2": "Computer Science"}},
-"Supervisor2": {"Last name": "Supervisor", "First name": "Another Busy", "Local User Id": "u100003", "E-mail": "sb@kth.se", "organisation": {"L1": "School of Architecture and the Built Environment ", "L2": "Public Buildings"}}, 
+"Supervisor2": {"Last name": "Supervisor", "First name": "Another Busy", "Local User Id": "u100003", "E-mail": "sb@kth.se", "organisation": {"L1": "School of Architecture and the Built Environment ", "L2": "Public Buildings"}},
 "Supervisor3": {"Last name": "Supervisor", "First name": "Third Busy", "E-mail": "sc@tu.va", "Other organisation": "Timbuktu University, Department of Pseudoscience"},
 "Examiner1": {"Last name": "Maguire Jr.", "First name": "Gerald Q.", "Local User Id": "u1d13i2c", "E-mail": "maguire@kth.se", "organisation": {"L1": "School of Electrical Engineering and Computer Science ", "L2": "Computer Science"}},
 "Cooperation": {"Partner_name": "Företaget AB"}, "National Subject Categories": "10201, 10206", "Other information": {"Year": "2021", "Number of pages": "xxxiii,35"}, "Opponents": {"Name": "A. B. Normal & A. X. E. Normalè"}, "Presentation": {"Date": "2021-03-15 13:00", "Language": "eng", "Room": "via Zoom https://kth-se.zoom.us/j/ddddddddddd", "Address": "Isafjordsgatan 22 (Kistagången 16)", "City": "Stockholm"},
@@ -1766,7 +1766,7 @@ The process of importing the MODS data into DiVA begins with the extracted JSON 
   </mods>
 </modsCollection>
 \end{lstlisting}
-	
+
 \subsection{Importing MODS file to DiVA}
 \label{sec:importingMODSfiletoDiVA}
 
@@ -1882,7 +1882,7 @@ Click on “Import” again to load the file. The MODS files is loaded and shown
 \clearpage
 
 
-	
+
 
 \subsection{Limitations}
 I was initially unable to get the KTH affiliations correctly entered. I think that it is because I did not understand the description of how to do this at: \url{ https://wiki.epc.ub.uu.se/pages/viewpage.action?pageId=27466001}  where it says:
@@ -1903,8 +1903,8 @@ This section describes how two of the limitations were overcome.
 
 \subsubsection{Entering number in series}
 The first limitation to be over come was entering the particular number in the series for a TRITA number. \Cref{fig:numberInSeriesCorrectlyEntered} shows the value being entered. The error was in the structure of the object, the working version is shown in \Cref{lst:seriesNumber}. My earlier error was due to having the \texttt{<identifier type="issue number">2021:00</identifier>} \textit{within} the \texttt{<titleInfo>}.
- 
- 
+
+
 \begin{figure}[!ht]
   \begin{center}
     \fbox{\includegraphics[width=1\textwidth]{README_notes/README-examiner-figures/Number_in_series_correctly_entered.png}}
@@ -2124,7 +2124,7 @@ If the issues you're reporting are when the full announcement is open, I'm not s
 Let me know if I've misinterpreted anything or if there are any other questions as well.  We'll be happy to help.  Thanks and have a great day!"
 \end{quote}
 
-The response from someone at Instructure shows that Instructure got the same behavior from the block equations in the snippets of the announcements.  A screenshot of this behavior is shown in \Cref{fig:screenSHotOfBlockEquation}. However, their solution for this is to suggest that we submit a feature request. 
+The response from someone at Instructure shows that Instructure got the same behavior from the block equations in the snippets of the announcements.  A screenshot of this behavior is shown in \Cref{fig:screenSHotOfBlockEquation}. However, their solution for this is to suggest that we submit a feature request.
 
 \begin{figure}[!ht]
   \begin{center}
@@ -2178,15 +2178,15 @@ An important note about the above example is that \textbackslash over is depreca
   \label{fig:cortinaExample3}
 \end{figure}
 \FloatBarrier
- 
+
 
 \subsubsection{Support for mathematics in DiVA}
 \label{sec:SupportForMathematicsInDiVA}
 In contrast to Canvas and Cortina, DiVA uses pictures (although these can have a \LaTeX~expression as an “alt” description of the image contents).
 The code does not (yet) support the addition of equations to the DiVA entry of the abstracts.
-The current DiVA user interface seems to strip out the math-tex classes, \ie 
+The current DiVA user interface seems to strip out the math-tex classes, \ie
 
-% <span class='math-tex'>\[ \int_{a}^{b} x^2 \,dx \]</span> 
+% <span class='math-tex'>\[ \int_{a}^{b} x^2 \,dx \]</span>
 \begin{quote}
 $<$span class=\textbackslash"math-tex\textbackslash"$>$\textbackslash [ \textbackslash int\_\{a\}\^{}\{b\} x\^{}  \textbackslash ,dx \textbackslash ] $<$/span$>$
 \end{quote}
@@ -2222,7 +2222,7 @@ Currently URLs in abstracts are supported in Canvas course room announcements an
 \subsection{Getting the PDF from a Canvas assignment and optionally extracting JSON}
 \label{sec:gettingPDFfromCanvasAssignment}
 
-To simplify getting a PDF file from an Canvas course assignment submission there is a program \texttt{get\_PDF\_submission.py} to help with this.  The program checks that the submission has been graded and has the grade 'complete' and then gets the PDF file submitted for a specified assignment. The generic form of the command and an example are shown in \Cref{lst:getPDFsumbission}. Note that the student's name is used as a prefix of the name of the output file, while the submitted filename is used as the rest of the file name. With the optional [-e] argument, the program runs the extraction program. Note that this program is my Canvas-tools github: \url{https://github.com/gqmaguirejr/Canvas-tools}. 
+To simplify getting a PDF file from an Canvas course assignment submission there is a program \texttt{get\_PDF\_submission.py} to help with this.  The program checks that the submission has been graded and has the grade 'complete' and then gets the PDF file submitted for a specified assignment. The generic form of the command and an example are shown in \Cref{lst:getPDFsumbission}. Note that the student's name is used as a prefix of the name of the output file, while the submitted filename is used as the rest of the file name. With the optional [-e] argument, the program runs the extraction program. Note that this program is my Canvas-tools github: \url{https://github.com/gqmaguirejr/Canvas-tools}.
 \Needspace*{4\baselineskip}
 \begin{lstlisting}[language={bash}, caption={get\_PDF\_submission program}, label=lst:getPDFsumbission]
 ./get_PDF_submission.py -c course_id -a assignment_id -u user_id
@@ -2293,7 +2293,7 @@ Where the colors are defined as (note that the ForestGreen lacks sufficient cont
 
 Note that the colors do not encode any special meaning (\ie they could all be turned to black), since the citations are recognizable by their format, the URL (and URI) by linking to an external document, and the links (by linking within the document.
 
-Some additional colors are defined and used for \texttt{todonotes} – they should of of course be removed before the thesis is finalized (as of course all of these issues should have been resolved!). The default background color for todonotes is orange (which is predefined as \#FF7F00 \textbackslash definecolor{orange(colorwheel)}{rgb}{1.0, 0.5, 0.0}). The color for notes in Swedish is aqua (defined as:\textbackslash definecolor{aqua}{rgb}{0.0, 1.0, 1.0}). For notes by the authors to themselves using \textbackslash todoinline are red (defined as \textbackslash definecolor{red}{rgb}{0.7,0.0,0.0}). 
+Some additional colors are defined and used for \texttt{todonotes} – they should of of course be removed before the thesis is finalized (as of course all of these issues should have been resolved!). The default background color for todonotes is orange (which is predefined as \#FF7F00 \textbackslash definecolor{orange(colorwheel)}{rgb}{1.0, 0.5, 0.0}). The color for notes in Swedish is aqua (defined as:\textbackslash definecolor{aqua}{rgb}{0.0, 1.0, 1.0}). For notes by the authors to themselves using \textbackslash todoinline are red (defined as \textbackslash definecolor{red}{rgb}{0.7,0.0,0.0}).
 
 \subsection{Template itself}
 \label{sec:ccessibilityOfTemplateItself}
@@ -2310,7 +2310,7 @@ The template is designed with a set of options to generate a thesis in English o
 
 The template is available from Overleaf (both as a template and via a share URL). The template is also available from a github repository at KTH; however, this is not updated as frequently as the Overleaf version of the template.
 
-The text in the template itself (\ie the \texttt{examplethesis.tex} file) is in Swedish and English. The notes regarding the \LaTeX~class file, the various lib files, and the two README files are currently only in English.
+The text in the template itself (\ie the \texttt{main.tex} file) is in Swedish and English. The notes regarding the \LaTeX~class file, the various lib files, and the two README files are currently only in English.
 
 The default bibliographic style when using \textsc{Bib}\TeX~is my own adaptation of the IEEE Transactions format (\ie numbered citations, numbered references, references in order of use) with the extension of adding DOIs, URLs, and ISBNs (when relevant).
 
@@ -2331,7 +2331,7 @@ The files and folders in Overleaf (or from GitHub) have the form shown in \Cref{
 \end{figure}
 \FloatBarrier
 
-There are currently instructions concerning the template in 
+There are currently instructions concerning the template in
 \iflabelexists{ch:READMEnotes}{\Cref{ch:READMEnotes}.}
 {xxxx- You have to include the \texttt{README\_notes/README\_notes.tex} file when compiling to get additional information.}
 Ideally, these instructions should be available in both English and Swedish; however, a Swedish version remains as future work.
@@ -2351,7 +2351,7 @@ There are two alternatives:
     \item The examiner or someone can use the method described in \Cref{sec:makeItSimpleFromTheStart} or
 
     \item They can make use of the program: \texttt{whoami\_for\_latex.py}\footnote{Note that this program requires access to LADOK; hence, it is \textbf{no longer available}. However, a version that does not need LADOK access could be used by a student to get their own information from Canvas, \textit{excluding their program information}; as Canvas does not currently have any source for the student's program information.}.
-    
+
     The \texttt{whoami\_for\_latex.py} program makes use of information from the Canvas course room where the student is enrolled for their degree project. In the examples below we will assume that this is the Canvas course\_id 25434.
 \end{itemize}
 
@@ -2441,7 +2441,7 @@ latex_courseCycle=\courseCycle{2}, type=<class 'str'>
 \examinersSchool{\schoolAcronym{EECS}}
 \examinersDepartment{Computer Science}
 \end{lstlisting}
- 	
+
 The program: whoam\_for\_latex.py is far more powerful that shown in the examples above, it can take other identifiers for the user in instead of an e-mail address, such as a Canvas user\_id or a KTHID. Additionally, rather than specifying the Canvas course room’s course\_id, it is also possible to use the name of the course room and even a nickname (if you have defined a nickname in your Canvas dashboard). See the README file in \url{https://gits-15.sys.kth.se/maguire/ladok3}.
 
 
@@ -2453,7 +2453,7 @@ Another way that the covers can be inserted is to use the \textsc{pdfpages} pack
 \usepackage{pdfpages}
 
 \include{lib/includes-after-hyperref}
-\end{lstlisting} 	
+\end{lstlisting}
 \Needspace*{6\baselineskip}
 \begin{lstlisting}[language={[LaTeX]TeX}, caption={Insert the front cover before the title page}, label=lst:frontCover]
 % Add front cover
@@ -2514,7 +2514,7 @@ Author1	\\
 \rowcolor{yellow} & First name &  & \textbackslash secondAuthorsFirstname\{\} & Author2\_First\_name & x & x & x & x\\
 \rowcolor{yellow} & Local User Id &  & \textbackslash secondkthid\{\} & Author2\_Local User Id &  &  & x & x\\
 \rowcolor{yellow} & E-mail &  & \textbackslash secondemail\{\} & Author2\_E-mail &  &  &  & x\\
-\rowcolor{yellow} & organisation & \multicolumn{7}{l}{\cellcolor{yellow}}\\ 
+\rowcolor{yellow} & organisation & \multicolumn{7}{l}{\cellcolor{yellow}}\\
 \rowcolor{yellow} &  & L1 & \textbackslash secondAuthorsSchool{ } & Author2\_organization\_L1 &  &  &  & x\\
 \rowcolor{yellow} &  &  &  & Author2\_organization\_L2 &  &  &  & \\
 \rowcolor{yellow} & Other organisation &  &  & Author2\_Other\_organisation &  &  &  & \\
@@ -2564,9 +2564,9 @@ Supervisor1 & \\
 \rowcolor{yellow}Supervisor3 & \multicolumn{8}{l}{\cellcolor{yellow}} \\
 \rowcolor{yellow} & Last name &  & \textbackslash supervisorCsLastname\{\} & Supervisor3\_Last\_name & x &  &  & x \\
 \rowcolor{yellow} & First name &  & \textbackslash supervisorCsFirstname\{\} & Supervisor3\_First\_name & x &  &  & x \\
-\rowcolor{yellow} & Local User Id &  & \textbackslash supervisorCsKTHID\{\} &  &  &  &  & \\ 
+\rowcolor{yellow} & Local User Id &  & \textbackslash supervisorCsKTHID\{\} &  &  &  &  & \\
 \rowcolor{yellow} & E-mail &  & \textbackslash supervisorCsEmail\{\} & Supervisor3\_E-mail &  &  &  & o \\
-\rowcolor{yellow} & organisation & \multicolumn{7}{l}{\cellcolor{yellow}}\\ 
+\rowcolor{yellow} & organisation & \multicolumn{7}{l}{\cellcolor{yellow}}\\
 \rowcolor{yellow} &  & L1 & \textbackslash supervisorCsSchool\{\} & Supervisor3\_organization\_L1 &  &  &  & x \\
 \rowcolor{yellow} &  & L2 & \textbackslash supervisorCsDepartment\{\} & Supervisor3\_organization\_L2 &  &  &  & o \\
 \rowcolor{yellow} & Other organisation &  & \textbackslash supervisorCsOrganization\{\} & Supervisor3\_Other\_organisation & x &  &  &  x \\
@@ -2634,8 +2634,8 @@ The first problem that I encountered was that the \texttt{xstring} function \tex
 \end{lstlisting}
 
 \Needspace*{25\baselineskip}
-\begin{lstlisting}[language={[LaTeX]TeX}, caption={Original \textbackslash schoolAcronym}, label=lst:originalSchoolAcronym] 
-	
+\begin{lstlisting}[language={[LaTeX]TeX}, caption={Original \textbackslash schoolAcronym}, label=lst:originalSchoolAcronym]
+
 \newcommand{\schoolAcronym}[1]{%
   \ifinswedish
   \IfEqCase{#1}{%
@@ -2658,7 +2658,7 @@ The first problem that I encountered was that the \texttt{xstring} function \tex
 \end{lstlisting}
 
 \Needspace*{28\baselineskip}
-\begin{lstlisting}[language={[LaTeX]TeX}, caption={New \textbackslash schoolAcronym}, label=lst:newSchoolAcronym] 
+\begin{lstlisting}[language={[LaTeX]TeX}, caption={New \textbackslash schoolAcronym}, label=lst:newSchoolAcronym]
 % The strcompare is added to kththesis.cls
 \newcommand{\schoolAcronym}[1]{%
   \ifinswedish
@@ -2676,9 +2676,9 @@ The first problem that I encountered was that the \texttt{xstring} function \tex
   \fi
 }
 \end{lstlisting}
-	
+
 \Needspace*{20\baselineskip}
-\begin{lstlisting}[language={[LaTeX]TeX}, caption={New version of \textbackslash programcode}, label=lst:newProgramcode] 
+\begin{lstlisting}[language={[LaTeX]TeX}, caption={New version of \textbackslash programcode}, label=lst:newProgramcode]
 \newcommand{\programmecode}[1]{%
   \ifinswedish
     \strcompare{#1}{ARKIT}{Arkitektutbildning}{}%
@@ -2695,7 +2695,7 @@ The first problem that I encountered was that the \texttt{xstring} function \tex
 \end{lstlisting}
 \Needspace*{30\baselineskip}
 \Cref{lst:codeToWriteToJSONfile} shows the code to write the first author’s information to the JSON file.
-\begin{lstlisting}[language={[LaTeX]TeX}, caption={Code to write the first author's information to a "JSON" file}, label=lst:codeToWriteToJSONfile] 
+\begin{lstlisting}[language={[LaTeX]TeX}, caption={Code to write the first author's information to a "JSON" file}, label=lst:codeToWriteToJSONfile]
 \newwrite\jsonfile
     \immediate\openout\jsonfile=fordiva.json
     \immediate\write\jsonfile{ \@charlb }
@@ -2735,7 +2735,7 @@ The second problem that I encountered was that the function \texttt{\textbacksla
 \begin{lstlisting}[language={[LaTeX]TeX}, caption={New code to output the "Other information" including page numbers}, label=lst:newCodeToOutputPageNumbers]
     % "\pageref{pg:lastPageofPreface},\pageref{pg:lastPageofMainmatter}" \@charrb,
     \immediate\write\jsonfile{
-    "Other information": \@charlb"Year": "\the\year", "Number of pages": 
+    "Other information": \@charlb"Year": "\the\year", "Number of pages":
     "\getpagerefnumber{pg:lastPageofPreface},\getpagerefnumber{pg:lastPageofMainmatter}" \@charrb,
     }
 \end{lstlisting}
@@ -2750,7 +2750,7 @@ The third problem turned out to be much harder to solve. The \textsc{scontents} 
 \__scontents_getfrom_seq:nn {#1} {#2}
 }
 \end{lstlisting}
-	
+
 \Needspace*{28\baselineskip}
 \begin{lstlisting}[language={[LaTeX]TeX}, caption={Writing out the language, abstract, and keywords information}, label=lst:writinglangAndKeywords]
 \immediate\write\jsonfile{"Number of lang instances": "\countsc{lang}",}
@@ -2780,29 +2780,29 @@ The third problem turned out to be much harder to solve. The \textsc{scontents} 
     \immediate\write\jsonfile{,}
 }
     \immediate\write\jsonfile{\@charrb} % end the keywords dict
-\end{lstlisting}	
+\end{lstlisting}
 
 
 The result is that \LaTeX~directly generates a file named “\texttt{fordiva.json}” with the (almost) desired information in it. See \Cref{lst:resultingForDIVAfile} for an example of such a file. As of 2025-05-03, the contents of the \texttt{fordiva.json} file are attached to the last page of the printed data. This means that it can be directly extracted!
 
-	
+
 \begin{lstlisting}[language={json}, caption={Resulting fordiva.json file}, label=lst:resultingForDIVAfile]
 {
 "Author1": {"Last name": "Student", "First name": "Fake A.", "Local User Id": "u100001", "E-mail": "a@kth.se", "organisation": {"L1": "School of Electrical Engineering and Computer Science" }},
 "Author2": {"Last name": "Student", "First name": "Fake B.", "Local User Id": "u100002", "E-mail": "b@kth.se", "organisation": {"L1": "School of Architecture and the Built Environment" }},
-"Cycle": "1", "Course code": "IA150X", "Credits": "15.0", 
-"Degree1": {"Educational program": "" ,"programcode": "TCOMK" ,"Degree": "Bachelors degree" ,"subjectArea": "Information and Communication Technology" }, 
-"Title": {"Main title": "This is the title in the language of the thesis", "Subtitle": "An subtitle in the language of the thesis", "Language": "eng" }, "Alternative title": {"Main title": "Detta är den svenska översättningen av titeln", "Subtitle": "Detta är den svenska översättningen av undertiteln", "Language": "swe" }, 
-"Supervisor1": {"Last name": "Supervisor", "First name": "A. Busy", "Local User Id": "u100003", "E-mail": "sa@kth.se", "organisation": {"L1": "School of Electrical Engineering and Computer Science" ,"L2": "Computer Science" }}, 
-"Supervisor2": {"Last name": "Supervisor", "First name": "Another Busy", "Local User Id": "u100003", "E-mail": "sb@kth.se", "organisation": {"L1": "School of Architecture and the Built Environment" ,"L2": "Architecture" }}, 
-"Supervisor3": {"Last name": "Supervisor", "First name": "Third Busy", "E-mail": "sc@tu.va", "Other organisation": "Timbuktu University, Department of Pseudoscience" }, 
-"Examiner1": {"Last name": "Maguire Jr.", "First name": "Gerald Q.", "Local User Id": "u1d13i2c", "E-mail": "maguire@kth.se", "organisation": {"L1": "School of Electrical Engineering and Computer Science" ,"L2": "Computer Science" }}, 
-"Cooperation": {"Partner_name": "Företaget AB"}, 
-"National Subject Categories": "10201, 10206", 
-"Other information": {"Year": "2021", "Number of pages": "xxxv,35" }, 
-"Series": {"Title of series": "TRITA-EECS-EX" , "No. in series": "2021:00" }, 
-"Opponents": {"Name": "A. B. Normal \& A. X. E. Normalè"}, 
-"Presentation": {"Date": "2021-03-15 13:00" ,"Language": "eng" ,"Room": "via Zoom https://kth-se.zoom.us/j/ddddddddddd" ,"Address": "Isafjordsgatan 22 (Kistagången 16)" ,"City": "Stockholm" }, 
+"Cycle": "1", "Course code": "IA150X", "Credits": "15.0",
+"Degree1": {"Educational program": "" ,"programcode": "TCOMK" ,"Degree": "Bachelors degree" ,"subjectArea": "Information and Communication Technology" },
+"Title": {"Main title": "This is the title in the language of the thesis", "Subtitle": "An subtitle in the language of the thesis", "Language": "eng" }, "Alternative title": {"Main title": "Detta är den svenska översättningen av titeln", "Subtitle": "Detta är den svenska översättningen av undertiteln", "Language": "swe" },
+"Supervisor1": {"Last name": "Supervisor", "First name": "A. Busy", "Local User Id": "u100003", "E-mail": "sa@kth.se", "organisation": {"L1": "School of Electrical Engineering and Computer Science" ,"L2": "Computer Science" }},
+"Supervisor2": {"Last name": "Supervisor", "First name": "Another Busy", "Local User Id": "u100003", "E-mail": "sb@kth.se", "organisation": {"L1": "School of Architecture and the Built Environment" ,"L2": "Architecture" }},
+"Supervisor3": {"Last name": "Supervisor", "First name": "Third Busy", "E-mail": "sc@tu.va", "Other organisation": "Timbuktu University, Department of Pseudoscience" },
+"Examiner1": {"Last name": "Maguire Jr.", "First name": "Gerald Q.", "Local User Id": "u1d13i2c", "E-mail": "maguire@kth.se", "organisation": {"L1": "School of Electrical Engineering and Computer Science" ,"L2": "Computer Science" }},
+"Cooperation": {"Partner_name": "Företaget AB"},
+"National Subject Categories": "10201, 10206",
+"Other information": {"Year": "2021", "Number of pages": "xxxv,35" },
+"Series": {"Title of series": "TRITA-EECS-EX" , "No. in series": "2021:00" },
+"Opponents": {"Name": "A. B. Normal \& A. X. E. Normalè"},
+"Presentation": {"Date": "2021-03-15 13:00" ,"Language": "eng" ,"Room": "via Zoom https://kth-se.zoom.us/j/ddddddddddd" ,"Address": "Isafjordsgatan 22 (Kistagången 16)" ,"City": "Stockholm" },
 "Number of lang instances": "10",
 "abstracts": {
 "eng": €€€€
@@ -2958,7 +2958,7 @@ This contrived example shows that a \LaTeX~abstract of the form shown in \Cref{l
 
 \textbf{NB}: that the cleanup\_pseudo\_JSON-from\_LaTeX.py program does simple text substitution and cannot handle nested \LaTeX~commands.
 
-	
+
 \begin{lstlisting}[language={}, caption={Source \LaTeX~(from inside the scontents of the abstract)}, label=lst:JSONtoLadokK]
 Write an abstract that is about \textit{250 and 350 words} (1/2 A4-page)  with the following components: % key parts of the abstract
 \begin{itemize}
@@ -3033,7 +3033,7 @@ Exception: Couldn't register PRO3=P 2021-07-14: Hinder mot skapa resultat påtr�
 
 \section{Removing the README\_examiner\_notes}
 At some point you will no longer want this README information. You can remove it by removing the line
-\textbackslash include\{README\_notes/README\_examiner\_notes\} -- from the \texttt{examplethesis.tex} file. You can then remove the \texttt{README\_notes} directory.
+\textbackslash include\{README\_notes/README\_examiner\_notes\} -- from the \texttt{main.tex} file. You can then remove the \texttt{README\_notes} directory.
 
 \section[Copyright or Creative Commons License]{Copyright or Creative Commons\\ License}
 \label{sec:copyrightOrCClicenseExaminer}
@@ -3122,7 +3122,7 @@ The use of \texttt{hyperxmp} caused a change in how the author's name is process
 \thispagestyle{empty}
 \begin{flushleft}
   \sffamily
-  \copyright\enspace\the\year\quad\@authorsFirstname\space\@authorsLastname 
+  \copyright\enspace\the\year\quad\@authorsFirstname\space\@authorsLastname
   \ifx\@secondAuthorsLastname\@empty\relax
   \else
     \ifinswedish
@@ -3145,7 +3145,7 @@ The use of \texttt{hyperxmp} caused a change in how the author's name is process
   \fi%
 }
 \hypersetup{
-     pdfcopyright={\mycopyright} 
+     pdfcopyright={\mycopyright}
 }
 \restoregeometry
 \clearpage
@@ -3177,7 +3177,7 @@ The use of \texttt{hyperxmp} caused a change in how the author's name is process
     {by-nc-sa}{CC BY-NC-SA}%
     {zero}{CC0}%
   }[\typeout{Creative Commons code  \doclicense@modifier not found}\copyright]
-  \enspace\the\year\quad\@authorsFirstname\space\@authorsLastname 
+  \enspace\the\year\quad\@authorsFirstname\space\@authorsLastname
   \ifx\@secondAuthorsLastname\@empty\relax
   \else
     \ifinswedish
@@ -3212,7 +3212,7 @@ The use of \texttt{hyperxmp} caused a change in how the author's name is process
 }
 
 \hypersetup{
-     pdfcopyright={\mycopyright} 
+     pdfcopyright={\mycopyright}
 }
 \restoregeometry
 \clearpage
@@ -3258,7 +3258,7 @@ Bepress has written about Elsevier's Digital Commons in a webpage ``Digital Comm
 \begin{table}[!ht]
     \caption{Dublin Core Elements in Digital Commons\cite{digital_commons_metadata_2016} - items in bold are from the so-called ``simple Dublic Core''}
     \label{tab:dublicCoreDigitalCommons}
-    \begin{footnotesize}   
+    \begin{footnotesize}
     \begin{tabular}{l | l }
       \textbf{Element} & \textbf{Element} \\
       \hline
@@ -3374,7 +3374,7 @@ The XMP data utilizes a number of different schema and namespaces. These namespa
 
 \begin{lstlisting}[style=myXML,
 caption={Second part of the XML metadata embedded in a PDF file (some reformatting has been done to fit the text in the boarders)}, label={lst:pdfinfoOutputPart2}]
-£$\ldots$ {\color{red} continuation of the above listing}£ 
+£$\ldots$ {\color{red} continuation of the above listing}£
       <pdfaExtension:schemas>
         <rdf:Bag>
           <rdf:li rdf:parseType="Resource">
@@ -3600,7 +3600,7 @@ caption={Second part of the XML metadata embedded in a PDF file (some reformatti
 \Cref{lst:pdfinfoOutputPart3} shows the third part of the XMP data. In this part we can see information in the \texttt{pdf} namespace. Information about this namespace should be found at \url{http://ns.adobe.com/pdf/1.3/}; however, this URL is no longer valid - but one can find the data at \url{https://developer.adobe.com/xmp/docs/XMPNamespaces/pdf/}. The Adobe PDF namespace has defined four names: pdf:Keywords, pdf:PDFVersion, pdf:Producer, and pdf:Trapped. In this listing we can see two of these: pdf:Producer and pdf:Keywords. The latter of these is a comma separated list of keywords.
 \begin{lstlisting}[style=myXML,
 caption={The \texttt{pdf}-prefix metadata embedded in a PDF file (some reformatting has been done to fit the text in the boarders)}, label={lst:pdfinfoOutputPart3}]
-£$\ldots$ {\color{red} continuation of the above listing}£ 
+£$\ldots$ {\color{red} continuation of the above listing}£
       <pdf:Producer>XeTeX version 0.999994</pdf:Producer>
       <pdf:Keywords>Canvas Learning Management System, Docker containers, Performance tuning, Canvas Lärplattform, Dockerbehållare, Prestandajustering</pdf:Keywords>
 \end{lstlisting}
@@ -3608,14 +3608,14 @@ caption={The \texttt{pdf}-prefix metadata embedded in a PDF file (some reformatt
 \Cref{lst:pdfinfoOutputPart4} shows the next part of the XMP data. In this case we see a new name prefix \texttt{xmpRights}, specifically the name \texttt{xmpRights:Marked}. This namespace should be described at \url{http://ns.adobe.com/xap/1.0/rights/}; however, this URL is no longer valid - but one can find the information at \url{https://developer.adobe.com/xmp/docs/XMPNamespaces/xmpRights/}. This namespace defines the following names: xmpRights:Certificate, xmpRights:Marked, xmpRights:Owner, xmpRights:UsageTerms, and xmpRights:WebStatement. In this case xmpRights:Marked is marked as ``True'' which ``indicates that this is a rights-managed resource. When false, indicates that this is a public-domain resource. Omit if the state is unknown.''. So in this case it is a right-managed resource.
 \begin{lstlisting}[style=myXML,
 caption={The \texttt{xmpRights:Marked} metadata embedded in a PDF file}, label={lst:pdfinfoOutputPart4}]
-£$\ldots$ {\color{red} continuation of the above listing}£ 
+£$\ldots$ {\color{red} continuation of the above listing}£
       <xmpRights:Marked>True</xmpRights:Marked>
 \end{lstlisting}
 
 \Cref{lst:pdfinfoOutputPart5} shows the next part of the XMP data. In this case we can see an element from the \texttt{dc} namespace. The name \texttt{dc:format} indicates the format of the document. As per \url{https://www.dublincore.org/specifications/dublin-core/format-element/} in the case of an electronic document the format is described using the Internet Media Types (\ie MIME values).
 \begin{lstlisting}[style=myXML,
 caption={The \texttt{dc:format} metadata embedded in a PDF file}, label={lst:pdfinfoOutputPart5}]
-£$\ldots$ {\color{red} continuation of the above listing}£ 
+£$\ldots$ {\color{red} continuation of the above listing}£
       <dc:format>application/pdf</dc:format>
 \end{lstlisting}
 
@@ -3623,7 +3623,7 @@ caption={The \texttt{dc:format} metadata embedded in a PDF file}, label={lst:pdf
 optional ISO 3166-1 two-letter region code.
 \begin{lstlisting}[style=myXML,
 caption={The \texttt{dc:title>} metadata embedded in a PDF file (some reformatting has been done to fit the text in the boarders)}, label={lst:pdfinfoOutputPart6}]
-£$\ldots$ {\color{red} continuation of the above listing}£ 
+£$\ldots$ {\color{red} continuation of the above listing}£
       <dc:title>
         <rdf:Alt>
           <rdf:li xml:lang="x-default">This is the title in the language of the thesis: A subtitle in the language of the thesis</rdf:li>
@@ -3636,7 +3636,7 @@ caption={The \texttt{dc:title>} metadata embedded in a PDF file (some reformatti
 \Cref{lst:pdfinfoOutputPart7} shows the \texttt{dc:description} metadata. These contain the abstracts in each of the languages used in the thesis. This is done using the same mechanism as described above for the titles. Note that is possible to use \LaTeX~macros in the abstracts, but the set of things that are supported by subsequent post-processing is limited. The \LaTeX~macros are hidden from expansion by replacing all instances of '\textbackslash' with '\textcent' (the cent symbol) using a new macro: \textbackslash replaceBS defined in \texttt{kththesis.cls}.
 \begin{lstlisting}[style=myXML,
 caption={The \texttt{dc:description} metadata embedded in a PDF file (some reformatting has been done to fit the text in the boarders)}, label={lst:pdfinfoOutputPart7}]
-£$\ldots$ {\color{red} continuation of the above listing}£ 
+£$\ldots$ {\color{red} continuation of the above listing}£
       <dc:description>
         <rdf:Alt>
           <rdf:li xml:lang="x-default">Detta är den svenska översättningen av titeln – Detta är den svenska översättningen av undertiteln</rdf:li>
@@ -3679,7 +3679,7 @@ or Swedish abstract and English summary need not be literal translations of each
 
 \begin{lstlisting}[style=myXML,
 caption={The \texttt{dc:rights}, \texttt{dc:publisher}, \texttt{dc:date}, and \texttt{dc:type} metadata embedded in a PDF file (some reformatting has been done to fit the text in the boarders)}, label={lst:pdfinfoOutputPart8}]
-£$\ldots$ {\color{red} continuation of the above listing}£ 
+£$\ldots$ {\color{red} continuation of the above listing}£
       <dc:rights>
         <rdf:Alt>
           <rdf:li xml:lang="en">Copyright (c) 2022 Fake A. Student, Jr. and Fake B. Student</rdf:li>
@@ -3702,7 +3702,7 @@ caption={The \texttt{dc:rights}, \texttt{dc:publisher}, \texttt{dc:date}, and \t
       </dc:type>
 \end{lstlisting}
 
- 	
+
 \begin{figure}[!ht]
   \begin{center}
     \includegraphics[width=0.99\textwidth]{README_notes/README-examiner-figures/Example-of-copyright-data-Screenshot_20221227_143035.png}
@@ -3714,7 +3714,7 @@ caption={The \texttt{dc:rights}, \texttt{dc:publisher}, \texttt{dc:date}, and \t
 \Cref{lst:pdfinfoOutputPart9} shows the \texttt{dc:creator} metadata. In this case the comma separated list of authors has been rendered as an \texttt{rdf:Seq} which is an \textbf{ordered} list of items.
 \begin{lstlisting}[style=myXML,
 caption={The \texttt{dc:creator} metadata embedded in a PDF file}, label={lst:pdfinfoOutputPart9}]
-£$\ldots$ {\color{red} continuation of the above listing}£ 
+£$\ldots$ {\color{red} continuation of the above listing}£
       <dc:creator>
         <rdf:Seq>
           <rdf:li>Fake A. Student, Jr.</rdf:li>
@@ -3727,7 +3727,7 @@ caption={The \texttt{dc:creator} metadata embedded in a PDF file}, label={lst:pd
 \Cref{lst:pdfinfoOutputPart10} shows the \texttt{dc:subject} metadata. In this case the comma separated list of keywords has been rendered as an \texttt{rdf:Bag} which is an \textbf{unordered} list of items.
 \begin{lstlisting}[style=myXML,
 caption={The \texttt{dc:subject} metadata embedded in a PDF file}, label={lst:pdfinfoOutputPart10}]
-£$\ldots$ {\color{red} continuation of the above listing}£ 
+£$\ldots$ {\color{red} continuation of the above listing}£
       <dc:subject>
         <rdf:Bag>
           <rdf:li>Canvas Learning Management System</rdf:li>
@@ -3743,7 +3743,7 @@ caption={The \texttt{dc:subject} metadata embedded in a PDF file}, label={lst:pd
 \Cref{lst:pdfinfoOutputPart11} shows the \texttt{dc:source} and \texttt{dc:language} metadata. The value of \texttt{dc:source} was not set explicitly, so this seems to have been derived in some way. Additionally, the \texttt{dc:language} \texttt{rdf:Bag} was automatically computed and includes all of the languages used via \textsc{babel} or \textsc{polyglossia} in the thesis.
 \begin{lstlisting}[style=myXML,
 caption={The \texttt{dc:source} and \texttt{dc:language} metadata embedded in a PDF file}, label={lst:pdfinfoOutputPart11}]
-£$\ldots$ {\color{red} continuation of the above listing}£ 
+£$\ldots$ {\color{red} continuation of the above listing}£
       <dc:source>output.tex</dc:source>
       <dc:language>
         <rdf:Bag>
@@ -3764,7 +3764,7 @@ caption={The \texttt{dc:source} and \texttt{dc:language} metadata embedded in a 
 \Cref{lst:pdfinfoOutputPart12} shows the \texttt{xmp}-prefix elements in the file. This namespace is supposed to be defined at \url{http://ns.adobe.com/xap/1.0/}; however, this URL is not longer valid but the Adobe XMP Basic namespace is described at url{https://developer.adobe.com/xmp/docs/XMPNamespaces/xmp/}. In this specific case, the file provides the \texttt{CreateDate}, \texttt{xmp:ModifyDate}, \texttt{xmp:MetadataDate}, and \texttt{xmp:CreatorTool}. For the last of these the value is shown as ``LaTeX with hyperref<'' even though the \XeLaTeX~engine was used.
 \begin{lstlisting}[style=myXML,
 caption={The final set of metadata embedded in a PDF file}, label={lst:pdfinfoOutputPart12}]
-£$\ldots$ {\color{red} continuation of the above listing}£ 
+£$\ldots$ {\color{red} continuation of the above listing}£
       <xmp:CreateDate>2022-12-27T10:22:34</xmp:CreateDate>
       <xmp:ModifyDate>2022-12-27T10:22:34Z</xmp:ModifyDate>
       <xmp:MetadataDate>2022-12-27T10:22:34Z</xmp:MetadataDate>
@@ -3774,7 +3774,7 @@ caption={The final set of metadata embedded in a PDF file}, label={lst:pdfinfoOu
 \Cref{lst:pdfinfoOutputPart13} shows the \texttt{xmpMM}-prefix metadata. The information about this namespace should be at \url{http://ns.adobe.com/xap/1.0/mm/}, however, this URL is no longer valid but the description of the XMP Media Management namespace is available at \url{https://developer.adobe.com/xmp/docs/XMPNamespaces/xmpMM/}.
 \begin{lstlisting}[style=myXML,
 caption={The \texttt{xmpMM}-prefix metadata embedded in a PDF file (two of the lines have been manually broken to fit the test in the margins)}, label={lst:pdfinfoOutputPart13}]
-£$\ldots$ {\color{red} continuation of the above listing}£ 
+£$\ldots$ {\color{red} continuation of the above listing}£
       <xmpMM:DocumentID>uuid:d7a82bbb-620a-439b-ac90-5413339b620a£\break£</xmpMM:DocumentID>
       <xmpMM:InstanceID>uuid:620005f7-f75f-4dce-a820-a8888d18205f£\break£</xmpMM:InstanceID>
       <xmpMM:VersionID>1</xmpMM:VersionID>
@@ -3784,7 +3784,7 @@ caption={The \texttt{xmpMM}-prefix metadata embedded in a PDF file (two of the l
 \Cref{lst:pdfinfoOutputPart14} shows the \texttt{Iptc4xmpCore}-prefix metadata. The IPTC Core Schema namespace used by the IPTC Photo Metadata standards is described briefly at \url{http://iptc.org/std/Iptc4xmpCore/1.0/xmlns/}. A full description is available at \url{https://www.iptc.org/std/Iptc4xmpCore/1.0/specification/Iptc4xmpCore_1.0-spec-XMPSchema_8.pdf}. The \texttt{Iptc4xmpCore:CreatorContactInfo} is supposed to provide enough information to enable someone reading the file to be able to contact the creator of the content. For the purposes of the thesis I have identified the authors using the KTH\_id, since one students have completed their studies at kTH their acocunts are deactivated; hence, an e-mail address is no longer meaningful.
 \begin{lstlisting}[style=myXML,
 caption={The \texttt{Iptc4xmpCore}-prefix metadata embedded in a PDF file}, label={lst:pdfinfoOutputPart14}]
-£$\ldots$ {\color{red} continuation of the above listing}£ 
+£$\ldots$ {\color{red} continuation of the above listing}£
       <Iptc4xmpCore:CreatorContactInfo rdf:parseType="Resource">
         <Iptc4xmpCore:CiEmailWork>author: u100001,secondauthor: u100002</Iptc4xmpCore:CiEmailWork>
       </Iptc4xmpCore:CreatorContactInfo>
@@ -3793,7 +3793,7 @@ caption={The \texttt{Iptc4xmpCore}-prefix metadata embedded in a PDF file}, labe
 \Cref{lst:pdfinfoOutputPart15} shows the \texttt{prism}-prefix metadata. The Publishing Requirements for Industry Standard Metadata (PRISM) namespace should be described at \url{http://prismstandard.org/namespaces/basic/3.0/}; however, this URL is no longer valid but the PRISM Basic Metadata Specification can be found at \url{https://www.w3.org/Submission/2020/SUBM-prism-20200910/prism-basic.html}.
 \begin{lstlisting}[style=myXML,
 caption={The \texttt{prism}-prefix metadata embedded in a PDF file}, label={lst:pdfinfoOutputPart15}]
-£$\ldots$ {\color{red} continuation of the above listing}£ 
+£$\ldots$ {\color{red} continuation of the above listing}£
       <prism:complianceProfile>three</prism:complianceProfile>
       <prism:subtitle xml:lang="en">A subtitle in the language of the thesis</prism:subtitle>
       <prism:aggregationType>report</prism:aggregationType>
@@ -3805,7 +3805,7 @@ caption={The \texttt{prism}-prefix metadata embedded in a PDF file}, label={lst:
 
 \begin{lstlisting}[style=myXML,
 caption={The final part of the metadata embedded in a PDF file}, label={lst:pdfinfoOutputPart16}]
-£$\ldots$ {\color{red} continuation of the above listing}£ 
+£$\ldots$ {\color{red} continuation of the above listing}£
     </rdf:Description>
   </rdf:RDF>
 </x:xmpmeta>
@@ -3873,7 +3873,7 @@ caption={The \textbackslash divainfo macro has been extended to output the abstr
 
 Based upon the US Library of Congress ``Codes for the Representation of Names of Languages: Codes arranged alphabetically by alpha-3/ISO 639-2 Code'', I have eliminated all of the rows that did not have both a three-letter ISO 639-2 Code \textbf{and} a two-letter ISO 639-1 Code. For the three-letter ISO 639-2 Codes, I used only the  ``B'', \ie bibliographic codes. Based upon the above code's case statement I split the table into two parts: Languages already implemented (\Cref{tab:languagesImplemented}) and those remaining to be implemented (\Cref{tab:languagesNotImplemented}). In the course of doing this, I found that I had an incorrect entry in my case statement for ``nor'' and fixed it in the code.
 
-According to SCB (\url{https://www.scb.se/contentassets/221c69e399f0424b852b21236952e300/sprakkoder.xlsx}) there are also ISO 639-2 codes for Yiddish with regions (see \Cref{tab:SCByiddish}). For Romanian the ISO 639-2 B code is "rum" and the ISO 639-1 code is  "ro". However, again SCB gives additional ISO 639-2 codes (see \Cref{tab:SCBromani}). For Northern Sami (Samiska, (norra)) the ISO 639-2 is "sme" and the ISO 639-1 code is "se", but is there a region code that should be used? (See \Cref{tab:SCBsami}) For Tornedalen Finnish; Meänkieli\ the ISO 639-2 code is "fit", but I am not able to determine what ISO 639-1 code should be used (see \Cref{tab:languagesMissing}). Is it "fi" with some region code? If so, what region code? 
+According to SCB (\url{https://www.scb.se/contentassets/221c69e399f0424b852b21236952e300/sprakkoder.xlsx}) there are also ISO 639-2 codes for Yiddish with regions (see \Cref{tab:SCByiddish}). For Romanian the ISO 639-2 B code is "rum" and the ISO 639-1 code is  "ro". However, again SCB gives additional ISO 639-2 codes (see \Cref{tab:SCBromani}). For Northern Sami (Samiska, (norra)) the ISO 639-2 is "sme" and the ISO 639-1 code is "se", but is there a region code that should be used? (See \Cref{tab:SCBsami}) For Tornedalen Finnish; Meänkieli\ the ISO 639-2 code is "fit", but I am not able to determine what ISO 639-1 code should be used (see \Cref{tab:languagesMissing}). Is it "fi" with some region code? If so, what region code?
 
 \begin{table}[!htp]
     \caption{SCB table - Yiddish with regions}
@@ -3993,7 +3993,7 @@ However, it seems strange that there is not an ISO 639-1 Code. Interestingly, th
 \multicolumn{3}{c}%
 {{\bfseries \tablename\ \thetable{} -- continued from previous page}} \\
 \hline \multicolumn{1}{|c|}{\textbf{ISO 639-2 Code}} & \multicolumn{1}{c|}{\textbf{ISO 639-1 Code}} & \multicolumn{1}{c|}{\textbf{English name of Language}} \\
-\hline 
+\hline
 \endhead
 \hline \multicolumn{3}{|r|}{{Continued on next page}} \\
 \hline
@@ -4160,8 +4160,8 @@ Even with all of the various schema included in XMP, there is a lot of metadata 
 
 For XMP, there are some specific areas that might be of interest in the future:
 \begin{itemize}
-  \item Adding new dc elements (§\,\ref{sec:newDCelements}) 
-  \item Adding references to the metadata (§\,\ref{sec:addingReferences}), and 
+  \item Adding new dc elements (§\,\ref{sec:newDCelements})
+  \item Adding references to the metadata (§\,\ref{sec:addingReferences}), and
   \item Adding citation data to the metadata (§\,\ref{sec:addingCitation})
 \end{itemize}
 
@@ -4216,7 +4216,7 @@ Note that to include the URN and DiVA identifiers assigned by DiVA, you first ne
 \section{Future work: Better exploiting unicode}
 \label{sec:betterExploitingUnicode}
 
-The current design of storing the \LaTeX\ commands in an \textsc{scontents} buffer and then retrieving them \textit{without} expanding the \LaTeX\ macros makes it possible to post-process these commands and make content that is suited for making announcements of the oral presentation, making calendar entries for this presentation, and generating the abstracts for the MODS file for DiVA. However,  if one wants to take the full leap to unicode, this is perhaps not a good design choice - as it requires that all of the processing that \LaTeX\ could do of the unicode is not done and that the programs that extract the unexpanded contents will have to keep changing to keep up with want \LaTeX\ macros are used. 
+The current design of storing the \LaTeX\ commands in an \textsc{scontents} buffer and then retrieving them \textit{without} expanding the \LaTeX\ macros makes it possible to post-process these commands and make content that is suited for making announcements of the oral presentation, making calendar entries for this presentation, and generating the abstracts for the MODS file for DiVA. However,  if one wants to take the full leap to unicode, this is perhaps not a good design choice - as it requires that all of the processing that \LaTeX\ could do of the unicode is not done and that the programs that extract the unexpanded contents will have to keep changing to keep up with want \LaTeX\ macros are used.
 
 There might seem to be two alternatives:
 \begin{enumerate}
@@ -4224,7 +4224,7 @@ There might seem to be two alternatives:
     \item Only allow the use of \LaTeX\ macros that expand into unicode; thus, not allowing environments and commands such as \textbackslash textbf\{\}, \textbackslash textif\{\}, etc. that do not translate into characters that can be written in unicode.
 \end{enumerate}
 
-In the second alternative, one might think about translating the string inside a \textbackslash textbf\{\} into unicode characters in the Bold, Latin, uppercase \& lowercase range, \ie U+1D400 to U+1D433 (there is a similar transformation possible for Greek). The characters are defined in the \textsc{unicode-math} package. Logically, this would be similar to redefining \textbackslash textbf\{\} as \textbackslash mathtextbf\{\}\footnote{\textbackslash mathtextbf\{\} cannot be used directly as it only works in math mode.}.  
+In the second alternative, one might think about translating the string inside a \textbackslash textbf\{\} into unicode characters in the Bold, Latin, uppercase \& lowercase range, \ie U+1D400 to U+1D433 (there is a similar transformation possible for Greek). The characters are defined in the \textsc{unicode-math} package. Logically, this would be similar to redefining \textbackslash textbf\{\} as \textbackslash mathtextbf\{\}\footnote{\textbackslash mathtextbf\{\} cannot be used directly as it only works in math mode.}.
 
 For \textbackslash textif\{\} one could utilize the Italic, Latin, uppercase  and lowercase range, \ie U+1D434 to U+1D467 (there is a similar transformation possible for Greek). Similar transformations are possible for \textbackslash texttt\{\}
 using Typewriter, Latin, uppercase \& lowercase and for \textbackslash textsc\{\}
