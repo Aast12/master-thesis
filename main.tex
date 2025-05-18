@@ -67,7 +67,6 @@
 %\documentclass[swedish, biblatex]{kththesis}
 % if pdflatex \usepackage[utf8]{inputenc}
 
-\usepackage{todonotes}
 
 %% Conventions for todo notes:
 % Informational
@@ -1084,7 +1083,7 @@ OR of the masks.
 Since the mask groups may contain overlapping regions, a difference is applied to obtain exclusive masks. This is done in an ordered manner,
 starting from the groups with higher absorption (bone) up to lower absorption values (lung). This ensures that each pixel is assigned to
 the mask that produces the higher attenuation. The complete merging operation is described in algorithm \ref{alg:mergeSegmentationMasks}. Figure
-\ref{fig:segmentationMasks} shows a sample set of the processed segmentation masks over a CheXpert image using a 0.5 threshold.
+\ref{fig:segmentationMasks} shows a sample set of the processed segmentation masks over a CheXpert image using a threshold of 0.5.
 
 \input{algorithms/merge_segmentation_masks.tex}
 
