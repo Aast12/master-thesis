@@ -1,0 +1,18 @@
+{
+"Author1": {"Last name": "Sanchez Torres", "First name": "Andres Alam", "Local User Id": "u100001", "E-mail": "aast2@kth.se", "organisation": {"L1": "School of Electrical Engineering and Computer Science" }},
+"Cycle": "2", "Course code": "SF259X", "Credits": "30.0",
+"Degree1": {"Educational program": "","programcode": "COSSE" ,"Degree": "Degree of Master of Science in Engineering" ,"subjectArea": "Scientific Computing" },
+"Title": {"Main title": "Chest X-ray Transmission Map Reconstruction", "Subtitle": "Constrained Optimization to Invert a Family of Image Processing Algorithms", "Language": "eng" }, "Alternative title": {"Main title": "Detta är den svenska översättningen av titeln", "Subtitle": "Detta är den svenska översättningen av undertiteln", "Language": "swe" },
+"Supervisor1": {"Last name": "Supervisor", "First name": "A. Busy", "Local User Id": "u100003", "E-mail": "sa@kth.se", "organisation": {"L1": "School of Electrical Engineering and Computer Science" ,"L2": "Computer Science" }},
+"Supervisor2": {"Last name": "Supervisor", "First name": "Another Busy", "Local User Id": "u100003", "E-mail": "sb@kth.se", "organisation": {"L1": "School of Architecture and the Built Environment" ,"L2": "Architecture" }},
+"Supervisor3": {"Last name": "Supervisor", "First name": "Third Busy", "E-mail": "sc@tu.va", "Other organisation": "Timbuktu University, Department of Pseudoscience" },
+"Examiner1": {"Last name": "Maguire Jr.", "First name": "Gerald Q.", "Local User Id": "u1d13i2c", "E-mail": "maguire@kth.se", "organisation": {"L1": "School of Electrical Engineering and Computer Science" ,"L2": "Computer Science" }},
+"Cooperation": {"Partner_name": "Företaget AB"},
+"National Subject Categories": "10201, 10206",
+"Other information": {"Year": "2025", "Number of pages": "1,87" },
+"Copyrightleft": "copyright",
+"Series": {"Title of series": "TRITA -- EECS-EX" , "No. in series": "2024:0000" },
+"Opponents": {"Name": "A. B. Normal \& A. X. E. Normalè"},
+"Presentation": {"Date": "2022-03-15 13:00" ,"Language": "eng" ,"Room": "via Zoom https://kth-se.zoom.us/j/ddddddddddd" ,"Address": "Isafjordsgatan 22 (Kistagången 16)" ,"City": "Stockholm" },
+"Number of lang instances": "2",
+}

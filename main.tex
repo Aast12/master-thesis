@@ -239,8 +239,8 @@ nopostdot]{glossaries}
 % insert the configuration information with author(s), examiner, supervisor(s), ...
 \input{custom_configuration}
 
-\title{This is the title in the language of the thesis}
-\subtitle{A subtitle in the language of the thesis}
+\title{Chest X-ray Transmission Map Reconstruction}
+\subtitle{Constrained Optimization to Invert a Family of Image Processing Algorithms}
 
 % give the alternative title - i.e., if the thesis is in English, then give a Swedish title
 \alttitle{Detta är den svenska översättningen av titeln}
@@ -252,7 +252,7 @@ nopostdot]{glossaries}
 % Enter the English and Swedish keywords here for use in the PDF metadata _and_ for later use
 % following the respective abstract.
 % Try to put the words in the same order in both languages to facilitate matching. For example:
-\EnglishKeywords{Canvas Learning Management System, Docker containers, Performance tuning}
+\EnglishKeywords{Nonlinear Optimization, Medical Imaging, Digital Image Processing}
 \SwedishKeywords{Canvas Lärplattform, Dockerbehållare, Prestandajustering}
 
 %%%%% For the oral presentation
@@ -674,7 +674,7 @@ X-ray transmission through matter follows Beer's Law, which describes how the in
 I = I_0 e^{-\mu x}
 \end{equation}
 
-where $I_0$ is the incident intensity and $\mu$ is the linear attenuation coefficient of the material \cite{cullity2014elements}.
+where $I_0$ is the incident intensity and $\mu$ is the linear attenuation coefficient of the material \cite[p.~35]{cullity2014elements}.
 
 For heterogeneous materials like the human body, the equation becomes an integral along the beam path:
 
@@ -944,7 +944,7 @@ The background presented establishes the foundation for our approach to transmis
 \section{Mathematical Model}
 \label{sec:mathematicalModel}
 
-For this thesis project, a family of methods \todo{is this the right term} are explored to recover transmission maps under the lack of prior knowledge about the ground truth, and the
+For this thesis project, a family of models \todo{is this the right term} are explored to recover transmission maps under the lack of prior knowledge about the ground truth, and the
 diversity of black-box models that are used in practice to process radiographic images. The motivations \todo{can we say this?} driving the design of the methods can be summarized as follows:
 
 \begin{itemize}
@@ -1042,7 +1042,7 @@ labels. Concretely, the segmentation model identifies 13 categories, which are g
 labels are listed in Table \ref{tab:segmentationGroups}.
 
 The motivation of the selected groups is the similar absorption coefficients among the different body tissues, which
-vary by about 2\% of the dynamic range of an X-ray measurement \todo{maybe the terminology isn't quite right} \cite[p.~34]{epsteinIntroductionMathematicsMedical2008}.
+vary by about 2\% of the dynamic range of an X-ray measurement \todo{maybe the terminology isn't quite right} \cite[p.~54]{epstein2008}.
 Thus, if we expect certain ranges of X-ray intensities over different chest regions, these will depend on the absorption coefficients of all tissues transversed.
 It is assumed that the projected intensities can vary significantly across regions where: bones are present, lungs are present (air content), and only soft tissues are transversed \todo{I feel I'm not explaining myself}.
 
@@ -1083,7 +1083,7 @@ OR of the masks.
 Since the mask groups may contain overlapping regions, a difference is applied to obtain exclusive masks. This is done in an ordered manner,
 starting from the groups with higher absorption (bone) up to lower absorption values (lung). This ensures that each pixel is assigned to
 the mask that produces the higher attenuation. The complete merging operation is described in algorithm \ref{alg:mergeSegmentationMasks}. Figure
-\ref{fig:segmentationMasks} shows a sample set of the processed segmentation masks over a CheXpert image using a threshold of 0.5.
+\ref{fig:segmentationMasks} shows a sample set of the processed segmentation masks over a CheXpert image using a threshold of 0.5. \todo{maybe add a figure to explain this algorithm}
 
 \input{algorithms/merge_segmentation_masks.tex}
 
@@ -1095,7 +1095,29 @@ the mask that produces the higher attenuation. The complete merging operation is
 \end{figure}
 
 \section{Analysis of Transmission Map Properties}
+
+To constrain our solution space, an analysis was done on the limited transmission map data
+
+\begin{description}
+    \item[Collimated area range] Only a fraction of the dynamic range of a transmission map
+   contains diagnostic information. Figure \ref{fig:transmissionMapsHistograms} shows the histograms
+   of the transmission map samples. It can be observed that the captured transmission values are concentrated in
+  the range below 0.4, with the outliers corresponding to the regions outside the collimated area. \todo{is 'collimated area' the right term?}
+  \item[]
+
+
+\end{description}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1.0\textwidth]{figures/transmission_maps_histograms.png}
+    \caption{Histograms of chest phantom transmission maps}
+    \label{fig:transmissionMapsHistograms}
+\end{figure}
+
+
 To constrain our solution space, we analyze properties of transmission maps:
+
 \begin{itemize}
     \item \textbf{Value range}: Transmission values must lie between 0 and 1
     \item \textbf{Anatomical constraints}: Different tissues have characteristic ranges of attenuation values
