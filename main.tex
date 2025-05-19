@@ -1006,6 +1006,7 @@ to the reconstruction of transmission maps.
 
 
 \subsection{Transmission Maps}
+
 To our knowledge, there are currently no open datasets of X-ray transmission maps.
 We had access to, precisely, two images taken from the same chest phantom at the Hard X-ray lab in KTH, one paired with a processed
 image produced by a clinical detector \todo{is it correct to say the image comes from the detector}. Figure \ref{fig:chestPhantomImages} shows the obtained sample pair of transmission map and
@@ -1103,43 +1104,109 @@ To constrain our solution space, an analysis was done on the limited transmissio
    contains diagnostic information. Figure \ref{fig:transmissionMapsHistograms} shows the histograms
    of the transmission map samples. It can be observed that the captured transmission values are concentrated in
   the range below 0.4, with the outliers corresponding to the regions outside the collimated area. \todo{is 'collimated area' the right term?}
-  \item[]
+    \begin{figure}
+        \centering
+        \includegraphics[width=1.0\textwidth]{figures/transmission_maps_histograms.png}
+        \caption{Histograms of chest phantom transmission maps}
+        \label{fig:transmissionMapsHistograms}
+    \end{figure}
+    \item[Histogram cluster ranges] Figure \ref{fig:segmentationTransmissionMapsHistograms} shows the histograms
+    of different regions. It can be observed that the captured transmission values are concentrated in a closed
+    range of intensity values for each group, indicating the presence of distinct tissue types.
 
+    \begin{figure}
+        \centering
+        \includegraphics[width=1.0\textwidth]{figures/segmentation_txm_histograms.png}
+        \caption{Histograms of chest phantom transmission maps grouped by regions}
+        \label{fig:segmentationTransmissionMapsHistograms}
+    \end{figure}
 
+    \item[Non-uniform histogram] Figure \ref{fig:processedHistogramCompare} shows the histograms of a real pair of transmission map
+    and processed image. There is an evident difference with the processed image having more uniform histograms,
+    likely resulting from a histogram equalization process. In contrast, transmission maps have higher frequencies
+    in the values closer to zero.
+    \begin{figure}
+        \centering
+        \includegraphics[width=1.0\textwidth]{figures/processed_hist_cmp.png}
+        \caption{Histograms of processed transmission maps}
+        \label{fig:processedHistogramCompare}
+    \end{figure}
 \end{description}
 
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=1.0\textwidth]{figures/transmission_maps_histograms.png}
-    \caption{Histograms of chest phantom transmission maps}
-    \label{fig:transmissionMapsHistograms}
-\end{figure}
+\section{Forward Operator Model}
 
+Throughout the entire model experimentation, a fixed forward operator is used to represent a
+digital radiography processing pipeline. According to the literature, modern iterations on image
+processing algorithms maintain a consistent appearance of images that the radiologists are used to
+\cite[p.~57]{STA00a}. The motivation then is to work with a model that can produce X-ray images
+with an appearance consistent to the existing image datasets. Then, it is expected
+that inverting this would produce transmission maps with realistic values.
 
-To constrain our solution space, we analyze properties of transmission maps:
+The goals of image processing can be condensed in the following \cite[p.~149]{Prokop2003}:
 
 \begin{itemize}
-    \item \textbf{Value range}: Transmission values must lie between 0 and 1
-    \item \textbf{Anatomical constraints}: Different tissues have characteristic ranges of attenuation values
-    \item \textbf{Spatial coherence}: Transmission values generally vary smoothly except at tissue boundaries
-    \item \textbf{Histogram characteristics}: Transmission maps typically show multi-modal distributions corresponding to different tissue types
+    \item to display the full range of attenuation differences in
+    the chest,
+    \item to optimize spatial resolution of digital chest radio-
+    graphs,
+    \item to enhance structural contrast in the lungs and medi-
+    astinum, and
+    \item to suppress image noise.
 \end{itemize}
 
-\section{Forward Operator Models}
-Based on our literature review of digital radiography processing, we model the forward operator $F$ as a composition of several transformations:
+These goals, and choosing transformations that are appropriate for autodifferentiation, rule the design
+of our operator $F$ as a composition of several transformations:
 
 \begin{equation}
 F = F_n \circ F_{n-1} \circ \cdots \circ F_1
 \end{equation}
 
 where the component transformations include:
-\begin{itemize}
-    \item \textbf{Negative logarithm}: $F_1(x) = -\log(x + \epsilon)$, where $\epsilon$ is a small constant to avoid numerical issues
-    \item \textbf{Windowing}: $F_2(x) = \frac{1}{1+e^{-(x-c)/w}}$, with center $c$ and width $w$
-    \item \textbf{Range normalization}: $F_3(x) = \frac{x - \min(x)}{\max(x) - \min(x)}$
-    \item \textbf{Unsharp masking}: $F_4(x) = x + \alpha \cdot (x - G_\sigma * x)$, where $G_\sigma$ is a Gaussian kernel with standard deviation $\sigma$
-    \item \textbf{Clipping}: $F_5(x) = \min(\max(x, 0), 1)$
-\end{itemize}
+\begin{description}
+
+\item[Negative logarithm] $F_1(x) = -\log(x + \epsilon)$, where $\epsilon$ is a small constant to avoid numerical instability
+
+    Transmission maps represent the ratio of X-ray intensities $I_1$ and $I_0$,
+
+    \begin{equation}
+        \frac{I_1}{I_0} = e^{-\mu x}.
+    \end{equation}
+
+    However, processed images operate on the thickness terms $\mu x$
+    (explaining the negative relationship between transmission maps and diagnostic images),
+    which can be extracted through a negative logarithm.
+
+\item[Windowing] As a way of implementing gradational adjustment, a window function is implemented, that creates
+an S-shape lookup table to achieve signal normalization:
+
+\begin{equation}
+    F_2(x) = \frac{1}{1+e^{-\gamma \frac{x - c}{w}}},
+\end{equation}
+
+where $c$ is the center of the sigmoid function, $w$ is a width parameter, and $\gamma$ is a steepness parameter.
+The effect of these parameters and how these translate into a LUT is shown in Figure \ref{fig:windowingParams}.
+
+\begin{figure}
+    \centering
+    \includegraphics[width=1.0\textwidth]{figures/window_params.png}
+    \caption{Windowing function with different parameter settings.}
+    \label{fig:windowingParams}
+\end{figure}
+
+\item[Unsharp masking]
+\begin{equation}
+    F_4(x) = x + \alpha \cdot (x - G_\sigma * x),
+\end{equation}
+
+where $G_\sigma$ is a Gaussian kernel with standard deviation $\sigma$.
+This operation achieves edge enhancement, and motivates the search of parameters with non-zero $\alpha$ and $\sigma$ values,
+in which case would be equivaling to ignoring this transformation.
+
+\item[Range normalization] $F_3(x) = \frac{x - \min(x)}{\max(x) - \min(x)}$, as a mean to normalize values to the $[0,1]$
+range, since operations such as windowing and unsharp masking can lead to values outside this range.
+
+\item[Clipping] $F_5(x) = \min(\max(x, 0), 1)$
+\end{description}
 
 The parameter vector $\theta$ includes all parameters of these transformations, such as $\{c, w, \alpha, \sigma\}$.
 
@@ -1228,303 +1295,303 @@ JAX's automatic differentiation capabilities require all operations in the forwa
     \end{lstlisting}
 \end{itemize}
 
-\subsection{Vectorization and Performance Optimization}
-JAX's vectorization capabilities allowed us to efficiently process batches of images:
+% \subsection{Vectorization and Performance Optimization}
+% JAX's vectorization capabilities allowed us to efficiently process batches of images:
 
-\begin{lstlisting}[language=Python]
-# Create a vectorized version of our forward function
-batched_forward = jax.vmap(forward, in_axes=(0, None))
+% \begin{lstlisting}[language=Python]
+% # Create a vectorized version of our forward function
+% batched_forward = jax.vmap(forward, in_axes=(0, None))
 
-# Create a vectorized version of our loss function
-def get_batch_mean_loss(unbatched_loss, in_axes=(0, None, 0, 0), **vmap_args):
-    def loss_fn(*args):
-        batched_loss = jax.vmap(unbatched_loss, in_axes=in_axes, **vmap_args)
-        loss_val = batched_loss(*args)
-        return jnp.mean(loss_val)
-    return loss_fn
-\end{lstlisting}
+% # Create a vectorized version of our loss function
+% def get_batch_mean_loss(unbatched_loss, in_axes=(0, None, 0, 0), **vmap_args):
+%     def loss_fn(*args):
+%         batched_loss = jax.vmap(unbatched_loss, in_axes=in_axes, **vmap_args)
+%         loss_val = batched_loss(*args)
+%         return jnp.mean(loss_val)
+%     return loss_fn
+% \end{lstlisting}
 
-\subsection{Pure Function Requirements}
-JAX requires pure functions without side effects, influencing our implementation:
+% \subsection{Pure Function Requirements}
+% JAX requires pure functions without side effects, influencing our implementation:
 
-\begin{itemize}
-    \item \textbf{Immutable state}: All state changes are handled through function returns rather than in-place modifications.
-    \item \textbf{Deterministic operations}: Random operations use explicitly managed PRNG keys:
-    \begin{lstlisting}[language=Python]
-    key = jax.random.PRNGKey(hyperparams["PRNGKey"])
-    txm0 = jax.random.uniform(
-        key, minval=minval, maxval=maxval, shape=batch_shape
-    )
-    \end{lstlisting}
-\end{itemize}
+% \begin{itemize}
+%     \item \textbf{Immutable state}: All state changes are handled through function returns rather than in-place modifications.
+%     \item \textbf{Deterministic operations}: Random operations use explicitly managed PRNG keys:
+%     \begin{lstlisting}[language=Python]
+%     key = jax.random.PRNGKey(hyperparams["PRNGKey"])
+%     txm0 = jax.random.uniform(
+%         key, minval=minval, maxval=maxval, shape=batch_shape
+%     )
+%     \end{lstlisting}
+% \end{itemize}
 
-\section{Data Loading and Preprocessing}
-\subsection{CheXpert Dataset Handler}
-We implemented a dataloader for the CheXpert dataset, focusing on frontal chest radiographs:
+% \section{Data Loading and Preprocessing}
+% \subsection{CheXpert Dataset Handler}
+% We implemented a dataloader for the CheXpert dataset, focusing on frontal chest radiographs:
 
-\begin{lstlisting}[language=Python, caption=CheXpert dataset loader implementation]
-def load_chexpert(
-    root_dir: str,
-    df_meta_path: str | None = None,
-    img_dir: str | None = None,
-    chexpert_version: str = "240401",
-    limit: int | None = None
-) -> list[ChexpertMeta]:
-    df_meta_path = (
-        df_meta_path
-        if df_meta_path is not None
-        else os.path.join(root_dir, f"df_chexpert_plus_{chexpert_version}.csv")
-    )
-    img_dir = img_dir if img_dir is not None else os.path.join(root_dir, "PNG")
+% \begin{lstlisting}[language=Python, caption=CheXpert dataset loader implementation]
+% def load_chexpert(
+%     root_dir: str,
+%     df_meta_path: str | None = None,
+%     img_dir: str | None = None,
+%     chexpert_version: str = "240401",
+%     limit: int | None = None
+% ) -> list[ChexpertMeta]:
+%     df_meta_path = (
+%         df_meta_path
+%         if df_meta_path is not None
+%         else os.path.join(root_dir, f"df_chexpert_plus_{chexpert_version}.csv")
+%     )
+%     img_dir = img_dir if img_dir is not None else os.path.join(root_dir, "PNG")
 
-    df_meta_path = os.path.abspath(df_meta_path)
-    img_dir = os.path.abspath(img_dir)
+%     df_meta_path = os.path.abspath(df_meta_path)
+%     img_dir = os.path.abspath(img_dir)
 
-    df_meta = pd.read_csv(df_meta_path)
-    df_meta = df_meta[df_meta["frontal_lateral"] == "Frontal"]
+%     df_meta = pd.read_csv(df_meta_path)
+%     df_meta = df_meta[df_meta["frontal_lateral"] == "Frontal"]
 
-    images: list[ChexpertMeta] = []
+%     images: list[ChexpertMeta] = []
 
-    for idx, row in df_meta.iterrows():
-        img_path = f"{img_dir}/{row['path_to_image']}"
-        patient_id = str(row["deid_patient_id"])
+%     for idx, row in df_meta.iterrows():
+%         img_path = f"{img_dir}/{row['path_to_image']}"
+%         patient_id = str(row["deid_patient_id"])
 
-        if not os.path.exists(img_path):
-            # chexpert csv reporting jpgs instead of pngs
-            img_path = img_path.replace(".jpg", ".png")
-            if not os.path.exists(img_path):
-                continue
+%         if not os.path.exists(img_path):
+%             # chexpert csv reporting jpgs instead of pngs
+%             img_path = img_path.replace(".jpg", ".png")
+%             if not os.path.exists(img_path):
+%                 continue
 
-        if limit and len(images) >= limit:
-            break
+%         if limit and len(images) >= limit:
+%             break
 
-        img_label = img_path.split("/")[-1]
-        study = img_path[img_path.find("study") :][:6]
+%         img_label = img_path.split("/")[-1]
+%         study = img_path[img_path.find("study") :][:6]
 
-        images.append(
-            {
-                "image": cv2.imread(img_path, cv2.IMREAD_UNCHANGED) / 255.0,
-                "image_path": img_path,
-                "patient_id": patient_id,
-                "study": study,
-                "image_label": img_label,
-            }
-        )
+%         images.append(
+%             {
+%                 "image": cv2.imread(img_path, cv2.IMREAD_UNCHANGED) / 255.0,
+%                 "image_path": img_path,
+%                 "patient_id": patient_id,
+%                 "study": study,
+%                 "image_label": img_label,
+%             }
+%         )
 
-    return images
-\end{lstlisting}
+%     return images
+% \end{lstlisting}
 
-\subsection{Image Preprocessing}
-Images are preprocessed to ensure consistent dimensions and value ranges:
+% \subsection{Image Preprocessing}
+% Images are preprocessed to ensure consistent dimensions and value ranges:
 
-\begin{lstlisting}[language=Python, caption=Image preprocessing function]
-def preprocess_chexpert_batch(
-    images, target_size=(512, 512)
-) -> Float[Array, "batch rows cols"]:
-    """
-    Preprocess a batch of CheXpert images with NumPy.
+% \begin{lstlisting}[language=Python, caption=Image preprocessing function]
+% def preprocess_chexpert_batch(
+%     images, target_size=(512, 512)
+% ) -> Float[Array, "batch rows cols"]:
+%     """
+%     Preprocess a batch of CheXpert images with NumPy.
 
-    Args:
-        images: Batch of images with shape (batch_size, height, width) or (batch_size, height, width, channels)
-        target_size: Target size (height, width) for all images
+%     Args:
+%         images: Batch of images with shape (batch_size, height, width) or (batch_size, height, width, channels)
+%         target_size: Target size (height, width) for all images
 
-    Returns:
-        Batch of preprocessed images with consistent dimensions
-    """
-    return np.array([center_crop_with_aspect_ratio(img, target_size) for img in images])
-\end{lstlisting}
+%     Returns:
+%         Batch of preprocessed images with consistent dimensions
+%     """
+%     return np.array([center_crop_with_aspect_ratio(img, target_size) for img in images])
+% \end{lstlisting}
 
-\section{Forward Operators Implementation}
-We implemented several operators to model the post-processing pipeline used in digital radiography, ensuring all operations are differentiable for compatibility with JAX:
+% \section{Forward Operators Implementation}
+% We implemented several operators to model the post-processing pipeline used in digital radiography, ensuring all operations are differentiable for compatibility with JAX:
 
-\begin{lstlisting}[language=Python, caption=Core forward operators]
-def negative_log(image: Float[Array, "rows cols"], eps=1e-6):
-    return -jnp.log(jnp.maximum(image, eps))
+% \begin{lstlisting}[language=Python, caption=Core forward operators]
+% def negative_log(image: Float[Array, "rows cols"], eps=1e-6):
+%     return -jnp.log(jnp.maximum(image, eps))
 
-def windowing(image, window_center, window_width, gamma):
-    x = image
-    x = (x - window_center) / window_width
-    x = jax.nn.sigmoid(x) ** gamma
-    return x
+% def windowing(image, window_center, window_width, gamma):
+%     x = image
+%     x = (x - window_center) / window_width
+%     x = jax.nn.sigmoid(x) ** gamma
+%     return x
 
-def unsharp_masking(image, sigma, enhance_factor):
-    x = jnp.expand_dims(image, axis=2)
-    kernel_size = 2 * sigma
-    blurred = gaussian_blur(x, sigma, kernel_size, padding="SAME")
-    x = (x - enhance_factor * blurred) / (1.0 - enhance_factor)
-    return x.squeeze()
+% def unsharp_masking(image, sigma, enhance_factor):
+%     x = jnp.expand_dims(image, axis=2)
+%     kernel_size = 2 * sigma
+%     blurred = gaussian_blur(x, sigma, kernel_size, padding="SAME")
+%     x = (x - enhance_factor * blurred) / (1.0 - enhance_factor)
+%     return x.squeeze()
 
-def clipping(image):
-    return jnp.clip(image, 0.0, 1.0)
+% def clipping(image):
+%     return jnp.clip(image, 0.0, 1.0)
 
-def range_normalize(image):
-    x = image
-    return (x - x.min()) / (x.max() - x.min())
-\end{lstlisting}
+% def range_normalize(image):
+%     x = image
+%     return (x - x.min()) / (x.max() - x.min())
+% \end{lstlisting}
 
-\section{Optimization Core}
-The core optimization function implements gradient descent with support for various optimizers and regularization terms. The optimization process leverages JAX's automatic differentiation to efficiently compute gradients:
+% \section{Optimization Core}
+% The core optimization function implements gradient descent with support for various optimizers and regularization terms. The optimization process leverages JAX's automatic differentiation to efficiently compute gradients:
 
-\begin{lstlisting}[language=Python, caption=Base optimization function]
-def base_optimize(
-    target: BatchT,
-    txm0: BatchT,
-    w0: WeightsT,
-    loss_fn: LossFnT,
-    forward_fn: ForwardFnT,
-    project_fn: ProjectFnT | None = None,
-    optimizer_builder=optax.adam,
-    constant_weights=False,
-    lr=0.001,
-    n_steps=500,
-    loss_logger=None,
-    eps=1e-8,
-) -> OptimizationRetT:
-    def loss_call(weights, tx_maps, target):
-        pred = forward_fn(tx_maps, weights)
-        loss = loss_fn(tx_maps, weights, pred, target)
+% \begin{lstlisting}[language=Python, caption=Base optimization function]
+% def base_optimize(
+%     target: BatchT,
+%     txm0: BatchT,
+%     w0: WeightsT,
+%     loss_fn: LossFnT,
+%     forward_fn: ForwardFnT,
+%     project_fn: ProjectFnT | None = None,
+%     optimizer_builder=optax.adam,
+%     constant_weights=False,
+%     lr=0.001,
+%     n_steps=500,
+%     loss_logger=None,
+%     eps=1e-8,
+% ) -> OptimizationRetT:
+%     def loss_call(weights, tx_maps, target):
+%         pred = forward_fn(tx_maps, weights)
+%         loss = loss_fn(tx_maps, weights, pred, target)
 
-        if loss_logger:
-            loss_logger(loss.item(), tx_maps, weights, pred, target)
+%         if loss_logger:
+%             loss_logger(loss.item(), tx_maps, weights, pred, target)
 
-        assert pred.shape == target.shape, (
-            f"Shapes do not match: {pred.shape} != {target.shape}"
-        )
+%         assert pred.shape == target.shape, (
+%             f"Shapes do not match: {pred.shape} != {target.shape}"
+%         )
 
-        return loss
+%         return loss
 
-    optimizer = optimizer_builder(learning_rate=lr)
-    state = (txm0, w0)
-    opt_state = optimizer.init(state)
-    losses = []
-    prev_state = (None, None)
+%     optimizer = optimizer_builder(learning_rate=lr)
+%     state = (txm0, w0)
+%     opt_state = optimizer.init(state)
+%     losses = []
+%     prev_state = (None, None)
 
-    def update(state, opt_state, target):
-        original_state = (state, opt_state)
-        tx_maps, weights = state
+%     def update(state, opt_state, target):
+%         original_state = (state, opt_state)
+%         tx_maps, weights = state
 
-        loss_value_and_grad = jax.value_and_grad(loss_call, argnums=(0, 1))
-        loss, (weight_grads, tx_grads) = loss_value_and_grad(weights, tx_maps, target)
-        grads = (tx_grads, weight_grads)
+%         loss_value_and_grad = jax.value_and_grad(loss_call, argnums=(0, 1))
+%         loss, (weight_grads, tx_grads) = loss_value_and_grad(weights, tx_maps, target)
+%         grads = (tx_grads, weight_grads)
 
-        updates, new_opt_state = optimizer.update(grads, opt_state)
-        updates_txm, updates_weights = updates
+%         updates, new_opt_state = optimizer.update(grads, opt_state)
+%         updates_txm, updates_weights = updates
 
-        txm_new_state = optax.apply_updates(tx_maps, updates_txm)
-        weights_new_state = weights
-        if not constant_weights:
-            weights_new_state = optax.apply_updates(weights, updates_weights)
+%         txm_new_state = optax.apply_updates(tx_maps, updates_txm)
+%         weights_new_state = weights
+%         if not constant_weights:
+%             weights_new_state = optax.apply_updates(weights, updates_weights)
 
-        new_state = (txm_new_state, weights_new_state)
-        if project_fn:
-            new_state = project_fn(txm_new_state, weights_new_state)
+%         new_state = (txm_new_state, weights_new_state)
+%         if project_fn:
+%             new_state = project_fn(txm_new_state, weights_new_state)
 
-        if jnp.isnan(loss):
-            new_state, new_opt_state = original_state
+%         if jnp.isnan(loss):
+%             new_state, new_opt_state = original_state
 
-        return loss, new_state, new_opt_state
+%         return loss, new_state, new_opt_state
 
-    for step in range(n_steps):
-        if step > 2 and jnp.abs(losses[-1] - losses[-2]) < eps:
-            wandb.log({"convergence_steps": step})
-            print(f"Converged after {step} steps")
-            break
+%     for step in range(n_steps):
+%         if step > 2 and jnp.abs(losses[-1] - losses[-2]) < eps:
+%             wandb.log({"convergence_steps": step})
+%             print(f"Converged after {step} steps")
+%             break
 
-        loss, state, opt_state = update(state, opt_state, target)
-        losses.append(loss)
+%         loss, state, opt_state = update(state, opt_state, target)
+%         losses.append(loss)
 
-        if jnp.isnan(loss):
-            state, loss = prev_state
-            print("Loss is NaN. Last loss:", loss)
-            break
+%         if jnp.isnan(loss):
+%             state, loss = prev_state
+%             print("Loss is NaN. Last loss:", loss)
+%             break
 
-        if step % 100 == 0:
-            print(f"\nStep {step}, Loss: {loss:.6f}")
+%         if step % 100 == 0:
+%             print(f"\nStep {step}, Loss: {loss:.6f}")
 
-        prev_state = (state, loss)
+%         prev_state = (state, loss)
 
-    if state is None:
-        return None, losses
+%     if state is None:
+%         return None, losses
 
-    return state, losses
-\end{lstlisting}
+%     return state, losses
+% \end{lstlisting}
 
-\section{Constraint Enforcement}
-We use Optax's projection operators to enforce constraints while maintaining differentiability:
+% \section{Constraint Enforcement}
+% We use Optax's projection operators to enforce constraints while maintaining differentiability:
 
-\begin{lstlisting}[language=Python, caption=Projection function for constraint enforcement]
-def projection(txm_state, weights_state):
-    new_txm_state = optax.projections.projection_hypercube(txm_state)
-    new_weights_state = optax.projections.projection_non_negative(weights_state)
-    new_weights_state["low_sigma"] = optax.projections.projection_box(
-        weights_state["low_sigma"], 0.1, 10
-    )
-    new_weights_state["low_enhance_factor"] = optax.projections.projection_box(
-        new_weights_state["low_enhance_factor"], 0.1, 1.0
-    )
-    return new_txm_state, new_weights_state
-\end{lstlisting}
+% \begin{lstlisting}[language=Python, caption=Projection function for constraint enforcement]
+% def projection(txm_state, weights_state):
+%     new_txm_state = optax.projections.projection_hypercube(txm_state)
+%     new_weights_state = optax.projections.projection_non_negative(weights_state)
+%     new_weights_state["low_sigma"] = optax.projections.projection_box(
+%         weights_state["low_sigma"], 0.1, 10
+%     )
+%     new_weights_state["low_enhance_factor"] = optax.projections.projection_box(
+%         new_weights_state["low_enhance_factor"], 0.1, 1.0
+%     )
+%     return new_txm_state, new_weights_state
+% \end{lstlisting}
 
-\section{Loss Functions and Metrics}
-We implemented several loss functions and metrics for evaluation:
+% \section{Loss Functions and Metrics}
+% We implemented several loss functions and metrics for evaluation:
 
-\begin{lstlisting}[language=Python, caption=Loss functions and metrics]
-def mse(pred, target):
-    return jnp.mean((pred - target) ** 2)
+% \begin{lstlisting}[language=Python, caption=Loss functions and metrics]
+% def mse(pred, target):
+%     return jnp.mean((pred - target) ** 2)
 
-def total_variation(image):
-    reg = (jnp.diff(image, axis=0) ** 2).mean() + (jnp.diff(image, axis=1) ** 2).mean()
-    return 0.5 * reg
+% def total_variation(image):
+%     reg = (jnp.diff(image, axis=0) ** 2).mean() + (jnp.diff(image, axis=1) ** 2).mean()
+%     return 0.5 * reg
 
-def ssim(x, y, L=1.0):
-    C1 = (0.01 * L) ** 2
-    C2 = (0.03 * L) ** 2
+% def ssim(x, y, L=1.0):
+%     C1 = (0.01 * L) ** 2
+%     C2 = (0.03 * L) ** 2
 
-    mu_x = jnp.mean(x)
-    mu_y = jnp.mean(y)
+%     mu_x = jnp.mean(x)
+%     mu_y = jnp.mean(y)
 
-    sigma_x = jnp.mean((x - mu_x) ** 2)
-    sigma_y = jnp.mean((y - mu_y) ** 2)
-    sigma_xy = jnp.mean((x - mu_x) * (y - mu_y))
+%     sigma_x = jnp.mean((x - mu_x) ** 2)
+%     sigma_y = jnp.mean((y - mu_y) ** 2)
+%     sigma_xy = jnp.mean((x - mu_x) * (y - mu_y))
 
-    num = (2 * mu_x * mu_y + C1) * (2 * sigma_xy + C2)
-    den = (mu_x**2 + mu_y**2 + C1) * (sigma_x + sigma_y + C2)
+%     num = (2 * mu_x * mu_y + C1) * (2 * sigma_xy + C2)
+%     den = (mu_x**2 + mu_y**2 + C1) * (sigma_x + sigma_y + C2)
 
-    return jnp.clip(num / den, 0.0, 1.0)
-\end{lstlisting}
+%     return jnp.clip(num / den, 0.0, 1.0)
+% \end{lstlisting}
 
-\section{Hyperparameter Search Configuration}
-We use Weights \& Biases for hyperparameter search:
+% \section{Hyperparameter Search Configuration}
+% We use Weights \& Biases for hyperparameter search:
 
-\begin{lstlisting}[language=Python, caption=Hyperparameter sweep configuration]
-sweep_config = {
-    "name": "unknown-transform-sweep-v2",
-    "method": "bayes",
-    "metric": {"name": "mse", "goal": "minimize"},
-    "parameters": {
-        "lr": {"min": 1e-5, "max": 1e-1},
-        "n_steps": {"values": [500, 700, 1200]},
-        "total_variation": {"values": [0.0, 0.1, 0.01, 0.001]},
-        "PRNGKey": {"values": [0, 42]},
-        "tm_distribution": {"values": ["uniform", "normal"]},
-        "tm_init_range": {
-            "values": [
-                (1e-6, 0.1),
-                (1e-6, 0.5),
-                (1e-6, 1.0),
-                (0.5, 1.0),
-            ]
-        },
-        # Fixed/metadata parameters
-        "loss": {"value": "MSE + TV"},
-        "initialization": {"value": "uniform random"},
-        "window_center_init_range": {"value": [0.1, 0.9]},
-        "window_width_init_range": {"value": [0.1, 0.9]},
-        "gamma_init_range": {"value": [0.1, 3.0]},
-        "eps": {"value": 1e-6},
-    },
-}
-\end{lstlisting}
+% \begin{lstlisting}[language=Python, caption=Hyperparameter sweep configuration]
+% sweep_config = {
+%     "name": "unknown-transform-sweep-v2",
+%     "method": "bayes",
+%     "metric": {"name": "mse", "goal": "minimize"},
+%     "parameters": {
+%         "lr": {"min": 1e-5, "max": 1e-1},
+%         "n_steps": {"values": [500, 700, 1200]},
+%         "total_variation": {"values": [0.0, 0.1, 0.01, 0.001]},
+%         "PRNGKey": {"values": [0, 42]},
+%         "tm_distribution": {"values": ["uniform", "normal"]},
+%         "tm_init_range": {
+%             "values": [
+%                 (1e-6, 0.1),
+%                 (1e-6, 0.5),
+%                 (1e-6, 1.0),
+%                 (0.5, 1.0),
+%             ]
+%         },
+%         # Fixed/metadata parameters
+%         "loss": {"value": "MSE + TV"},
+%         "initialization": {"value": "uniform random"},
+%         "window_center_init_range": {"value": [0.1, 0.9]},
+%         "window_width_init_range": {"value": [0.1, 0.9]},
+%         "gamma_init_range": {"value": [0.1, 3.0]},
+%         "eps": {"value": 1e-6},
+%     },
+% }
+% \end{lstlisting}
 
 \section{Experimental Setup}
 Our experiments are configured to explore different models and hyperparameters:
