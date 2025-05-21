@@ -623,46 +623,49 @@ Digital radiography systems are ubiquitous in modern healthcare but rely on expe
 an alternative low-cost approach using scintillator-coupled computer vision cameras, where a small camera sensor images a chest-sized scintillator screen.
 While this approach could significantly reduce hardware costs, such system will be expected to have higher noise, distortions, and sensitivity issues compared to commercial
 systems. A more sophisticated image processing pipeline would be required to produce diagnostic-quality images, and existing diagnostic predictive models
-trained on high-quality datasets like CheXpert may not perform adequately on images captured from these systems. To address the later, new models would be needed
-that are specifically trained on the unique characteristics of the proposed system.
+trained on high-quality datasets like CheXpert may not perform adequately on images captured from these systems due to the potential loss of diagnostic features.
+To address the later, new models would be needed that are specifically trained on the unique characteristics of the proposed system.
 
 \section{Problem Statement}
 \subsection{Original Problem Definition}
-The core problem is to build an open-source X-ray detector that is cost-effective yet diagnostically useful.  However, all film and digitalX-ray detectors and their subsequent processing pipelines operate on the same transmission maps,
-which represent the incident radiation (still dependent on dose and exposure time), which is later transformed by the detector system, and later processed to obtain
-a diagnostic quality image.
-
-Having access to the intermediate, detector-agnostic, incident X-ray transmission would enable the simulation of the same X-ray images captured by different detector systems,
-and the development of diagnostic models for the specific profile of images captured from these systems. This describes the primary goal of this project: to develop a framework that
-inverts the image processing transformations from high-quality chest x-ray images to obtain a new dataset of their underlying transmission maps.
-
-Morevever, equipment manufacturers (e.g., Siemens, Philips, GE) apply proprietary post-processing algorithms that include non-linear
-operations—likely including a combination of denoising, frequency filtering, and dynamic range adjustments. These operations form a "black-box" that varies across manufacturers,
-and images, represented in large datasets like CheXpert.
+The core problem is to build an open-source X-ray detector that is cost-effective yet diagnostically useful.  However, all film and digitalX-ray detectors and
+their subsequent processing pipelines operate on the same \textit{transmission maps}, which represent the incident radiation (still dependent on dose and exposure time),
+which is later acquired by the detector system, and further processed to obtain a diagnostic quality image.
 
 \todo{add diagram of X-ray image processing pipeline}
+
+Having access to the intermediate, detector-agnostic, incident X-ray transmission would enable the simulation of the same X-ray images captured by different detector systems.
+For the case of existing diagnostically labeled datasets, it would allow the development of diagnostic models on specific profiles of images captured from non-standard systems.
+Moreover, clinical grade equipment manufacturers (e.g., Siemens, Philips, GE) apply proprietary digital image processing algorithms that include non-linear
+operations—likely including a combination of denoising, frequency filtering, and dynamic range adjustments. These operations form a "black-box" that varies across manufacturers,
+and on an image-by-image basis.
+
+This describes the primary goal of this project: to develop a framework that inverts the image processing transformations from high-quality chest x-ray
+images to extend annotated, diagnositcally labeled, existing datasets with their corresponding transmission maps.
 
 \subsection{Scientific and Engineering Challenges}
 
 The problem to solve lies in the category of inverse problems, and has several critical challenges:
 
-\begin{itemize}
-    \item \textbf{Ill-posedness}:
+\begin{description}
+    \item[Ill-posedness]
         A single processed image can map back to multiple possible "realistic" transmission maps.
         The same holds on the other way around, where a single transmission map can map back to multiple processed images.
-        This makes the inverse problem fundamentally ill-posed.
-    \item \textbf{Diversity of processing approaches}:
+       This makes the inverse problem fundamentally ill-posed.
+    \item[Diversity of processing approaches]
         Each manufacturer implements proprietary image processing pipelines that differ in their specific algorithms and parameters.
-    \item \textbf{Limited ground truth}: We lack labeled data showing the original transmission maps corresponding to processed images.
-    \item \textbf{Scaling requirements}: We need to process many images to build a representative dataset.
-\end{itemize}
+    \item[Limited ground truth] We lack labeled data showing the original transmission maps corresponding to processed images.
+    \item[Scaling requirements] We need to process many images to build a representative dataset.
+\end{description}
 
 \section{Purpose}
-This research aims to develop accessible X-ray detector technology for resource-limited settings. By creating an open-source computational pipeline that simulates how camera-based X-ray detectors capture chest radiographs, we can:
+This research aims to develop accessible X-ray detector technology for resource-limited settings. By creating an open-source computational pipeline
+that simulates how camera-based X-ray detectors capture chest radiographs, we can:
+
 \begin{itemize}
     \item Enable more affordable diagnostic imaging in remote populations
     \item Provide a common baseline for comparing different detector technologies
-    \item Support development of machine learning models specifically trained for low-cost imaging systems
+    \item Support development of machine learning models specifically trained for non-standard imaging systems
 \end{itemize}
 
 \section{Goals}
