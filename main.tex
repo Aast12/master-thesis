@@ -659,28 +659,34 @@ The problem to solve lies in the category of inverse problems, and has several c
 \end{description}
 
 \section{Purpose}
-This research aims to develop accessible X-ray detector technology for resource-limited settings. By creating an open-source computational pipeline
-that simulates how camera-based X-ray detectors capture chest radiographs, we can:
+
+This research aims to support the development and experimentation with alternative X-ray detector technologies.
+More specifically, we aim to:
+
+\todo{add references to x-ray detector accessibility}
 
 \begin{itemize}
-    \item Enable more affordable diagnostic imaging in remote populations
-    \item Provide a common baseline for comparing different detector technologies
-    \item Support development of machine learning models specifically trained for non-standard imaging systems
+    \item Enable the development of X-ray detector technologies for resource-limited settings.
+    \item Provide a common baseline for comparing different detector technologies.
+    \item Support development of radiography machine learning models specific for non-standard imaging systems.
 \end{itemize}
 
 \section{Goals}
-The specific goals of this research are to:
+
+Regarding concrete outcomes of this project, the specific goals are delimited as follows:
+
 \begin{enumerate}
-    \item Identify properties shared by real X-ray transmission maps and define characteristics that make them "realistic"
-    \item Characterize the diversity of image processing pipelines applied to these maps in commercial systems
-    \item Develop and evaluate optimization algorithms that can recover plausible transmission maps from processed images
-    \item Create a framework that produces realistic simulated images for different detector configurations
+    \item Analyze limited X-ray transmission map data to identify and characterize the essential features that define radiologically realistic representations.
+    \item Characterize the diversity of image processing pipelines applied to these maps in commercial systems.
+    \item Develop and evaluate optimization algorithms that can recover plausible transmission maps from processed images.
 \end{enumerate}
 
 \section{Research Methodology}
-Our approach involves:
+
+Overall, the research methodology involves a combination of theoretical and experimental analysis, and computational modeling, described in the following steps:
+
 \begin{itemize}
-    \item Investigating established image processing algorithms used in radiography
+    \item Investigating established image processing algorithms used in radiography and a potential concensus across manufacturers
     \item Identifying common properties in processed images and their corresponding transmission maps
     \item Developing optimization algorithms with appropriate forward operators and loss functions
     \item Evaluating recovered maps through comparison with known physics models and visual assessment
