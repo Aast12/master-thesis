@@ -660,6 +660,7 @@ The problem to solve lies in the category of inverse problems, and has several c
 
 \section{Purpose}
 
+\todo{refine this and goals section, may have too many bullet points}
 This research aims to support the development and experimentation with alternative X-ray detector technologies.
 More specifically, we aim to:
 
@@ -698,6 +699,7 @@ The remainder of this thesis is organized as follows: Chapter 2 presents backgro
 \chapter{Background}
 
 \section{X-ray Transmission}
+\todo{add more cites}
 \subsection{Beer's Law}
 X-ray transmission through matter follows Beer's Law, which describes how the intensity of radiation decreases as it passes through a material. For an X-ray beam passing through a homogeneous material, the intensity $I$ after passing through a thickness $x$ is given by:
 
@@ -726,6 +728,8 @@ where $\mu$ and $d$ represent the attenuation coefficients and tissue thickness 
 
 The beam quality also changes as it passes through tissue—a phenomenon known as "beam hardening," where lower energy photons are preferentially absorbed, resulting in objects closer to the detector having less contrast than objects further away \cite{bushberg2011essential}.
 
+\todo{add reference of attenuation values for body tissues}
+
 \subsection{Transmission Map Definition}
 The transmission map is defined as the ratio of transmitted to incident intensity at each point, essentially capturing the exponential term from Beer's Law:
 
@@ -734,6 +738,8 @@ T(x,y) = \frac{I_1(x,y)}{I_0(x,y)} = e^{-\int \mu(x,y,z) dz}
 \end{equation}
 
 This map has values between 0 and 1, where 0 represents complete absorption and 1 represents no absorption. The transmission map is the fundamental input to any digital radiography processing pipeline, and recovering it is essential for simulating different detector configurations \cite{seibert2006flat}.
+
+\todo{add subsection or more details for the x ray image formation process}
 
 \section{Digital Image Processing in Radiography}
 \subsection{Gradation Curves}
