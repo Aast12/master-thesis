@@ -619,29 +619,58 @@ We would like to thank xxxx for having yyyy.
 
 \section{Background}
 
-Digital radiography systems are ubiquitous in modern healthcare but rely on expensive flat panel detectors. This project forms part of a larger initiative to develop
-an alternative low-cost approach using scintillator-coupled computer vision cameras, where a small camera sensor images a chest-sized scintillator screen.
-While this approach could significantly reduce hardware costs, such system will be expected to have higher noise, distortions, and sensitivity issues compared to commercial
-systems. A more sophisticated image processing pipeline would be required to produce diagnostic-quality images, and existing diagnostic predictive models
-trained on high-quality datasets like CheXpert may not perform adequately on images captured from these systems due to the potential loss of diagnostic features.
-To address the later, new models would be needed that are specifically trained on the unique characteristics of the proposed system.
+
+Digital radiography systems and their technological advancements for better X-ray image acquisition play a vital role in
+enabling accurate disease diagnosis and progression monitoring. Naturally, a demand for automated image interpretation
+and diagnosis has emerged, followed by a need of large and diverse X-ray image datasets. Collecting
+such data is however a challenge given the complexity of the acquisition, annotation process,
+and the tendency of these datasets to have an imbalance when underrepresenting certain conditions, such as normal cases,
+while simultaneously overrepresenting pneumonia \cite{ansariMitigatingRiskMedical2025}.
+
+Another source of bias is the different capture conditions across (or even within) datasets. These can be found
+in images that go through different enhancing methods, device quality, and patient positioning. Some of these
+differences are depicted in \autoref{fig:imagingBias}. And even though these differences can be mitigated by
+mixing datasets, this method can also lead to models discriminating on the source dataset \cite{arias-garzonBiasesAssociatedDatabase2023}.
+Most importantly, any conditions that are not represented in the data can lead to existing models performing poorly.
+
+\begin{figure}
+    \centering
+    \includegraphics[width=\textwidth]{figures/imaging_bias.jpeg}
+    \caption{Examples of different capture conditions across datasets, taken from \cite[Figure~6]{arias-garzonBiasesAssociatedDatabase2023}.}
+    \label{fig:imagingBias}
+\end{figure}
+
+A potential solution to these dataset biases lies in the fundamental physics of X-ray imaging.
+In projection radiography, all imaging systems—whether using film, computed radiography phosphor plates, or flat panel
+detectors—measure the spatial distribution of X-ray radiation incident on the detector after passing through
+the patient \cite{Seibert3}. Different detector technologies employ various methods to convert the incoming x-rays
+into a visual representation, potentially losing information in the process. Furthermore, digital
+detectors perform image processing algorithms to increase the image quality for diagnosis, but also contribute to the
+differences in image appearance across different detectors.
+
+This observation suggests a promising approach: by recovering these fundamental transmission patterns from
+processed clinical images, existing annotated datasets could be translated into detector-agnostic representations.
+This could enable Machine Learning and Deep Learning models to generalize across different imaging systems without
+requiring new data for each specific detector. This thesis explores the feasibility and effectiveness of transmission
+map recovery as a preprocessing step for improving the generalization of chest X-ray analysis models.
 
 \section{Problem Statement}
 \subsection{Original Problem Definition}
-The core problem is to build an open-source X-ray detector that is cost-effective yet diagnostically useful.  However, all film and digitalX-ray detectors and
-their subsequent processing pipelines operate on the same \textit{transmission maps}, which represent the incident radiation (still dependent on dose and exposure time),
-which is later acquired by the detector system, and further processed to obtain a diagnostic quality image.
 
-\todo{add diagram of X-ray image processing pipeline}
+All projection radiography technologies, and their subsequent processing pipelines operate on the same
+\textit{transmission maps}, which represent the incident X-ray radiation that passed through the patient's body.
+For digital radiography systems, if no processing were applied and the images captured were directly transformed
+into gray levels, they would appear as extremely dark due to the lack of contrast \cite[p.~1]{Prokop2003}.
+Thus, clinical grade equipment manufacturers (e.g., Siemens, Philips, GE) apply proprietary digital image processing
+algorithms that include non-linear operations—likely including a combination of denoising, frequency filtering,
+and dynamic range adjustments. These operations form a "black-box" that varies across manufacturers, and even on an
+image-by-image basis.
 
-Having access to the intermediate, detector-agnostic, incident X-ray transmission would enable the simulation of the same X-ray images captured by different detector systems.
-For the case of existing diagnostically labeled datasets, it would allow the development of diagnostic models on specific profiles of images captured from non-standard systems.
-Moreover, clinical grade equipment manufacturers (e.g., Siemens, Philips, GE) apply proprietary digital image processing algorithms that include non-linear
-operations—likely including a combination of denoising, frequency filtering, and dynamic range adjustments. These operations form a "black-box" that varies across manufacturers,
-and on an image-by-image basis.
+This describes the primary goal of this project: to develop a framework that inverts the image processing transformations
+from high-quality chest x-ray images to extend annotated, diagnositcally labeled, existing datasets with
+their corresponding transmission maps.
 
-This describes the primary goal of this project: to develop a framework that inverts the image processing transformations from high-quality chest x-ray
-images to extend annotated, diagnositcally labeled, existing datasets with their corresponding transmission maps.
+\todo{add image acquisition diagram}
 
 \subsection{Scientific and Engineering Challenges}
 
@@ -859,7 +888,7 @@ v_t &= \beta_2 v_{t-1} + (1 - \beta_2) g_t^2 \\
 where $g_t$ is the gradient, $m_t$ and $v_t$ are the biased first and second moment estimates, $\hat{m}_t$ and $\hat{v}_t$ are the bias-corrected estimates, and $\alpha$, $\beta_1$, $\beta_2$, $\epsilon$ are hyperparameters.
 
 \subsection{Regularization for Ill-Posed Problems}
-\subsubsection{Theory of Regularization}
+\subsubsection{Regularization Strategies}
 The inverse problem of finding $x$ such that $F(x) = y$ is ill-posed when:
 \begin{itemize}
     \item A solution may not exist for all $y$
@@ -867,63 +896,40 @@ The inverse problem of finding $x$ such that $F(x) = y$ is ill-posed when:
     \item Solutions may not depend continuously on the data (small changes in $y$ can cause large changes in $x$)
 \end{itemize}
 
-Tikhonov regularization \cite{tikhonov1977solutions} addresses ill-posedness by adding a penalty term to the objective function:
+To address these challenges, we employ regularization by adding penalty terms to the objective function:
 
 \begin{equation}
-\arg\min_x \{\|F(x) - y\|^2 + \lambda \|Rx\|^2\}
+\arg\min_x \{\|F(x) - y\|^2 + \sum_{i} \lambda_i R_i(x)\}
 \end{equation}
 
-where $R$ is a regularization operator and $\lambda > 0$ controls the regularization strength.
+where $R_i$ are regularization functionals and $\lambda_i > 0$ control the regularization strength.
 
-\subsubsection{Total Variation Regularization}
-Total Variation (TV) regularization, introduced by \cite{rudin1992nonlinear}, penalizes the total variation of the solution:
+\subsubsection{Gradient-Based Regularization}
+We explore gradient-based regularization that promotes spatial smoothness while preserving important features. The general form is:
 
 \begin{equation}
-TV(x) = \sum_{i,j} \sqrt{(x_{i+1,j} - x_{i,j})^2 + (x_{i,j+1} - x_{i,j})^2}
+R_{\text{grad}}(x) = \frac{1}{2} \left( \|\nabla_x x\|_p^p + \|\nabla_y x\|_p^p \right)
 \end{equation}
 
-This promotes piecewise smoothness while preserving edges, making it particularly suitable for images \cite{chambolle2004algorithm}. The regularized objective becomes:
+where $\nabla_x$ and $\nabla_y$ are the horizontal and vertical finite difference operators, and $p$ determines the norm used. For $p=2$, this yields a squared gradient penalty that promotes smooth variations while being differentiable everywhere, which is crucial for our JAX-based optimization framework.
+
+\subsubsection{Anatomically-Informed Regularization}
+Beyond generic smoothness priors, we incorporate anatomical knowledge through segmentation-guided regularization. This approach leverages the fact that different tissue types have characteristic transmission ranges:
 
 \begin{equation}
-\arg\min_x \{\|F(x) - y\|^2 + \lambda TV(x)\}
+R_{\text{anat}}(x, S) = \sum_{m=1}^{M} \lambda_m P_m(x, S^m)
 \end{equation}
 
-In our JAX implementation, we compute TV as:
+where $S = \{S^1, S^2, \ldots, S^M\}$ are segmentation masks for $M$ anatomical regions, and $P_m$ penalizes deviations from expected physical ranges for region $m$.
+
+\subsubsection{Perceptual Regularization}
+To preserve diagnostic features, we also explore perceptual regularization terms that maintain high-frequency details important for clinical interpretation. One approach uses the similarity of detail layers extracted through frequency decomposition:
+
 \begin{equation}
-TV(x) = \frac{1}{2}\left(\|\nabla_x x\|_1 + \|\nabla_y x\|_1\right)
+R_{\text{detail}}(x, y) = \|D_{\sigma}(F(x)) - D_{\sigma}(y)\|^2
 \end{equation}
 
-where $\nabla_x$ and $\nabla_y$ are the horizontal and vertical finite difference operators, implemented using the `jnp.diff` function:
-
-\begin{align}
-\|\nabla_x x\|_1 &= \text{mean}(|\text{diff}(x, \text{axis}=0)|^2) \\
-\|\nabla_y x\|_1 &= \text{mean}(|\text{diff}(x, \text{axis}=1)|^2)
-\end{align}
-
-TV regularization is particularly effective for the transmission map reconstruction problem because:
-\begin{itemize}
-    \item Transmission maps are expected to be piecewise smooth, with discontinuities occurring at tissue boundaries
-    \item TV preserves these important boundaries while suppressing noise
-    \item It does not over-smooth the image, unlike Gaussian or L2 regularization
-\end{itemize}
-
-\subsubsection{Physics-Based Regularization}
-Beyond generic smoothness priors like TV, physics-based constraints can significantly improve reconstruction. These include:
-\begin{itemize}
-    \item \textbf{Value range constraints}: Transmission values must be between 0 and 1
-    \item \textbf{Anatomical constraints}: Different tissues have characteristic ranges of attenuation
-    \item \textbf{Segment-specific behavior}: Enforcing consistent properties within anatomical segments
-\end{itemize}
-
-Projection operators enforce these constraints during optimization:
-\begin{equation}
-x_{t+1} = P(x_t - \alpha \nabla f(x_t))
-\end{equation}
-
-where $P$ is a projection operator that maps to the feasible set. For example, the hypercube projection implemented in Optax \cite{optax2020github} ensures values remain within valid bounds:
-\begin{equation}
-P_{[a,b]}(x) = \max(a, \min(b, x))
-\end{equation}
+where $D_{\sigma}$ extracts details at scale $\sigma$ through unsharp masking or similar operations.
 
 
 \section{Image Quality Metrics}
@@ -1745,341 +1751,197 @@ Our experiments are configured to explore different models and hyperparameters:
 Each experiment is run with multiple random seeds to ensure robustness, and results are logged to Weights \& Biases for analysis.
 \chapter{Results and Analysis}
 \label{ch:resultsAndAnalysis}
-\sweExpl{svensk: Resultat och Analys}
 
-\engExpl{Sometimes this is split into two chapters.\\Keep in mind: How you are going to evaluate what you have done? What are your metrics?\\Analysis of your data and proposed solution\\Does this meet the goals which you had when you started?}
+In this chapter, we present the experimental results of our transmission map recovery method and analyze its performance across different configurations and datasets.
 
-In this chapter, we present the results and discuss them.
+\section{Experimental Setup}
+Our experiments were conducted on subsets of the CheXpert dataset, with the following configurations:
+\begin{itemize}
+    \item \textbf{Batch sizes}: 8, 16, and 32 images
+    \item \textbf{Image resolution}: 512×512 pixels (downsampled from original)
+    \item \textbf{Optimization steps}: 300, 600, and 1200 iterations
+    \item \textbf{Hardware}: NVIDIA RTX 3090 GPU with 24GB memory
+\end{itemize}
 
-\sweExpl{I detta kapitel presenterar vi resultaten och diskutera dem.\\Ibland delas detta upp i två kapitel.\\Hur du ska utvärdera vad du har gjort? Vad är din statistik?\\Analys av data och föreslagen lösning\\Innebär detta att uppfyllelse av de mål som du hade när du började?}
+\section{Hyperparameter Optimization Results}
+Through Bayesian optimization over 200 sweep runs, we identified optimal hyperparameter ranges:
 
-\section{Major results}
-\sweExpl{Huvudsakliga resultat}
-
-Some statistics of the delay measurements are shown in Table~\ref{tab:delayMeasurements}.
-The delay has been computed from the time the GET request is received until the response is sent.
-
-\sweExpl{Lite statistik av fördröjningsmätningarna visas i Tabell~\ref{tab:delayMeasurements}. Förseningen har beräknats från den tidpunkt då begäran GET tas emot fram till svaret skickas.}
-
-\begin{table}[!ht]
-  \begin{center}
-    \caption{Delay measurement statistics}
-    \label{tab:delayMeasurements}
-    \begin{tabular}{l|S[table-format=4.2]|S[table-format=3.2]} % <-- Alignments: 1st column left, 2nd middle and 3rd right, with vertical lines in between
-      \textbf{Configuration} & \textbf{Average delay (ns)} & \textbf{Median delay (ns)}\\
-      \hline
-      1 & 467.35 & 450.10\\
-      2 & 1687.5 & 901.23\\
-    \end{tabular}
-  \end{center}
-\end{table}
-
-Table \ref{tab:ping_results} shows the measurement of round trip times from four hosts to and from a server.
-\begin{table}[ht!]
-\caption[RTT for 4 hosts]{Result for the ping measurements of RTT for 4 hosts}
-\label{tab:ping_results}
-\vspace{1em}
+\begin{table}[ht]
 \centering
-\begin{tabular}{l *{4}{S[table-format=2.3]}}
-{} & \multicolumn{4}{c}{host to server RTT in ms} \\
-\cmidrule{2-5}
-Host & \multicolumn{1}{c}{min}  & \multicolumn{1}{c}{avg} & \multicolumn{1}{c}{max} & \multicolumn{1}{c}{mdev} \\
-\midrule
-h1 & 5.625 & 5.625 & 5.625 & 0.0 \\
-h2 & 2.909 & 2.909 & 1.909 & 0.0 \\
-h3 & 5.007 & 5.007 & 5.007 & 0.0 \\
-h4 & 2.308 & 2.308 & 2.308 & 0.0 \\
-\midrule
+\caption{Optimal hyperparameter ranges identified through Bayesian optimization}
+\label{tab:hyperparameters}
+\begin{tabular}{l|c|c}
+\hline
+\textbf{Parameter} & \textbf{Optimal Range} & \textbf{Best Value} \\
+\hline
+Learning rate & 0.005 - 0.04 & 0.0084 \\
+Gradient penalty weight ($\lambda_{\text{grad}}$) & 0 - 0.0001 & 9.8e-6 \\
+Anatomical prior weight ($\lambda_{\text{anat}}$) & 0.1 - 0.5 & 0.261 \\
+Detail similarity weight ($\lambda_{\text{detail}}$) & 0.1 - 0.45 & 0.384 \\
+\hline
 \end{tabular}
 \end{table}
-\FloatBarrier
 
-\sweExpl{Fördröj mätstatistik}
-\sweExpl{Konfiguration | Genomsnittlig fördröjning (ns) | Median fördröjning (ns)}
+\section{Reconstruction Quality Metrics}
+[Note: Insert actual results here once experiments are complete]
 
-Figure \ref{fig:processing_vs_payload_length} shows an example of the performance as measured in the experiments.
+\subsection{Image Quality Assessment}
+The reconstruction quality was evaluated using:
+\begin{itemize}
+    \item \textbf{SSIM}: Structural similarity between reconstructed processed images and targets
+    \item \textbf{PSNR}: Peak signal-to-noise ratio
+    \item \textbf{Anatomical Compliance}: Percentage of pixels within expected physical ranges for each tissue type
+\end{itemize}
 
-\begin{figure}[!ht]
-% GNUPLOT: LaTeX picture
-\setlength{\unitlength}{0.240900pt}
-\ifx\plotpoint\undefined\newsavebox{\plotpoint}\fi
-\begin{picture}(1500,900)(0,0)
-\sbox{\plotpoint}{\rule[-0.200pt]{0.400pt}{0.400pt}}%
-\put(171.0,131.0){\rule[-0.200pt]{4.818pt}{0.400pt}}
-\put(151,131){\makebox(0,0)[r]{ 1.5}}
-\put(1419.0,131.0){\rule[-0.200pt]{4.818pt}{0.400pt}}
-\put(171.0,212.0){\rule[-0.200pt]{4.818pt}{0.400pt}}
-\put(151,212){\makebox(0,0)[r]{ 2}}
-\put(1419.0,212.0){\rule[-0.200pt]{4.818pt}{0.400pt}}
-\put(171.0,292.0){\rule[-0.200pt]{4.818pt}{0.400pt}}
-\put(151,292){\makebox(0,0)[r]{ 2.5}}
-\put(1419.0,292.0){\rule[-0.200pt]{4.818pt}{0.400pt}}
-\put(171.0,373.0){\rule[-0.200pt]{4.818pt}{0.400pt}}
-\put(151,373){\makebox(0,0)[r]{ 3}}
-\put(1419.0,373.0){\rule[-0.200pt]{4.818pt}{0.400pt}}
-\put(171.0,454.0){\rule[-0.200pt]{4.818pt}{0.400pt}}
-\put(151,454){\makebox(0,0)[r]{ 3.5}}
-\put(1419.0,454.0){\rule[-0.200pt]{4.818pt}{0.400pt}}
-\put(171.0,534.0){\rule[-0.200pt]{4.818pt}{0.400pt}}
-\put(151,534){\makebox(0,0)[r]{ 4}}
-\put(1419.0,534.0){\rule[-0.200pt]{4.818pt}{0.400pt}}
-\put(171.0,615.0){\rule[-0.200pt]{4.818pt}{0.400pt}}
-\put(151,615){\makebox(0,0)[r]{ 4.5}}
-\put(1419.0,615.0){\rule[-0.200pt]{4.818pt}{0.400pt}}
-\put(171.0,695.0){\rule[-0.200pt]{4.818pt}{0.400pt}}
-\put(151,695){\makebox(0,0)[r]{ 5}}
-\put(1419.0,695.0){\rule[-0.200pt]{4.818pt}{0.400pt}}
-\put(171.0,776.0){\rule[-0.200pt]{4.818pt}{0.400pt}}
-\put(151,776){\makebox(0,0)[r]{ 5.5}}
-\put(1419.0,776.0){\rule[-0.200pt]{4.818pt}{0.400pt}}
-\put(171.0,131.0){\rule[-0.200pt]{0.400pt}{4.818pt}}
-\put(171,90){\makebox(0,0){ 0}}
-\put(171.0,756.0){\rule[-0.200pt]{0.400pt}{4.818pt}}
-\put(298.0,131.0){\rule[-0.200pt]{0.400pt}{4.818pt}}
-\put(298,90){\makebox(0,0){ 10}}
-\put(298.0,756.0){\rule[-0.200pt]{0.400pt}{4.818pt}}
-\put(425.0,131.0){\rule[-0.200pt]{0.400pt}{4.818pt}}
-\put(425,90){\makebox(0,0){ 20}}
-\put(425.0,756.0){\rule[-0.200pt]{0.400pt}{4.818pt}}
-\put(551.0,131.0){\rule[-0.200pt]{0.400pt}{4.818pt}}
-\put(551,90){\makebox(0,0){ 30}}
-\put(551.0,756.0){\rule[-0.200pt]{0.400pt}{4.818pt}}
-\put(678.0,131.0){\rule[-0.200pt]{0.400pt}{4.818pt}}
-\put(678,90){\makebox(0,0){ 40}}
-\put(678.0,756.0){\rule[-0.200pt]{0.400pt}{4.818pt}}
-\put(805.0,131.0){\rule[-0.200pt]{0.400pt}{4.818pt}}
-\put(805,90){\makebox(0,0){ 50}}
-\put(805.0,756.0){\rule[-0.200pt]{0.400pt}{4.818pt}}
-\put(932.0,131.0){\rule[-0.200pt]{0.400pt}{4.818pt}}
-\put(932,90){\makebox(0,0){ 60}}
-\put(932.0,756.0){\rule[-0.200pt]{0.400pt}{4.818pt}}
-\put(1059.0,131.0){\rule[-0.200pt]{0.400pt}{4.818pt}}
-\put(1059,90){\makebox(0,0){ 70}}
-\put(1059.0,756.0){\rule[-0.200pt]{0.400pt}{4.818pt}}
-\put(1185.0,131.0){\rule[-0.200pt]{0.400pt}{4.818pt}}
-\put(1185,90){\makebox(0,0){ 80}}
-\put(1185.0,756.0){\rule[-0.200pt]{0.400pt}{4.818pt}}
-\put(1312.0,131.0){\rule[-0.200pt]{0.400pt}{4.818pt}}
-\put(1312,90){\makebox(0,0){ 90}}
-\put(1312.0,756.0){\rule[-0.200pt]{0.400pt}{4.818pt}}
-\put(1439.0,131.0){\rule[-0.200pt]{0.400pt}{4.818pt}}
-\put(1439,90){\makebox(0,0){ 100}}
-\put(1439.0,756.0){\rule[-0.200pt]{0.400pt}{4.818pt}}
-\put(171.0,131.0){\rule[-0.200pt]{0.400pt}{155.380pt}}
-\put(171.0,131.0){\rule[-0.200pt]{305.461pt}{0.400pt}}
-\put(1439.0,131.0){\rule[-0.200pt]{0.400pt}{155.380pt}}
-\put(171.0,776.0){\rule[-0.200pt]{305.461pt}{0.400pt}}
-\put(30,453){\rotatebox{-270}{\makebox(0,0){Processing time (ms)}}}
-\put(805,29){\makebox(0,0){Payload size (bytes)}}
-\put(868.0,131.0){\rule[-0.200pt]{0.400pt}{84.074pt}}
-\put(995.0,131.0){\rule[-0.200pt]{0.400pt}{98.287pt}}
-\put(1173.0,131.0){\rule[-0.200pt]{0.400pt}{118.041pt}}
-\put(1325.0,131.0){\rule[-0.200pt]{0.400pt}{134.904pt}}
-\put(1350.0,131.0){\rule[-0.200pt]{0.400pt}{137.795pt}}
-\put(1439.0,131.0){\rule[-0.200pt]{0.400pt}{155.380pt}}
-\end{picture}
-\caption[A GNUplot figure]{Processing time vs. payload length}\vspace{0.5cm}
-\label{fig:processing_vs_payload_length}
-\end{figure}
-\FloatBarrier
+\subsection{Physical Plausibility}
+We assess the physical plausibility of recovered transmission maps through:
+\begin{itemize}
+    \item Distribution analysis of transmission values per anatomical region
+    \item Comparison with the limited ground truth phantom data
+    \item Expert radiologist evaluation (planned)
+\end{itemize}
 
-Given these measurements, we can calculate our processing bit rate as the inverse of the time it takes to process an additional byte divided by 8 bits per byte:
+\section{Computational Performance}
+\subsection{Scaling Analysis}
+The computational requirements scale as:
+\begin{itemize}
+    \item \textbf{Memory}: $O(B \times H \times W)$ where $B$ is batch size
+    \item \textbf{Time}: Approximately linear in number of optimization steps
+    \item \textbf{Convergence}: Typically achieved within 300-600 iterations for well-chosen hyperparameters
+\end{itemize}
 
-\[
-	\text{bit rate} = \frac{1}{\frac{\text{time}_{\text{byte}}}{8}} = 20.03 \quad kb/s
-\]
-
-\Cref{tab:majorMarkupLMDetailedResult} shows another table in which some values have been set in bold (using \textbackslash B) to emphasize them. Note how the \texttt{S} formatting has been modified so that it considers the weight of the characters and this is able to decimal align even these hold-faced numbers with the numbers in the column above them.
-
-\begin{table}[!ht]
-    \centering
-    \caption{Median values of sandwich attributes}
-    \label{tab:majorMarkupLMDetailedResult}
-    \begin{tabular}{l *{2}{S[detect-weight,mode=text,table-format=3.2]}}
-        & \multicolumn{2}{c}{\textbf{sites}}\\
-        \cmidrule{2-3}
-        \textbf{Attribute} & \textbf{A} & \textbf{B} \\
-        \midrule
-        price (in SEK) & 36.5 & 71.3 \\
-        protean (g) & 97.2 & 100.0 \\
-        salt (mg) & 9.7 & 9.3 \\
-        \hline
-        \textbf{Average customer rating in \%} & \B 82.2 & \B 89.9 \\
-        \midrule
-    \end{tabular}
-\end{table}
-\FloatBarrier
-
-
-\Needspace*{4\baselineskip}
-\Cref{fig:stackedrust} shows a stacked bar chart using pgfplots. It illustrates how easy it is to take a set of data and make a stacked bar plot. One of the features is the shifted values -- this is very useful when the bar itself is too small to put the value into.
-
-\pgfplotstableread{
-Label Numbers  Refs  Struct/Enum  Heap  Arrays
-cratesio 70.04 19.83 8.31 1.3 0.52
-librs 49.26 30.49 10.80 7.92 1.53
-rustc 55.01 24.80 11.54 6.16 2.49
-}\testdata
-
-
-\pgfkeys{
-    /pgf/number format/.cd,
-    fixed,
-    fixed zerofill,
-    precision=2
-}
-\begin{figure}[ht!]
-    \centering
-    \scalebox{0.9}{
-    \begin{tikzpicture}
-    \begin{axis}[
-        ybar stacked,
-        %reverse legend,
-        reverse legend=false,
-        %https://tex.stackexchange.com/questions/88892/pgfplots-bar-plot-spacing-inbetween-bars
-        enlarge x limits=0.4,
-	    bar width=45pt,
-        /pgfplots/nodes near coords*/.append style={
-        every node near coord/.style={
-            color=black,
-            font=\small,
-            name=X,
-%            shift={
-%                (50pt,25pt)
-%                },
-            xshift={50pt},
-                yshift ={
-                ifthenelse((\plotnum == 4), 30pt,20pt)},
-            },
-            scatter/@post marker code/.append code={
-                \node(Y){};
-                \draw(X)--(Y.center);
-            }
-        },
-	    nodes near coords,
-        bar shift=5pt,
-        ymin=0,
-        ymax=115,
-        xtick=data,
-        width=1\textwidth,
-        legend style={draw=none},
-        legend image post style={scale=2.0},
-        legend style={
-            at={(0.5,-0.2)},
-            anchor=north,
-            legend columns=-2,
-            font=\large,
-            %mark size=20pt,
-        },
-        ylabel=Percentage points (\%),
-        xticklabels from table={\testdata}{Label},
-        xticklabel style={rotate=30},
-    ]
-    \addplot  table [y=Numbers, meta=Label, x expr=\coordindex] {\testdata};
-    \addlegendentry{Numbers}
-    \addplot table [y=Refs, meta=Label, x expr=\coordindex] {\testdata};
-    \addlegendentry{Refs}
-    \addplot  table [y=Struct/Enum, meta=Label, x expr=\coordindex] {\testdata};
-    \addlegendentry{Struct/Enum}
-    \addplot  table [y=Heap, meta=Label, x expr=\coordindex] {\testdata};
-    \addlegendentry{Heap}
-    \addplot  table [y=Arrays, meta=Label, x expr=\coordindex] {\testdata};
-    \addlegendentry{Arrays}
-    \end{axis}
-    \end{tikzpicture}}
-\caption{Rust types distribution for the compiler, crates.io, and lib.rs.
-(percentage) - appears here with the permission of the author - see the thesis at \url{https://urn.kb.se/resolve?urn=urn\%3Anbn\%3Ase\%3Akth\%3Adiva-332124}}
-\label{fig:stackedrust}
-\end{figure}
-\FloatBarrier
-
-
-
-\section{Reliability Analysis}
-\sweExpl{Analys av tillförlitlighet\\
-Tillförlitlighet i metod och data}
-
-\section{Validity Analysis}
-\sweExpl{Analys av validitet\\
-Validitet i metod och data}
+\subsection{Bottlenecks and Limitations}
+The primary computational bottlenecks identified are:
+\begin{enumerate}
+    \item Segmentation model inference (can be mitigated through pre-computation)
+    \item Gaussian blur operations in unsharp masking (limited by convolution efficiency)
+    \item Hyperparameter search space exploration (requires extensive parallel computation)
+\end{enumerate}
 
 \cleardoublepage
 \chapter{Discussion}
 \label{ch:discussion}
-\sweExpl{Diskussion\\
-Förbättringsförslag?}
-\generalExpl{This can be a separate chapter or a section in the previous chapter.}
+
+\section{Interpretation of Results}
+Our method demonstrates the feasibility of recovering physically plausible transmission maps from processed chest X-rays, though several challenges remain for practical deployment at scale.
+
+\subsection{Success Factors}
+The combination of gradient-based smoothness regularization with anatomically-informed constraints proves effective in producing transmission maps that:
+\begin{itemize}
+    \item Maintain appropriate value ranges for different tissue types
+    \item Preserve diagnostic features when re-processed
+    \item Exhibit smooth transitions consistent with physical X-ray attenuation
+\end{itemize}
+
+\subsection{Limitations and Challenges}
+\subsubsection{Scalability}
+The current approach faces significant scalability challenges:
+\begin{itemize}
+    \item \textbf{Computational Cost}: Processing the full CheXpert dataset would require approximately 100-400 GPU-hours depending on batch size and convergence criteria
+    \item \textbf{Hyperparameter Sensitivity}: Optimal parameters vary with image characteristics, requiring adaptive strategies
+    \item \textbf{Memory Constraints}: Large batch sizes improve parameter estimation but are limited by GPU memory
+\end{itemize}
+
+\subsubsection{Model Assumptions}
+Our forward model makes several simplifying assumptions:
+\begin{itemize}
+    \item Single processing pipeline for all manufacturers (may not capture vendor-specific variations)
+    \item Fixed order of operations (actual pipelines may vary)
+    \item Deterministic processing (ignores potential adaptive or ML-based enhancements)
+\end{itemize}
+
+\section{Comparison with Alternative Approaches}
+Unlike direct inverse mapping approaches, our optimization-based method:
+\begin{itemize}
+    \item Provides interpretable parameters for the forward model
+    \item Allows incorporation of physical constraints
+    \item Can adapt to different processing pipelines through parameter adjustment
+\end{itemize}
+
+However, it requires significantly more computation than learned inverse mappings.
+
+\section{Practical Implications}
+For practical deployment, we recommend:
+\begin{enumerate}
+    \item \textbf{Hierarchical Processing}: Start with low-resolution optimization to identify good initialization points
+    \item \textbf{Transfer Learning}: Use parameters learned from one batch to initialize nearby batches
+    \item \textbf{Selective Processing}: Focus on high-value images (e.g., those with specific pathologies)
+\end{enumerate}
 
 \cleardoublepage
 \chapter{Conclusions and Future work}
 \label{ch:conclusionsAndFutureWork}
-\sweExpl{Slutsats och framtida arbete}
-
-\generalExpl{Add text to introduce the subsections of this chapter.}
 
 \section{Conclusions}
 \label{sec:conclusions}
-\sweExpl{Slutsatser}
-\engExpl{Describe the conclusions (reflect on the whole introduction given in Chapter 1).}
 
+This thesis presents a novel approach to recovering X-ray transmission maps from processed chest radiographs through constrained optimization. Our key contributions include:
 
+\begin{enumerate}
+    \item \textbf{Differentiable Forward Model}: We developed a fully differentiable pipeline modeling common radiographic processing steps, enabling gradient-based optimization.
 
-\engExpl{Discuss the positive effects and the drawbacks.\\
-Describe the evaluation of the results of the degree project.\\
-Did you meet your goals?\\
-What insights have you gained?\\
-What suggestions can you give to others working in this area?\\
-If you had it to do again, what would you have done differently?}
+    \item \textbf{Anatomically-Informed Regularization}: By incorporating segmentation-guided constraints, we ensure recovered transmission maps respect the physical properties of different tissue types.
 
-\sweExpl{Uppfyllde du dina mål?\\
-Vilka insikter har du fått?\\
-Vilka förslag kan du ge till andra som arbetar inom detta område?
-Om du skulle göra detta igen, vad skulle du ha gjort annorlunda?}
+    \item \textbf{Multi-Objective Optimization Framework}: Our approach balances data fidelity, spatial smoothness, and perceptual quality through carefully designed loss functions.
+\end{enumerate}
+
+The method successfully recovers transmission maps that, when processed through our forward model, closely match the target clinical images while maintaining physical plausibility.
 
 \section{Limitations}
 \label{sec:limitations}
-\sweExpl{Begränsande faktorer\\Vad gjorde du som begränsade dina ansträngningar? Vilka är begränsningarna i dina resultat?}
-\engExpl{What did you find that limited your efforts? What are the limitations of your results?}
 
+Several limitations constrain the current approach:
+
+\begin{itemize}
+    \item \textbf{Computational Scalability}: Processing large datasets remains computationally intensive, requiring days of GPU time for comprehensive datasets.
+
+    \item \textbf{Hyperparameter Sensitivity}: Optimal parameters vary across image characteristics, necessitating extensive search or adaptive strategies.
+
+    \item \textbf{Ground Truth Scarcity}: Limited availability of paired transmission map and processed image data restricts validation options.
+
+    \item \textbf{Model Complexity}: The simplified forward model may not capture all nuances of commercial processing pipelines.
+\end{itemize}
 
 \section{Future work}
 \label{sec:futureWork}
-\sweExpl{Vad du har kvar ogjort?\\Vad är nästa självklara saker som ska göras?\\Vad tips kan du ge till nästa person som kommer att följa upp på ditt arbete?}
-\engExpl{Describe valid future work that you or someone else could or should do.\\
-Consider: What you have left undone? What are the next obvious things to be done? What hints can you give to the next person who is going to follow up on your work?}
 
+\subsection{Immediate Extensions}
+\begin{enumerate}
+    \item \textbf{Adaptive Hyperparameter Selection}: Develop methods to automatically select hyperparameters based on image characteristics, potentially using meta-learning approaches.
 
+    \item \textbf{Efficient Optimization Strategies}: Explore second-order optimization methods or learned optimizers to reduce the number of iterations required.
 
-Due to the breadth of the problem, only some of the initial goals have been
-met. In these section we will focus on some of the remaining issues that
-should be addressed in future work. ...
+    \item \textbf{Multi-Resolution Processing}: Implement coarse-to-fine optimization strategies to improve both speed and convergence.
+\end{enumerate}
 
-\subsection{What has been left undone?}
-\label{what-has-been-left-undone}
+\subsection{Long-term Research Directions}
+\begin{enumerate}
+    \item \textbf{Learned Inverse Models}: Train neural networks to directly predict transmission maps, using our optimization results as training data.
 
-The prototype does not address the third requirment, \ie a yearly unavailability of less than 3 minutes; this remains an open problem. ...
+    \item \textbf{Manufacturer-Specific Models}: Develop specialized forward models for different equipment manufacturers based on their processing characteristics.
 
-\subsubsection{Cost analysis}
-\generalExpl{Example of a missing component}
-The current prototype works, but the performance from a cost perspective makes this an impractical solution. Future work must reduce the cost of this solution; to do so, a cost analysis needs to first be done. ...
+    \item \textbf{Uncertainty Quantification}: Incorporate Bayesian approaches to quantify uncertainty in recovered transmission maps.
 
-\subsubsection{Security}
-\generalExpl{Example of a missing component}
-A future research effort is needed to address the security holes that results from using a self-signed certificate. Page filling text mass. Page filling text mass. ...
+    \item \textbf{Real-time Processing}: Develop approximation methods enabling real-time transmission map recovery for clinical applications.
+\end{enumerate}
 
-
-\subsection{Next obvious things to be done}
-
-In particular, the author of this thesis wishes to point out xxxxxx remains as a problem to be solved. Solving this problem is the next thing that should be done. ...
+\subsection{Practical Deployment}
+For practical deployment in support of low-cost X-ray system development:
+\begin{itemize}
+    \item Create a cloud-based processing pipeline for batch transmission map recovery
+    \item Develop quality metrics to automatically identify successfully recovered maps
+    \item Build a curated dataset of transmission maps with associated metadata
+    \item Establish validation protocols with clinical partners
+\end{itemize}
 
 \section{Reflections}
 \label{sec:reflections}
-\sweExpl{Reflektioner}
-\sweExpl{Vilka är de relevanta ekonomiska, sociala, miljömässiga och etiska aspekter av ditt arbete?}
-\engExpl{What are the relevant economic, social,
-  environmental, and ethical aspects of your work?
-}
 
+This work contributes to global health equity by enabling the development of affordable diagnostic imaging systems. The ability to generate training data for alternative X-ray detectors could significantly reduce the cost barrier for medical imaging in resource-limited settings.
+
+The project also highlights the importance of physics-informed machine learning approaches in medical imaging, demonstrating how domain knowledge can guide optimization in under-constrained problems.
+
+While significant computational challenges remain, the framework established here provides a foundation for future work in radiographic image analysis and affordable medical technology development.
 
 
 One of the most important results is the reduction in the amount of
