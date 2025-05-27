@@ -754,7 +754,7 @@ $|dS|$, placed at right angles to $I(x)$, then the energy-per-unit-time passing 
 When x-rays encounter any form of matter, they are partly transmitted and partly absorbed.
 The fractional decrease in the intensity $I$ of an x-ray beam as it passes
 through any homogeneous substance is proportional to the distance traversed $x$
-and the material encounterd\cite[p.~11]{cullityElementsXrayDiffraction2014}. The intensity
+and the material encountered\cite[p.~11]{cullityElementsXrayDiffraction2014}. The intensity
 $I$ of the x-ray beam satisfies Beer's law:
 
 \begin{equation}
@@ -834,7 +834,7 @@ Hounsfield unit, which is a measure relative to the attenuation coefficient of w
     H_{\text{tissue}} = 1000 \cdot \frac{\mu_{\text{tissue}} − \mu_{\text{water}}}{\mu_{\text{water}}}
 \end{equation}
 
-\begin{figure}
+\begin{figure}[H]
     \centering
     \begin{tabular}{|c|c|}
         \hline
@@ -865,72 +865,86 @@ Hounsfield unit, which is a measure relative to the attenuation coefficient of w
 \section{Digital Image Processing in Radiography}
 
 
-Digital radiography systems can capture the wide attenuation differences between lungs and mediastinum due to
-their wide dynamic range and linear response to th incident radiation. Hoever, it leads to a lack of contrast on
+\acrshort{DR} systems can capture the wide attenuation differences between lungs and mediastinum due to
+their wide dynamic range and linear response to th incident radiation. However, it leads to a lack of contrast on
 the direct conversion to gray values. At the same time, image sharpness may not be as good as in screen-film
-due to the pixel size constraint \cite[p.~148]{Prokop2003}. Screen-film systems, despite having greater spatial
+due to the pixel size constraint \cite[p.~148]{Prokop2003}. \acrshort{FSR} systems, despite having greater spatial
 resolution, they have a non-linear (S-shaped) response, leading to under- or overexposed images\cite[p.~551]{vuylstekeMultiscaleImageContrast1994}.
 Regardless of the imaging modality, digital image processing is not only used to take full advantage of the positive
-characteristics of the radiography systems, but also to amend the intrisic limitations of each detector.
+characteristics of the radiography systems, but also to amend the intrinsic limitations of each detector.
+
 To overcome this, different algorithms are applied to the captured x-ray image, with the goals of:
 
 \begin{itemize}
     \item displaying the full range of attenuation differences in the chest,
-    \item optimizaing spatial resolution of digital chest radiographs,
+    \item optimizing spatial resolution of digital chest radiographs,
     \item enhancing structural contrast in the lungs and mediastinum, and
-    \item supress image noise \cite[p.~149]{Prokop2003}.
+    \item suppressing image noise \cite[p.~149]{Prokop2003}.
 \end{itemize}
 
-\subsection{Gradation Curves}
-Digital radiography systems apply various processing steps to the raw transmission map to produce diagnostically useful images. As described by \cite{prokop2003principles}, gradation curves map detector signals to display values. These include:
 
-\begin{itemize}
-    \item \textbf{Automated Signal Normalization}: Detects the collimated region and stretches the relevant histogram range to fit the available gray scale values. This process includes:
-    \begin{enumerate}
-        \item Detection of the collimated region to exclude direct, unattenuated radiation
-        \item Histogram analysis of pixel values within the collimated region
-        \item Linear mapping to exclude input values where the histogram is (close to) zero
-    \end{enumerate}
+\subsection{Dynamic range reduction}
 
-    \item \textbf{Gradational Adjustment}: Applies lookup tables to optimize contrast for different anatomical regions. Theoretical optimums like the Kanamori curve \cite{kanamori1966determination} have been proposed, but many radiologists prefer sigmoid-shaped curves that more closely match the appearance of conventional radiographs.
-\end{itemize}
+Particularly for \acrshort{DR} systems, the dynamic range is large, only a small portion of it contains diagnostically
+relevant information. The image histogram can be 'stretched' via a \acrlong{LUT} (\acrshort{LUT}) that exclude
+any values outside the relevant range. As depicted in \autoref{fig:histogram_stretching}, this improves the overall
+image contrast, and normalizes for different doses and patient body types \cite[p.~151]{Prokop2003}.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1.0\textwidth]{figures/LUT.png}
+    \caption{Gradational curves applied to normalize signal over different x-ray doses.\cite[Figure~3]{Prokop2003}}
+    \label{fig:histogram_stretching}
+\end{figure}
+
 
 \subsection{Spatial Frequency Processing}
+
+As a mean to improve structural contrast and achieve edge enhancement, spatial frequency algorithms are applied.
+Unlike dynamic range operations, these types of processings can vary drastically across manufacturers, and
+are driven by multiple parameters that can also change on a per-image basis. Nevertheles, despite the algorithms
+changing by vendor (Agfa [Mortsel, Belgium] uses MUSICA; Fuji [Tokyo, Japan] uses Gradation; and Kodak uses Tonescaling),
+they all share the same effect and purpose \cite[p.~119]{carterDigitalRadiographyPACS2010}.
+
 \subsubsection{Unsharp Masking}
-Unsharp masking enhances edges and fine details in radiographs. The process involves:
-\begin{enumerate}
-    \item Creating a blurred version of the image using low-pass filtering
-    \item Subtracting this from the original to obtain high-frequency information
-    \item Combining the original with the weighted high-frequency image
-\end{enumerate}
 
-The resulting processed image can be expressed as:
-\begin{equation}
-I' = I + f \cdot (I - B)
-\end{equation}
+Unsharp masking is a simple method for edge enhancement and sharpening of images, and consist of
+three core steps:
 
-where $I$ is the original image, $B$ is the blurred version, and $f$ is an enhancement factor, typically around 0.5 for chest radiographs \cite{prokop2003principles}.
+\begin{description}
+    \item[Step 1] The image is blurred using low-pass filtering, e.g. via a Gaussian filter. The wider the kernel size,
+    the more blurred the low-pass image is, and structures lower than the kernel size are almost completely suppressed.
+    \item[Step 2] Subtracting the low-pass image from the original yields the high-pass information and contains those
+    details that are suppressed on the low-pass image. If the kernel size is not too small, most sharp contours on the
+    original image will be retained in the high-pass image.
+    \item[Step 3] For the enhanced image, various weighted combinations of the original, low-pass or high-pass images
+    can be created. A common approach is to add the weighted high-pass image to the original image, leading to an
+    amplification of the detail information contained in it \cite[p.~152-153]{Prokop2003},.
+\end{description}
 
-Mathematically equivalent formulations include:
-\begin{equation}
-I' = I - f^* \cdot B
-\end{equation}
-where $f^* = \frac{f}{1+f}$, and:
-\begin{equation}
-I' = B + (1+f) \cdot (I - B)
-\end{equation}
+\begin{figure}
+    \centering
+    \includegraphics[width=0.8\textwidth]{figures/unsharp_mask.png}
+    \caption{Unsharp masking algorithm \cite[Figure~5]{Prokop2003}}
+    \label{fig:unsharp_masking}
+\end{figure}
 
-The effects of unsharp masking depend critically on the size of the filter kernel used to create the blurred image $B$. Kernels of 20-30mm typically give the best results for general chest imaging \cite{prokop1993improved}, as they enhance structures of diagnostic interest while avoiding suppression of relevant pathology.
+The effects of unsharp masking depend critically on the size of the filter kernel used to create the blurred image.
+Kernels of 20-30mm typically give the best results for general chest imaging \cite[p.~153]{Prokop2003},
+as they enhance structures of diagnostic interest while avoiding suppression of diagnostic information.
 
 \subsubsection{Multiscale Processing}
-More advanced systems use multiscale decomposition, dividing the image into frequency bands that can be independently processed. As detailed by \cite{stahl2000digital}, this approach allows for:
+
+More advanced systems use multiscale decomposition, dividing the image into frequency bands that can be independently
+processed. As detailed by \cite{stahl2000digital}, this approach allows for:
 \begin{itemize}
     \item Size-independent enhancement of structures
     \item Better handling of dynamic range differences
     \item More effective noise suppression
 \end{itemize}
 
-The Laplacian pyramid decomposition, introduced by \cite{burt1983laplacian}, is a hierarchical structure where the original image is repeatedly filtered and downsampled:
+The Laplacian pyramid decomposition, introduced by \cite{burt1983laplacian}, is a hierarchical structure where the
+original image is repeatedly filtered and downsampled:
 
 \begin{enumerate}
     \item The image is blurred with a low-pass filter (typically a 3×3 or 5×5 binomial kernel)
@@ -947,33 +961,6 @@ I_{\text{original}} = B_{n-1} + \sum_{i=0}^{n-2} B_i
 \end{equation}
 
 For enhancement, each bandpass image can be processed independently before reconstruction. This allows for targeted enhancement of structures of specific sizes without affecting others, as implemented in commercial systems like MUSICA (Agfa) \cite{vuylsteke1994multiscale}, MFP (Fuji) \cite{ogoda1997unsharp}, and UNIQUE (Philips) \cite{stahl2000digital}.
-
-\subsubsection{Dynamic Range Reduction}
-Chest radiographs must cope with large attenuation differences between the lungs and mediastinum. Dynamic range reduction (DRR) or compression (DRC) harmonizes the image by reducing these differences while preserving local contrast \cite{cowen1988computer,prokop2003principles}.
-
-With unsharp masking, DRR is accomplished by nonlinear subtraction of a low-pass image with a large kernel (2-4cm). The subtraction weight varies with pixel values—minimal for lungs but substantial (e.g., 0.2) for the mediastinum—effectively increasing density in high-absorption areas without affecting well-exposed regions.
-
-In multiscale processing, DRR works by applying nonlinear transformations to the lowest frequency bands, which contain the large-area density differences \cite{stahl2000digital}.
-
-\subsection{Noise Characteristics and Management}
-Noise in radiographic images comes from multiple sources:
-\begin{itemize}
-    \item Quantum noise (Poisson-distributed, proportional to $\sqrt{N}$ where $N$ is the number of photons)
-    \item Detector structure noise
-    \item Electronic noise
-    \item Quantization noise
-\end{itemize}
-
-Noise power is distributed across spatial frequencies and varies with detector dose. After logarithmic processing and intensity inversion in storage phosphor systems, noise is most prominent in high-brightness (low optical density) regions \cite{hillen1987imaging,ogawa1995quantitative}.
-
-Subjectively, noise is most visible in areas with minimal texture or "activity." \cite{stahl2000digital} developed a noise containment approach where enhancement is reduced in noise-sensitive regions defined by spatial frequency, local image density, and local activity measures.
-
-Their blending technique can be expressed as:
-\begin{equation}
-S_{i, \text{robust}}(x,y) = b_D(x,y) \cdot b_A(x,y) \cdot S_{i, \text{fully\_enh}}(x,y) + (1 - b_D(x,y) \cdot b_A(x,y)) \cdot S_{i, \text{orig}}(x,y)
-\end{equation}
-
-where $b_D$ and $b_A$ are weighting factors dependent on local density and activity, respectively.
 
 \section{Nonlinear Optimization}
 \subsection{Gradient Descent Methods}
