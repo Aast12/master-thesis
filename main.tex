@@ -658,19 +658,26 @@ map recovery as a preprocessing step for improving the generalization of chest X
 \subsection{Original Problem Definition}
 
 All projection radiography technologies, and their subsequent processing pipelines operate on the same
-\textit{transmission maps}, which represent the incident X-ray radiation that passed through the patient's body.
+\textit{transmission maps}, which represent the X-ray radiation that passed through the patient's body.
 For digital radiography systems, if no processing were applied and the images captured were directly transformed
-into gray levels, they would appear as extremely dark due to the lack of contrast \cite[p.~1]{Prokop2003}.
+into gray levels, they would appear as extremely dark due to the lack of contrast \cite[p.~148]{Prokop2003}.
 Thus, clinical grade equipment manufacturers (e.g., Siemens, Philips, GE) apply proprietary digital image processing
 algorithms that include non-linear operations—likely including a combination of denoising, frequency filtering,
 and dynamic range adjustments. These operations form a "black-box" that varies across manufacturers, and even on an
 image-by-image basis.
 
 This describes the primary goal of this project: to develop a framework that inverts the image processing transformations
-from high-quality chest x-ray images to extend annotated, diagnositcally labeled, existing datasets with
-their corresponding transmission maps.
+from high-quality, chest x-ray images. This will recover the latent images described in \autoref{fig:image_processing_pipeline}
+that will enable the extension of exiting labeled datasets via the siulation of non-represented radiography sysyems.
 
-\todo{add image acquisition diagram}
+\begin{figure}
+    \centering
+    \includegraphics[width=0.8\textwidth]{figures/latent_image.jpg}
+    \caption{X-ray image acquisition pipeline. All projection radiography capture the same x-ray energies and
+   form a latent image, which is distorted by the systems' methods to capture x-rays and subsequent processing steps.
+    Taken from \cite[p.~13]{Seibert3}}
+    \label{fig:image_processing_pipeline}
+\end{figure}
 
 \subsection{Scientific and Engineering Challenges}
 
@@ -769,12 +776,12 @@ I_{\text{out}} = I_{\text{in}} \cdot e^{-\mu(x)}
 
 \subsection{X-ray Image acquisition}
 
-In the context of X-ray imaging, we measure intensities at the detector plane. Let:
+In the context of X-ray imaging, we measure intensities at the detector plane. Let
 
 \begin{itemize}
 \item $I_0(x,y)$ denote the intensity measured at detector position $(x,y)$ in the absence
-    of any object (the reference or flat-field measurement)
-\item $I(x,y)$ denote the intensity measured at detector position $(x,y)$ with the object present
+    of any object (the reference or flat-field measurement), and
+\item $I(x,y)$ denote the intensity measured at detector position $(x,y)$ with the object present.
 \end{itemize}
 
 Then, for radiation traversing a heterogeneous medium, such as body tissues, along a ray path $L$
@@ -793,11 +800,12 @@ $I$ incident on the object along a given line $l$ is known. The total energy, $I
 along $l$ is then measured by an x-ray detector. Integrating Beer’s law we obtain \cite[p.~60]{epstein2008}
 
 \begin{equation}
-    \log \frac{I(x,y)}{I_0(x,y)} = -\int_l \mu(s) \, ds,
+    -\log \frac{I(x,y)}{I_0(x,y)} = \int_l \mu(s) \, ds,
 \end{equation}
 
 where $\frac{I(x, y)}{I_0(x, y)}$ is the \textit{transmission map}, which describes the fraction of the
-incident radiation that transmits through the patient at each position $(x, y)$.
+incident radiation that transmits through the patient at each position $(x, y)$, and applying
+the negative logarithm captures the energy absorbed by the object.
 
 For a medium composed of $n$ distinct homogeneous regions with attenuation coefficients
 $\{\mu_i\}_{i=1}^n$ and thicknesses $\{d_i\}_{i=1}^n$ along a given ray path,
@@ -807,23 +815,23 @@ a simplified model can be expressed as
     \label{eq:discrete_materials}
 \end{equation}
 
-The x-ray image is created by the detection of the transmitted x-rays of an incident, uniform x-ray beam
-as they pass through an object. Note that ideal x-ray image acquisition and the described
-model assume a point x-ray source, a straight line trajectory from the source through the object,
-and complete detection of the x-ray beam that strikes the detector. These are not realistic assumptions, however,
-clinical detectors apply methods to counteract nonideal conditions \cite[p.~9]{Seibert3}.
+Note that ideal x-ray image acquisition and the described model assume a point x-ray source, a straight line
+trajectory from the source through the object, and complete detection of the x-ray beam that strikes the detector.
+These are not realistic assumptions, however, clinical detectors apply methods to counteract nonideal conditions
+\cite[p.~9]{Seibert3}.
 
 \subsection{Application to Human Chest Imaging}
 
 In the context of chest radiography, the human thorax can be modeled as a composition of distinct, but
 known tissue types, and therefore, different anatomical structures have different attenuation coefficients.
 Bone has a much higher attenuation coefficient than soft tissue, and different soft tissues have slightly
-different coefficients. More precisely, \autoref{fig:attenuation_coefficients} shows the attenuation coefficients
-of common body tissue types. The table is presented with a dimensionless measure called a
-Hounsfield unit, which is a measure relative to the attenuation coefficient of water defined as \cite[p.~54]{epstein2008}
+different coefficients. More precisely, \autoref{fig:tissue_attenuation} shows the attenuation coefficients
+of common body tissue types. The table is presented in a dimensionless quantity called a
+Hounsfield unit, which is a measure relative to the attenuation coefficient of water, defined as
+\cite[p.~54]{epstein2008}
 
 \begin{equation}
-H_{\text{tissue}} = 1000 \cdot \frac{\mu_{\text{tissue}} − \mu_{\text{water}}}{\mu_{\text{water}}}
+    H_{\text{tissue}} = 1000 \cdot \frac{\mu_{\text{tissue}} − \mu_{\text{water}}}{\mu_{\text{water}}}
 \end{equation}
 
 \begin{figure}
@@ -855,6 +863,24 @@ H_{\text{tissue}} = 1000 \cdot \frac{\mu_{\text{tissue}} − \mu_{\text{water}}}
 
 
 \section{Digital Image Processing in Radiography}
+
+
+Digital radiography systems can capture the wide attenuation differences between lungs and mediastinum due to
+their wide dynamic range and linear response to th incident radiation. Hoever, it leads to a lack of contrast on
+the direct conversion to gray values. At the same time, image sharpness may not be as good as in screen-film
+due to the pixel size constraint \cite[p.~148]{Prokop2003}. Screen-film systems, despite having greater spatial
+resolution, they have a non-linear (S-shaped) response, leading to under- or overexposed images\cite[p.~551]{vuylstekeMultiscaleImageContrast1994}.
+Regardless of the imaging modality, digital image processing is not only used to take full advantage of the positive
+characteristics of the radiography systems, but also to amend the intrisic limitations of each detector.
+To overcome this, different algorithms are applied to the captured x-ray image, with the goals of:
+
+\begin{itemize}
+    \item displaying the full range of attenuation differences in the chest,
+    \item optimizaing spatial resolution of digital chest radiographs,
+    \item enhancing structural contrast in the lungs and mediastinum, and
+    \item supress image noise \cite[p.~149]{Prokop2003}.
+\end{itemize}
+
 \subsection{Gradation Curves}
 Digital radiography systems apply various processing steps to the raw transmission map to produce diagnostically useful images. As described by \cite{prokop2003principles}, gradation curves map detector signals to display values. These include:
 
