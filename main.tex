@@ -727,48 +727,132 @@ The remainder of this thesis is organized as follows: Chapter 2 presents backgro
 
 \chapter{Background}
 
-\section{X-ray Transmission}
-\todo{add more cites}
-\subsection{Beer's Law}
-X-ray transmission through matter follows Beer's Law, which describes how the intensity of radiation decreases as it passes through a material. For an X-ray beam passing through a homogeneous material, the intensity $I$ after passing through a thickness $x$ is given by:
+\section{X-ray Transmission Model}
+
+\subsection{X-ray intensity and Beer's law}
+
+X-rays are thought of as a flux of very high-energy, electromagnetic radiation. The x-ray beam is
+described by a vector valued function $I(x)$. The direction of $I$ at $x$ is the direction of the flux at $x$ and
+its magnitude,
+\begin{equation}
+    I (x) = \lVert I(x) \rVert
+\end{equation}
+is the intensity of the beam. If $dS$ is an infinitesimal surface element at $x$ of area
+$|dS|$, placed at right angles to $I(x)$, then the energy-per-unit-time passing through $dS$ is \cite[p.~56]{epstein2008}.
 
 \begin{equation}
-I = I_0 e^{-\mu x}
+    I (x) |dS|.
 \end{equation}
 
-where $I_0$ is the incident intensity and $\mu$ is the linear attenuation coefficient of the material \cite[p.~35]{cullity2014elements}.
-
-For heterogeneous materials like the human body, the equation becomes an integral along the beam path:
+When x-rays encounter any form of matter, they are partly transmitted and partly absorbed.
+The fractional decrease in the intensity $I$ of an x-ray beam as it passes
+through any homogeneous substance is proportional to the distance traversed $x$
+and the material encounterd\cite[p.~11]{cullityElementsXrayDiffraction2014}. The intensity
+$I$ of the x-ray beam satisfies Beer's law:
 
 \begin{equation}
-I(u,v) = I_0(u,v) \cdot \exp\left(-\int_L \mu(s)ds\right)
+    \frac{dI}{ds} = -\mu(x)I,
+    \label{eq:BeerLambert}
 \end{equation}
 
-where $(u,v)$ represents the detector coordinates, and the integral is taken along the linear path $L$ through the body.
+where $s$ is the arc-length along the straight-line trajectory of the x-ray beam.
+Each material encountered has a characteristic \textit{linear attenuation coefficient} $\mu$ for x-rays of a
+given energy, and is dependent on the substance composition, density, and the wavelength of the x-rays \cite[p.~57]{epstein2008}.
 
-\subsection{Body Tissues and X-ray Attenuation}
-For the human body specifically, the relation between incident intensity $I_0$ and transmitted intensity $I_1$ can be modeled as:
+For a homogeneous medium of thickness $x$ with linear attenuation coefficient $\mu$, if radiation of intensity
+$I_{\text{in}}$ is incident upon the medium, the transmitted intensity $I_{\text{out}}$ is given by:
 
 \begin{equation}
-I_1(x, y) = I_0(x, y) e^{-\mu_s d_s(x,y)} e^{-\mu_b d_b(x,y)} e^{-\mu_l d_l(x, y)}
+I_{\text{out}} = I_{\text{in}} \cdot e^{-\mu(x)}
+\label{eq:beer_lambert}
 \end{equation}
 
-where $\mu$ and $d$ represent the attenuation coefficients and tissue thickness over a projected point $(x,y)$ for bone ($b$), lungs ($l$), and other soft tissue ($s$). This relationship forms the physical basis for interpreting chest radiographs, as different tissues create characteristic attenuation patterns \cite{prokop2003principles}.
+\subsection{X-ray Image acquisition}
 
-The beam quality also changes as it passes through tissue—a phenomenon known as "beam hardening," where lower energy photons are preferentially absorbed, resulting in objects closer to the detector having less contrast than objects further away \cite{bushberg2011essential}.
+In the context of X-ray imaging, we measure intensities at the detector plane. Let:
 
-\todo{add reference of attenuation values for body tissues}
+\begin{itemize}
+\item $I_0(x,y)$ denote the intensity measured at detector position $(x,y)$ in the absence
+    of any object (the reference or flat-field measurement)
+\item $I(x,y)$ denote the intensity measured at detector position $(x,y)$ with the object present
+\end{itemize}
 
-\subsection{Transmission Map Definition}
-The transmission map is defined as the ratio of transmitted to incident intensity at each point, essentially capturing the exponential term from Beer's Law:
+Then, for radiation traversing a heterogeneous medium, such as body tissues, along a ray path $L$
+from source to detector position $(x,y)$, the relation of the incident and transmitted intensity is
+given by:
 
 \begin{equation}
-T(x,y) = \frac{I_1(x,y)}{I_0(x,y)} = e^{-\int \mu(x,y,z) dz}
+I(x,y) = I_0(x,y) \cdot \exp\left(-\int_L \mu(s) \, ds\right)
+\label{eq:beer_lambert_imaging}
 \end{equation}
 
-This map has values between 0 and 1, where 0 represents complete absorption and 1 represents no absorption. The transmission map is the fundamental input to any digital radiography processing pipeline, and recovering it is essential for simulating different detector configurations \cite{seibert2006flat}.
+where $\mu(s)$ represents the spatially varying attenuation coefficient along the ray path \cite[p.~57]{epstein2008}.
 
-\todo{add subsection or more details for the x ray image formation process}
+In a real measurement, the x-ray source is turned on for a known period of time. The total energy
+$I$ incident on the object along a given line $l$ is known. The total energy, $I_0$, emerging from the object
+along $l$ is then measured by an x-ray detector. Integrating Beer’s law we obtain \cite[p.~60]{epstein2008}
+
+\begin{equation}
+    \log \frac{I(x,y)}{I_0(x,y)} = -\int_l \mu(s) \, ds,
+\end{equation}
+
+where $\frac{I(x, y)}{I_0(x, y)}$ is the \textit{transmission map}, which describes the fraction of the
+incident radiation that transmits through the patient at each position $(x, y)$.
+
+For a medium composed of $n$ distinct homogeneous regions with attenuation coefficients
+$\{\mu_i\}_{i=1}^n$ and thicknesses $\{d_i\}_{i=1}^n$ along a given ray path,
+a simplified model can be expressed as
+\begin{equation}
+    I(x,y) &= I_0(x,y) \cdot \exp\left(-\sum_{i=1}^n \mu_i d_i\right).
+    \label{eq:discrete_materials}
+\end{equation}
+
+The x-ray image is created by the detection of the transmitted x-rays of an incident, uniform x-ray beam
+as they pass through an object. Note that ideal x-ray image acquisition and the described
+model assume a point x-ray source, a straight line trajectory from the source through the object,
+and complete detection of the x-ray beam that strikes the detector. These are not realistic assumptions, however,
+clinical detectors apply methods to counteract nonideal conditions \cite[p.~9]{Seibert3}.
+
+\subsection{Application to Human Chest Imaging}
+
+In the context of chest radiography, the human thorax can be modeled as a composition of distinct, but
+known tissue types, and therefore, different anatomical structures have different attenuation coefficients.
+Bone has a much higher attenuation coefficient than soft tissue, and different soft tissues have slightly
+different coefficients. More precisely, \autoref{fig:attenuation_coefficients} shows the attenuation coefficients
+of common body tissue types. The table is presented with a dimensionless measure called a
+Hounsfield unit, which is a measure relative to the attenuation coefficient of water defined as \cite[p.~54]{epstein2008}
+
+\begin{equation}
+H_{\text{tissue}} = 1000 \cdot \frac{\mu_{\text{tissue}} − \mu_{\text{water}}}{\mu_{\text{water}}}
+\end{equation}
+
+\begin{figure}
+    \centering
+    \begin{tabular}{|c|c|}
+        \hline
+        Tissue Type & Attenuation Coefficient \\
+        \hline
+        water & 0 \\
+        \hline
+        air & -1000 \\
+        \hline
+        bone & 1086 \\
+        \hline
+        blood & 53 \\
+        \hline
+        fat & -61 \\
+        \hline
+        breast tissue & 9 \\
+        \hline
+        muscle & 41 \\
+        \hline
+        soft tissue & 51 \\
+        \hline
+    \end{tabular}
+    \caption{Body tissue attenuation coefficients in Hounsfeld units. Adapted from \cite[p.~54]{epstein2008}}
+    \label{fig:tissue_attenuation}
+\end{figure}
+
 
 \section{Digital Image Processing in Radiography}
 \subsection{Gradation Curves}
