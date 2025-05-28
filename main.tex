@@ -696,21 +696,22 @@ The problem to solve lies in the category of inverse problems, and has several c
 
 \section{Purpose}
 
-\todo{refine this and goals section, may have too many bullet points}
-This research aims to support the development and experimentation with alternative X-ray detector technologies.
-More specifically, we aim to:
+The primary use case that motivates this project is the development of alternative X-ray detector technologies.
+Large chest X-ray datasets like CheXpert \cite{chexpert} and ChestX-ray8 \cite{nih} collect images from large
+and modern hospitals with extensive archives of X-ray imaging studies. While these can drive X-ray models to be
+used in most clinical environments, they may not be effective on resource-limited settings. These include portable,
+or cost-effective alternatives.
+
+Building large datasets for these subset of technologies is unlikely, given this has been possible due to
+modern archiving systems (PACS) keeping long histories of X-ray studies \cite[p.~3462]{nih}. Being able
+to translate existing datasets into representations of any other imaging system will bring existing and
+coming advancements in X-ray related automation to all scenarios.
 
 \todo{add references to x-ray detector accessibility}
 
-\begin{itemize}
-    \item Enable the development of X-ray detector technologies for resource-limited settings.
-    \item Provide a common baseline for comparing different detector technologies.
-    \item Support development of radiography machine learning models specific for non-standard imaging systems.
-\end{itemize}
-
 \section{Goals}
 
-Regarding concrete outcomes of this project, the specific goals are delimited as follows:
+Concretely, the expected outcomes of this project are the following:
 
 \begin{enumerate}
     \item Analyze limited X-ray transmission map data to identify and characterize the essential features that define radiologically realistic representations.
@@ -718,19 +719,13 @@ Regarding concrete outcomes of this project, the specific goals are delimited as
     \item Develop and evaluate optimization algorithms that can recover plausible transmission maps from processed images.
 \end{enumerate}
 
-\section{Research Methodology}
-
-Overall, the research methodology involves a combination of theoretical and experimental analysis, and computational modeling, described in the following steps:
-
-\begin{itemize}
-    \item Investigating established image processing algorithms used in radiography and a potential concensus across manufacturers
-    \item Identifying common properties in processed images and their corresponding transmission maps
-    \item Developing optimization algorithms with appropriate forward operators and loss functions
-    \item Evaluating recovered maps through comparison with known physics models and visual assessment
-\end{itemize}
-
 \section{Thesis Structure}
-The remainder of this thesis is organized as follows: Chapter 2 presents background information on X-ray transmission, digital image processing, and relevant optimization methods. Chapter 3 describes our proposed method for solving the inverse problem. Chapter 4 details the implementation of our computational pipeline. Chapter 5 presents experimental results, and Chapter 6 discusses implications and directions for future work.
+
+The remainder of this thesis is organized as follows: Chapter 2 presents background information on X-ray transmission,
+digital image processing, and the background of the numerical methods applied to solve this problem.Chapter 3
+presents the mathematical description of the problem and the method used to approach it. Chapter 4 includes implementation
+details and computational settings. Chapter 5 presents experimental results, and Chapter 6 discusses implications
+and directions for future work.
 
 \chapter{Background}
 
@@ -935,99 +930,63 @@ as they enhance structures of diagnostic interest while avoiding suppression of 
 
 \subsubsection{Multiscale Processing}
 
-More advanced systems use multiscale decomposition, dividing the image into frequency bands that can be independently
-processed. As detailed by \cite{stahl2000digital}, this approach allows for:
-\begin{itemize}
-    \item Size-independent enhancement of structures
-    \item Better handling of dynamic range differences
-    \item More effective noise suppression
-\end{itemize}
+Multiscale processing addresses a key limitation of unsharp masking: the inability to enhance structures of different sizes independently. While unsharp masking uses a single filter size, multiscale methods decompose the image into multiple layers, each containing details of a specific size range \cite{vuylstekeMultiscaleImageContrast1994}.
 
-The Laplacian pyramid decomposition, introduced by \cite{burt1983laplacian}, is a hierarchical structure where the
-original image is repeatedly filtered and downsampled:
+The process works by creating a pyramid of images:
 
 \begin{enumerate}
-    \item The image is blurred with a low-pass filter (typically a 3×3 or 5×5 binomial kernel)
-    \item The blurred image is downsampled by a factor of 2 in each direction
-    \item The downsampled image is expanded back to the original size using interpolation
-    \item The expanded image is subtracted from the original to create a "detail" or bandpass image
-    \item The process repeats with the downsampled image as the new input
+    \item \textbf{Decomposition}: The original image is repeatedly blurred and downsampled, creating a stack of progressively smaller, blurrier images
+    \item \textbf{Detail extraction}: The difference between each level and the next blurrier level captures details of a specific size:
+    \begin{equation}
+    \text{Details}_k = \text{Image}_k - \text{Blur}(\text{Image}_k)
+    \end{equation}
+    \item \textbf{Selective enhancement}: Each detail layer is enhanced based on its contrast:
+    \begin{equation}
+    \text{Enhanced}_k = \text{sign}(\text{Details}_k) \cdot |\text{Details}_k|^p
+    \end{equation}
+    where $p < 1$ (typically 0.7) amplifies weak details more than strong ones
+    \item \textbf{Reconstruction}: The enhanced layers are combined to create the final image
 \end{enumerate}
 
-This creates a series of bandpass images $\{B_0, B_1, ..., B_{n-2}\}$ plus a residual low-pass image $B_{n-1}$. The original image can be perfectly reconstructed by reversing the process:
-
-\begin{equation}
-I_{\text{original}} = B_{n-1} + \sum_{i=0}^{n-2} B_i
-\end{equation}
-
-For enhancement, each bandpass image can be processed independently before reconstruction. This allows for targeted enhancement of structures of specific sizes without affecting others, as implemented in commercial systems like MUSICA (Agfa) \cite{vuylsteke1994multiscale}, MFP (Fuji) \cite{ogoda1997unsharp}, and UNIQUE (Philips) \cite{stahl2000digital}.
-
-\section{Nonlinear Optimization}
-\subsection{Gradient Descent Methods}
-Our approach to recovering transmission maps relies on gradient-based optimization. Given a forward model $F$ that maps transmission maps to processed images, we seek to find the transmission map $x$ that minimizes:
-
-\begin{equation}
-\arg\min_{x, \theta} \mathcal{L}(F(x, \theta), y)
-\end{equation}
-
-where $y$ is the observed processed image, $\theta$ represents parameters of the forward model, and $\mathcal{L}$ is a suitable loss function.
-
-The optimization uses automatic differentiation to compute gradients efficiently. We employ the Adam optimizer \cite{kingma2014adam}, which adapts the learning rate for each parameter based on estimates of first and second moments of the gradients:
-
-\begin{align}
-m_t &= \beta_1 m_{t-1} + (1 - \beta_1) g_t \\
-v_t &= \beta_2 v_{t-1} + (1 - \beta_2) g_t^2 \\
-\hat{m}_t &= \frac{m_t}{1 - \beta_1^t} \\
-\hat{v}_t &= \frac{v_t}{1 - \beta_2^t} \\
-\theta_t &= \theta_{t-1} - \alpha \frac{\hat{m}_t}{\sqrt{\hat{v}_t} + \epsilon}
-\end{align}
-
-where $g_t$ is the gradient, $m_t$ and $v_t$ are the biased first and second moment estimates, $\hat{m}_t$ and $\hat{v}_t$ are the bias-corrected estimates, and $\alpha$, $\beta_1$, $\beta_2$, $\epsilon$ are hyperparameters.
-
-\subsection{Regularization for Ill-Posed Problems}
-\subsubsection{Regularization Strategies}
-The inverse problem of finding $x$ such that $F(x) = y$ is ill-posed when:
+This approach offers three key advantages \cite{Prokop2003,STA00a}:
 \begin{itemize}
-    \item A solution may not exist for all $y$
-    \item Solutions may not be unique
-    \item Solutions may not depend continuously on the data (small changes in $y$ can cause large changes in $x$)
+    \item \textbf{Multi-resolution enhancement}: Fine details (e.g., lung vessels) and coarse structures (e.g., heart borders) can be enhanced independently
+    \item \textbf{Better noise handling}: Enhancement can be reduced for the finest scales where noise dominates
+    \item \textbf{Adaptive contrast}: The power-law function ($x^p$) ensures subtle abnormalities are made visible without creating artifacts from already-visible edges
 \end{itemize}
 
-To address these challenges, we employ regularization by adding penalty terms to the objective function:
+Commercial implementations like MUSICA (Agfa) typically use 7-9 decomposition levels, allowing simultaneous enhancement of structures ranging from sub-millimeter vessels to large organ boundaries. This explains why modern digital radiographs can show both fine bone detail and subtle soft tissue structures that would be impossible to visualize with conventional processing.
 
-\begin{equation}
-\arg\min_x \{\|F(x) - y\|^2 + \sum_{i} \lambda_i R_i(x)\}
-\end{equation}
+\section{Nonlinear Optimization}
 
-where $R_i$ are regularization functionals and $\lambda_i > 0$ control the regularization strength.
+% Explain constrained nonlinear problems and present the problem in optimization
 
-\subsubsection{Gradient-Based Regularization}
-We explore gradient-based regularization that promotes spatial smoothness while preserving important features. The general form is:
+\subsection{Gradient Descent Methods}
 
-\begin{equation}
-R_{\text{grad}}(x) = \frac{1}{2} \left( \|\nabla_x x\|_p^p + \|\nabla_y x\|_p^p \right)
-\end{equation}
+% Explain a general framework of gradient descent methods, and how this approaches nonlinear
+% optimization problems
 
-where $\nabla_x$ and $\nabla_y$ are the horizontal and vertical finite difference operators, and $p$ determines the norm used. For $p=2$, this yields a squared gradient penalty that promotes smooth variations while being differentiable everywhere, which is crucial for our JAX-based optimization framework.
+\subsection{Regularization for Ill-Posed Problems}
 
-\subsubsection{Anatomically-Informed Regularization}
-Beyond generic smoothness priors, we incorporate anatomical knowledge through segmentation-guided regularization. This approach leverages the fact that different tissue types have characteristic transmission ranges:
+% Explain the concept of regularization, give extra details about
+% nonlinear problems
+%
+%
 
-\begin{equation}
-R_{\text{anat}}(x, S) = \sum_{m=1}^{M} \lambda_m P_m(x, S^m)
-\end{equation}
+\subsubsection{Square penalty}
 
-where $S = \{S^1, S^2, \ldots, S^M\}$ are segmentation masks for $M$ anatomical regions, and $P_m$ penalizes deviations from expected physical ranges for region $m$.
+% Introduce the square penalty regularization and how it helps regularize problems
 
-\subsubsection{Perceptual Regularization}
-To preserve diagnostic features, we also explore perceptual regularization terms that maintain high-frequency details important for clinical interpretation. One approach uses the similarity of detail layers extracted through frequency decomposition:
 
-\begin{equation}
-R_{\text{detail}}(x, y) = \|D_{\sigma}(F(x)) - D_{\sigma}(y)\|^2
-\end{equation}
+\subsubsection{Smoothing Regularization}
 
-where $D_{\sigma}$ extracts details at scale $\sigma$ through unsharp masking or similar operations.
+% explain approaches to achieve 'smooth' solutions when solving optimization problems
+%
 
+\subsection{Constrained Optimization}
+
+% explain approaches to achieve solutions that are constrained to certain strict
+% constraints such as inequalities
 
 \section{Image Quality Metrics}
 \subsection{Mean Squared Error (MSE)}
