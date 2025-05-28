@@ -4,7 +4,6 @@
 %% expanded upon by Gerald Q. Maguire Jr.
 %% This template has been adapted by Anders Sjögren to the University
 %% Engineering Program in Computer Science at KTH ICT. This adaptation was
-%% translation of English headings into Swedish with the addition of Swedish.
 %% Many thanks to others who have provided constructive input regarding the template.
 
 % Make it possible to conditionally depend on the TeX engine used
@@ -722,7 +721,7 @@ Concretely, the expected outcomes of this project are the following:
 \section{Thesis Structure}
 
 The remainder of this thesis is organized as follows: Chapter 2 presents background information on X-ray transmission,
-digital image processing, and the background of the numerical methods applied to solve this problem.Chapter 3
+digital image processing, and the an overview of the optimization methods applied to solve this problem. Chapter 3
 presents the mathematical description of the problem and the method used to approach it. Chapter 4 includes implementation
 details and computational settings. Chapter 5 presents experimental results, and Chapter 6 discusses implications
 and directions for future work.
@@ -904,8 +903,6 @@ are driven by multiple parameters that can also change on a per-image basis. Nev
 changing by vendor (Agfa [Mortsel, Belgium] uses MUSICA; Fuji [Tokyo, Japan] uses Gradation; and Kodak uses Tonescaling),
 they all share the same effect and purpose \cite[p.~119]{carterDigitalRadiographyPACS2010}.
 
-\subsubsection{Unsharp Masking}
-
 Unsharp masking is a simple method for edge enhancement and sharpening of images, and consist of
 three core steps:
 
@@ -931,203 +928,44 @@ The effects of unsharp masking depend critically on the size of the filter kerne
 Kernels of 20-30mm typically give the best results for general chest imaging \cite[p.~153]{Prokop2003},
 as they enhance structures of diagnostic interest while avoiding suppression of diagnostic information.
 
-\subsubsection{Multiscale Processing}
+More complex algorithms such as Multiscale processing can apply the effect of unsharp masking on multiple scales
+by splitting an image into many frequency bands, enabling multiple size-specific enhancements \cite[p.~156]{Prokop2003}.
 
-Multiscale processing addresses a key limitation of unsharp masking: the inability to enhance structures of different sizes independently. While unsharp masking uses a single filter size, multiscale methods decompose the image into multiple layers, each containing details of a specific size range \cite{vuylstekeMultiscaleImageContrast1994}.
+% \section{Nonlinear Optimization}
 
-The process works by creating a pyramid of images:
+% A fundamental tool for problems in science and engineering, and particularly in medical imaging, is
+% nonlinear optimization. In medical imaging, and overall problems in image reconstruction, it is common
+% to formulate the problem as an optimization problem, to find out of a space of images, one that
+% maximizes or minimizes an objective and satisfies some defined criteria.
 
-\begin{enumerate}
-    \item \textbf{Decomposition}: The original image is repeatedly blurred and downsampled, creating a stack of progressively smaller, blurrier images
-    \item \textbf{Detail extraction}: The difference between each level and the next blurrier level captures details of a specific size:
-    \begin{equation}
-    \text{Details}_k = \text{Image}_k - \text{Blur}(\text{Image}_k)
-    \end{equation}
-    \item \textbf{Selective enhancement}: Each detail layer is enhanced based on its contrast:
-    \begin{equation}
-    \text{Enhanced}_k = \text{sign}(\text{Details}_k) \cdot |\text{Details}_k|^p
-    \end{equation}
-    where $p < 1$ (typically 0.7) amplifies weak details more than strong ones
-    \item \textbf{Reconstruction}: The enhanced layers are combined to create the final image
-\end{enumerate}
+% Optimization refers precisely to the minimization or maximization of a function subject
+% to constraints on its variables. Consider a called \textit{objective function} $f$ as a scalar function with
+% variables $x$, and a set of constraint scalar functions $c_i$ define equations and inequalities
+% that $x$ must satisfy \cite[p.~2]{NumericalOptimization2006}. With this notation, an optimization problem
+% can be formulated as:
 
-This approach offers three key advantages \cite{Prokop2003,STA00a}:
-\begin{itemize}
-    \item \textbf{Multi-resolution enhancement}: Fine details (e.g., lung vessels) and coarse structures (e.g., heart borders) can be enhanced independently
-    \item \textbf{Better noise handling}: Enhancement can be reduced for the finest scales where noise dominates
-    \item \textbf{Adaptive contrast}: The power-law function ($x^p$) ensures subtle abnormalities are made visible without creating artifacts from already-visible edges
-\end{itemize}
+% \begin{equation}
+%     \begin{aligned}
+%         \min_{x \in \Omega \quad & f(x) \\
+%         \text{subject to} \quad & c_i(x) \leq 0, \quad i \in \mathcal{I} \\
+%         & c_i(x) = 0, \quad i \in \mathcal{E}.
+%     \end{aligned}
+% \end{equation}
 
-Commercial implementations like MUSICA (Agfa) typically use 7-9 decomposition levels, allowing simultaneous enhancement of structures ranging from sub-millimeter vessels to large organ boundaries. This explains why modern digital radiographs can show both fine bone detail and subtle soft tissue structures that would be impossible to visualize with conventional processing.
+% Here, $\mathcal{I}$ and $\mathcal{E}$ are the set of indices corresponding to inequality and equality constraints, respectively.
+% There exist many methods for the solution of these problems, although in most cases, and especially when the
+% objective function is non-linear and non-convex, only seek for a local solution. Reaching a global solution
+% is often difficult
 
-\section{Nonlinear Optimization}
 
-Nonlinear optimization forms the mathematical foundation for solving inverse problems in medical imaging. The general constrained nonlinear optimization problem seeks to minimize an objective function subject to equality and inequality constraints:
+% \section{Related Work}
+% \subsection{Inverse Problems in Medical Imaging}
+% While image recovery from processed versions has been studied in photography \cite{moran2020deeptone}, similar
+% work in medical imaging is limited. Most related work focuses on denoising, deblurring, or super-resolution rather
+% than recovering physically meaningful quantities like transmission maps \cite{jin2017deep}.
 
-\begin{equation}
-\begin{aligned}
-\min_{x \in \mathbb{R}^n} \quad & f(x) \\
-\text{subject to} \quad & g_i(x) \leq 0, \quad i = 1, \ldots, m \\
-& h_j(x) = 0, \quad j = 1, \ldots, p
-\end{aligned}
-\end{equation}
-
-where $f: \mathbb{R}^n \to \mathbb{R}$ is the objective function, $g_i: \mathbb{R}^n \to \mathbb{R}$ are inequality constraint functions, and $h_j: \mathbb{R}^n \to \mathbb{R}$ are equality constraint functions \cite{nocedal2006numerical}. When $f$, $g_i$, or $h_j$ are nonlinear, the problem becomes significantly more challenging than its linear counterpart, often exhibiting multiple local minima and requiring sophisticated algorithms for solution.
-
-\subsection{Gradient Descent Methods}
-
-Gradient descent methods form the backbone of modern optimization algorithms for differentiable objective functions. The fundamental principle exploits the fact that the negative gradient $-\nabla f(x)$ points in the direction of steepest descent \cite{boyd2004convex}.
-
-\subsubsection{Basic Gradient Descent}
-The classical gradient descent algorithm updates the current iterate $x_k$ according to:
-\begin{equation}
-x_{k+1} = x_k - \alpha_k \nabla f(x_k)
-\end{equation}
-
-where $\alpha_k > 0$ is the step size or learning rate. The convergence properties depend critically on the choice of $\alpha_k$ and the conditioning of $f$ \cite{nesterov2018lectures}.
-
-For functions with Lipschitz continuous gradients satisfying $\|\nabla f(x) - \nabla f(y)\| \leq L\|x - y\|$, choosing $\alpha_k = 1/L$ guarantees convergence at a rate of $O(1/k)$ for convex functions \cite{beck2017first}.
-
-\subsubsection{Accelerated Methods}
-Nesterov's accelerated gradient method achieves an improved convergence rate of $O(1/k^2)$ for convex functions through momentum:
-\begin{align}
-y_{k+1} &= x_k - \alpha_k \nabla f(x_k) \\
-x_{k+1} &= y_{k+1} + \beta_k(y_{k+1} - y_k)
-\end{align}
-
-where $\beta_k$ is the momentum parameter \cite{nesterov1983method}.
-
-\subsubsection{Adaptive Methods}
-Modern variants like Adam \cite{kingma2014adam} and AdaGrad \cite{duchi2011adaptive} adapt the learning rate based on historical gradient information:
-\begin{equation}
-x_{k+1} = x_k - \alpha_k \frac{m_k}{\sqrt{v_k} + \epsilon}
-\end{equation}
-
-where $m_k$ and $v_k$ are exponential moving averages of the gradient and squared gradient, respectively.
-
-\subsection{Regularization for Ill-Posed Problems}
-
-Many inverse problems in imaging are ill-posed in the sense of Hadamard: the solution may not exist, may not be unique, or may not depend continuously on the data \cite{hansen2010discrete}. Regularization introduces additional information to stabilize the solution.
-
-The general regularized optimization problem takes the form:
-\begin{equation}
-\min_x \|Ax - b\|^2 + \lambda R(x)
-\end{equation}
-
-where $A$ is the forward operator, $b$ is the observed data, $R(x)$ is the regularization functional, and $\lambda > 0$ is the regularization parameter that balances data fidelity and regularity.
-
-\subsubsection{Choice of Regularization Parameter}
-The selection of $\lambda$ is crucial and can be determined through several methods \cite{hansen2010discrete}:
-
-\begin{itemize}
-    \item \textbf{L-curve method}: Plot $\log\|Ax_\lambda - b\|$ versus $\log\|R(x_\lambda)\|$ and choose $\lambda$ at the corner
-    \item \textbf{Generalized Cross-Validation (GCV)}: Minimize
-    \begin{equation}
-    \text{GCV}(\lambda) = \frac{\|Ax_\lambda - b\|^2}{[\text{trace}(I - A(A^TA + \lambda R)^{-1}A^T)]^2}
-    \end{equation}
-    \item \textbf{Morozov's discrepancy principle}: Choose $\lambda$ such that $\|Ax_\lambda - b\| = \delta$, where $\delta$ is the noise level
-\end{itemize}
-
-\subsubsection{Square Penalty}
-
-The square penalty method, also known as Tikhonov regularization, is the most widely used regularization technique \cite{tikhonov1977solutions}. It adds a quadratic penalty term to the objective function:
-\begin{equation}
-\min_x \|Ax - b\|^2 + \lambda \|Lx\|^2
-\end{equation}
-
-where $L$ is a regularization matrix, often chosen as the identity (standard Tikhonov) or a discrete derivative operator.
-
-The solution has a closed-form expression:
-\begin{equation}
-x_\lambda = (A^TA + \lambda L^TL)^{-1}A^Tb
-\end{equation}
-
-This method effectively filters out high-frequency components that are typically associated with noise, providing smooth solutions. The degree of smoothing is controlled by $\lambda$: larger values produce smoother solutions at the cost of potentially losing important features \cite{vogel2002computational}.
-
-\subsubsection{Smoothing Regularization}
-
-While square penalty methods promote smoothness globally, more sophisticated regularization functionals can preserve important features like edges while still suppressing noise.
-
-\paragraph{Total Variation Regularization}
-Total Variation (TV) regularization, introduced by Rudin, Osher, and Fatemi \cite{rudin1992nonlinear}, minimizes:
-\begin{equation}
-\min_x \|Ax - b\|^2 + \lambda \text{TV}(x)
-\end{equation}
-
-where the TV functional is defined as:
-\begin{equation}
-\text{TV}(x) = \int_\Omega |\nabla x| \, d\Omega
-\end{equation}
-
-In discrete form for 2D images:
-\begin{equation}
-\text{TV}(x) = \sum_{i,j} \sqrt{(x_{i+1,j} - x_{i,j})^2 + (x_{i,j+1} - x_{i,j})^2 + \epsilon}
-\end{equation}
-
-where $\epsilon$ is a small parameter to ensure differentiability. TV regularization promotes piecewise constant solutions, making it particularly effective for images with sharp edges \cite{chambolle2010introduction}.
-
-\paragraph{Higher-Order Regularization}
-To avoid the staircasing artifacts of TV, higher-order methods like Total Generalized Variation (TGV) have been developed \cite{bredies2010total}:
-\begin{equation}
-\text{TGV}^2_\alpha(x) = \min_v \alpha_1 \int_\Omega |\nabla x - v| \, d\Omega + \alpha_0 \int_\Omega |Ev| \, d\Omega
-\end{equation}
-
-where $E$ is the symmetrized gradient and $\alpha_0, \alpha_1$ are weighting parameters.
-
-\subsection{Constrained Optimization}
-
-When the solution must satisfy explicit constraints, several approaches can be employed:
-
-\subsubsection{Projection Methods}
-For convex constraint sets $\mathcal{C}$, the projected gradient method updates:
-\begin{equation}
-x_{k+1} = \mathcal{P}_\mathcal{C}(x_k - \alpha_k \nabla f(x_k))
-\end{equation}
-
-where $\mathcal{P}_\mathcal{C}$ is the projection operator onto $\mathcal{C}$ \cite{bertsekas1999nonlinear}. For simple constraints like box constraints $[a, b]^n$, the projection is:
-\begin{equation}
-[\mathcal{P}_{[a,b]^n}(x)]_i = \max(a, \min(b, x_i))
-\end{equation}
-
-\subsubsection{Penalty Methods}
-Penalty methods convert constrained problems into unconstrained ones by adding penalty terms:
-\begin{equation}
-\min_x f(x) + \mu \sum_{i=1}^m \max(0, g_i(x))^2 + \mu \sum_{j=1}^p h_j(x)^2
-\end{equation}
-
-As $\mu \to \infty$, the solution of the penalized problem approaches that of the constrained problem \cite{nocedal2006numerical}.
-
-\subsection{Image Quality Assessment}
-\label{sec:image_quality_assessment}
-
-\subsection{Structural Similarity Index (SSIM)}
-SSIM \cite{wang2004image} better aligns with human perception by considering structural information:
-\begin{equation}
-\text{SSIM}(x, y) = \frac{(2\mu_x\mu_y + C_1)(2\sigma_{xy} + C_2)}{(\mu_x^2 + \mu_y^2 + C_1)(\sigma_x^2 + \sigma_y^2 + C_2)}
-\end{equation}
-
-where $\mu_x$, $\mu_y$ are means, $\sigma_x$, $\sigma_y$ are standard deviations, $\sigma_{xy}$ is the covariance, and $C_1$, $C_2$ are constants to avoid instability.
-
-\subsection{Peak Signal-to-Noise Ratio (PSNR)}
-PSNR measures the ratio between the maximum possible power of a signal and the power of corrupting noise:
-\begin{equation}
-\text{PSNR}(x, y) = 10 \cdot \log_{10}\left(\frac{\text{MAX}_I^2}{\text{MSE}(x, y)}\right)
-\end{equation}
-
-where $\text{MAX}_I$ is the maximum possible pixel value.
-
-\section{Related Work}
-\subsection{Digital Radiography Processing}
-Digital radiography processing has evolved from simple unsharp masking to sophisticated multiscale techniques. \cite{prokop2003principles} provides a comprehensive overview of the principles used in clinical systems, while \cite{stahl2000digital} details the nonlinear multiscale approach now common in commercial systems.
-
-\subsection{Inverse Problems in Medical Imaging}
-While image recovery from processed versions has been studied in photography \cite{moran2020deeptone}, similar work in medical imaging is limited. Most related work focuses on denoising, deblurring, or super-resolution rather than recovering physically meaningful quantities like transmission maps \cite{jin2017deep}.
-
-\subsection{Low-Cost X-ray Imaging}
-Several initiatives aim to develop affordable X-ray systems for resource-limited settings. The World Health Organization's specifications for basic radiographic systems \cite{who2014specifications} guide such efforts. \cite{mollura2010radiology} highlights the critical need for affordable diagnostic imaging in developing countries.
-
-\section{Summary}
-The background presented establishes the foundation for our approach to transmission map recovery. We understand the physics of X-ray transmission, the typical processing steps applied in digital radiography, and the mathematical framework for tackling the inverse problem. Our approach leverages advanced optimization techniques, appropriate regularization, and insights from the literature on digital radiography processing to recover physically plausible transmission maps from processed images.
+% \section{Summary}
+% The background presented establishes the foundation for our approach to transmission map recovery. We understand the physics of X-ray transmission, the typical processing steps applied in digital radiography, and the mathematical framework for tackling the inverse problem. Our approach leverages advanced optimization techniques, appropriate regularization, and insights from the literature on digital radiography processing to recover physically plausible transmission maps from processed images.
 
 \chapter{Method}
 
@@ -1456,95 +1294,36 @@ explored to represent the fidelity of our estimated processed images. Concretely
 
 \subsection{Regularization Terms}
 
-\subsubsection{Total Variation Regularization}
-Total variation regularization promotes piecewise smoothness while preserving edges in the reconstructed transmission maps:
-\begin{equation}
-R_{\text{TV}}(X) = \frac{1}{N} \sum_{i=1}^N R_{\text{TV}}(x_i)
-\end{equation}
+The selection of regularization terms is guided by the soft constraints expected from the reconstructed transmission
+maps. These have the goals of reducing noise and artifacts from the images, as well as promoting the
+compliance with the expected transmission ranges at each of the absorption-similar regions.
 
-where for a single image $x_i$:
-\begin{equation}
-R_{\text{TV}}(x_i) = \frac{1}{2} \left( \|\nabla_h x_i\|_F^2 + \|\nabla_v x_i\|_F^2 \right)
-\end{equation}
+\begin{description}
+    \item[Total Variation] TV regularization promotes piecewise smoothness in $x_i$, thus discouraging discontinuities
+    in the image. Despite the fact that TV regularization can lead to over-smoothed images, it is still explored due to
+    its low computational cost.
+    \item[Total Variation] TV regularization promotes piecewise smoothness in $x_i$, thus discouraging discontinuities
+    in the image. Despite the fact that TV regularization can lead to over-smoothed images, it is still explored due to
+    its low computational cost.
+    \item[Segmentation-based regularization] We incorporate physics-based constraints derived from anatomical segmentation
+    to ensure realistic transmission values for each tissue type. For each of the anatomical groups discussed in
+   \autoref{sec:segmentation}, a value range is extracted from a real transmission map, and is used as ideal bounds for
+   recovered transmission. The formulation of this regularization consists of a square penalty for values outside their
+   defined bounds (if any). More formally, let $s_i^{t}(x, y)$ denote the binary mask for $x_i$ of the anatomical group $t$,
+   and $v^{t}_{min}, v^{t}_{max}$ be the expected transmission bounds for said group. Then,
 
-% Here, $\nabla_h$ and $\nabla_v$ represent horizontal and vertical finite difference operators, and $\|\cdot\|_F$ is the Frobenius norm. In discrete form:
-% \begin{equation}
-% R_{\text{TV}}(x_i) = \frac{1}{2} \left( \sum_{j=1}^{r-1} \sum_{k=1}^{c} (x_i(j+1,k) - x_i(j,k))^2 + \sum_{j=1}^{r} \sum_{k=1}^{c-1} (x_i(j,k+1) - x_i(j,k))^2 \right)
-% \end{equation}
+   \begin{equation}
+   p_t(x_i, s^t_i) = \frac{\sum_{j, k}  s_i^t(j, k) \cdot \left[ \max(0, x_i(j, k) - v^{t}_{max})^2 + \max(0, v^{t}_{min} - x_i(j, k) )^2\right]}{\sum_{j, k}  s_i^t(j, k) }
+   \end{equation}
 
-\subsubsection{Segmentation-Based Regularization}
-We incorporate physics-based constraints derived from anatomical segmentation to ensure realistic transmission values for different tissue types:
+   is the penalty on $x_i$ that is zero when all the pixels within the mask $s_i^t$ are within their respective bounds
+   and increases quadratically as the values deviate from them. This penalty is always introduced in the loss function
+   for all explorations.
+\end{description}
 
-\begin{equation}
-R_{\text{seg}}(X, S) = \frac{1}{N} \sum_{i=1}^N R_{\text{seg}}(x_i, S_i)
-\end{equation}
-
-where $S_i = \{S_i^1, S_i^2, \ldots, S_i^M\}$ are the segmentation masks for the $M$ anatomical regions in image $i$, and:
-
-\begin{equation}
-R_{\text{seg}}(x_i, S_i) = \sum_{m=1}^{M} P_m(x_i, S_i^m)
-\end{equation}
-
-The penalty function $P_m$ for region $m$ computes the squared deviation of pixel values from the expected range $[v_{min}^m, v_{max}^m]$:
-
-\begin{equation}
-P_m(x_i, S_i^m) = \frac{\sum_{j, k} \left( \max(0, v_{min}^m - x_i(j,k))^2 + \max(0, x_i(j,k) - v_{max}^m)^2 \right) \cdot S_i^m(j,k)}{\sum_{j, k} S_i^m(j,k)}
-\end{equation}
-
-This penalizes transmission values that fall outside the expected physical ranges for each anatomical region, normalized by the size of the region.
-
-\subsection{Constraint Enforcement via Projections}
-To ensure the optimization process stays within physically plausible regions of the parameter space, we employ projection operators after each gradient update step. These projections enforce hard constraints on both the transmission maps and the forward model parameters.
-
-\subsubsection{Transmission Map Constraints}
-Physical principles dictate that transmission values must lie between 0 and 1, where 0 represents complete absorption and 1 represents no absorption. We enforce this using a hypercube projection:
-
-\begin{equation}
-P_{\text{hypercube}}(x) = \min(\max(x, 0), 1)
-\end{equation}
-
-This ensures that after each optimization step, all pixel values in the transmission maps remain physically valid.
-
-\subsubsection{Forward Model Parameter Constraints}
-To ensure the forward model produces realistic processed images, we constrain its parameters within ranges that correspond to clinically relevant image processing operations. These constraints are implemented as:
-
-\begin{equation}
-P_{\text{param}}(\theta) = \{P_{\text{box}}(\theta_k; a_k, b_k) \mid k \in \text{keys}(\theta)\}
-\end{equation}
-
-where $P_{\text{box}}$ is a box projection that constrains a parameter to lie within a specified interval $[a, b]$:
-
-\begin{equation}
-P_{\text{box}}(\theta_k; a_k, b_k) = \min(\max(\theta_k, a_k), b_k)
-\end{equation}
-
-Specifically, we apply the following constraints to the forward model parameters:
-\begin{itemize}
-    \item Windowing parameters: $\text{window\_center} \in [0.1, 0.8]$, $\text{window\_width} \in [0.1, 1.0]$
-    \item Sigmoid steepness: $\gamma \in [1, 20]$
-    \item Unsharp masking parameters: $\text{low\_sigma} \in [0.5, 10]$, $\text{low\_enhance\_factor} \in [0.3, 1.0]$
-\end{itemize}
-
-These constraints ensure that:
-\begin{enumerate}
-    \item The window center stays within the meaningful range of X-ray transmission values
-    \item The window width allows for appropriate contrast adjustment
-    \item The sigmoid steepness produces S-curves similar to those used in clinical practice
-    \item Unsharp masking uses filter sizes appropriate for enhancing structures at diagnostically relevant scales
-    \item Enhancement factors avoid under and over-sharpening artifacts
-\end{enumerate}
-
-\subsubsection{Projection in the Optimization Loop}
-After each gradient update step, we apply these projections sequentially:
-
-\begin{align}
-x_{t+1} &= P_{\text{hypercube}}(x_t - \alpha_x \nabla_x L(x_t, \theta_t)) \\
-\theta_{t+1} &= P_{\text{param}}(\theta_t - \alpha_\theta \nabla_\theta L(x_t, \theta_t))
-\end{align}
-
-where $\alpha_x$ and $\alpha_\theta$ are learning rates for the transmission maps and forward model parameters, respectively. This projection-based approach ensures that the optimization remains faithful to the physical and practical constraints of the problem, avoiding physically implausible solutions even when the loss function might favor them.
 
 \subsection{Optimization Procedure}
+
 We employ the JAX-based optimization framework with the following steps:
 \begin{enumerate}
     \item Initialize transmission maps $X$ and parameters $\theta$ with reasonable values
@@ -1557,6 +1336,7 @@ We employ the JAX-based optimization framework with the following steps:
 
 The optimization is performed by minimizing the complete loss function with respect to both the transmission maps and the parameters of the forward model.
 \section{Evaluation Methodology}
+
 We evaluate our method using several metrics:
 \begin{itemize}
     \item \textbf{Image quality metrics}: SSIM, PSNR between reconstructed processed images and originals
