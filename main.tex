@@ -1013,18 +1013,6 @@ PSNR measures the ratio between the maximum possible power of a signal and the p
 
 where $\text{MAX}_I$ is the maximum possible pixel value.
 
-\section{Available Chest X-ray Datasets}
-Several large datasets of chest radiographs are available, though none provide the raw transmission maps:
-\begin{itemize}
-    \item \textbf{CheXpert} \cite{irvin2019chexpert}: Over 200,000 images from Stanford Hospital, with labels for 14 different pathologies
-    \item \textbf{MIMIC-CXR} \cite{johnson2019mimic}: Over 377,000 chest radiographs from Beth Israel Deaconess Medical Center
-    \item \textbf{Open-i} \cite{demner2016preparing}: A collection from the National Library of Medicine with associated radiology reports
-
-    \item \textbf{PLCO} \cite{gohagan2000prostate}: From the Prostate, Lung, Colorectal and Ovarian Cancer Screening Trial
-\end{itemize}
-
-None of these datasets report radiography hardware specifications or processing parameters, making the inverse problem challenging.
-
 \section{Related Work}
 \subsection{Digital Radiography Processing}
 Digital radiography processing has evolved from simple unsharp masking to sophisticated multiscale techniques. \cite{prokop2003principles} provides a comprehensive overview of the principles used in clinical systems, while \cite{stahl2000digital} details the nonlinear multiscale approach now common in commercial systems.
@@ -1040,65 +1028,75 @@ The background presented establishes the foundation for our approach to transmis
 
 \chapter{Method}
 
+The design of the presented method is motivated by the following findings coming from prior knowledge on X-ray images
+and the \acrshort{DIP} algorithms used in the field:
+
+\begin{itemize}
+    \item Despite differences in processing algorithms across vendors, all seek the same perceptual effects
+    \cite[p.~119]{carterDigitalRadiographyPACS2010}, and iterations of such algorithms avoid changes in the appearance
+    that radiologists expect from X-ray images \cite[p.~57]{STA00a}.
+    \item If we recover an appropriate forward model (image processing algorithm) that can produce images perceptually
+    similar to the target X-ray images, we may use it as a basis to reconstruct 'realistic' transmission maps from
+    the processed images.
+\end{itemize}
+
+Moreover, there is little to none prior information about transmission maps. Thus, if it's not possible to
+design a model constrained on data, it might be possible to constrain it on the transformations that map the
+latent images to the observed X-ray datasets.
+
 \section{Mathematical Model}
 \label{sec:mathematicalModel}
 
-For this thesis project, a family of models \todo{is this the right term} are explored to recover transmission maps under the lack of prior knowledge about the ground truth, and the
-diversity of black-box models that are used in practice to process radiographic images. The motivations \todo{can we say this?} driving the design of the methods can be summarized as follows:
-
-\begin{itemize}
-    \item If all images are processed to match a same visual profile \todo{cite DIP paper or reference to section}, we could model all black boxes using a single,
-        although parameterized, image processing algorithm.
-    \item If we recover an appropriate forward model (image processing algorithm) \todo{express forward model and image processing are synonims}, we can reconstruct a
-        'realistic' transmission map from the processed images.
-\end{itemize}
-
-Given the previous knowledge, we can formulate a general optimization problem using the following notation:
-
-\begin{itemize}
-    \item $N$ as the size of the image dataset.
-    \item $d$ is the number of parameters of the image processing operator.
-    \item $r, c$ as the fixed row and columns in pixels, respectively, of all images in the dataset.
-    \item $Y = \{ y_1, y_2, \dots, y_N \}, y_i \in [0, 1]^{r, c}$ is the given set of processed X-ray images.
-    \item $X=\{x_{1}, x_{2}, \dots, x_{N}\} $ as the corresponding set of unknown transmission maps, with $x_i \in [0,1]^{r,c}$ for all $i \in \{1,2,\dots,N\}$. \todo{Image formal notation?}
-    \item $F:[0,1]^{r, c} \times \mathbb{R}^d \to [0, 1]^{r, c}$ \todo{can we specify domain sets?} as a known image processing algorithm with parameters $\theta \in \mathbb{R}^d$.
-\end{itemize}
-
-Then, we formulate the optimization problem to recover $X$ and $\theta$
-
+For a dataset of observed, grayscale processed X-ray images $Y = \{y_i\}^N_{i=1}$, we aim to recover a corresponding
+set of transmission maps $X = \{x_i\}^N_{i=1}$, with $x_i, y_i \in [0, 1]^{r, c}$ that satisfy
 \begin{equation}
-    \min_{X, \theta} \sum_{i=1}^{N} \left( \ell(y_i, F(x_i, \theta)) + \sum_{j = 1}^{K} \lambda_j R_j(x_i) \right)
+    F(x_i, \theta) = y_i.
 \end{equation}
 
-where $\ell$ is a loss function measuring the discrepancy between the processed versions of our estimated transmission
-maps and the observed processed images, $R$ is a regularization term applied to $X$, with weights $\lambda$.
+Here, $F:[0,1]^{r, c} \times \mathbb{R}^d \to [0, 1]^{r, c}$ denotes a known image processing algorithm governed by
+parameters $\theta \in \mathbb{R}^d$.
 
-Furthermore, the following concrete models can be considered:
+This can be formulated as an optimization problem: for each image $y_i$, we aim to find the transmission map $x_i$
+and parameters $\theta_i$ that satisfy
+
+\begin{equation}
+    \min_{x_i, \theta_i \in \Omega_\theta}  \mathcal{D}(y_i, F(x_i, \theta_i)) + \sum_{j = 1}^{K} \lambda_k R_j(x_i)
+\end{equation}
+
+where $\mathcal{D}$ is a data fidelity function measuring the discrepancy between the processed versions of
+our estimated transmission maps and the observed processed images, and $R_1, \dots R_K$ are regularization
+terms on $x_i$ weighted by $\lambda_1, \dots, \lambda_K$.
+
+As $F$ is chosen based on existing \acrshort{DIP} algorithms, we can therefore constraint the parameters $\theta_i$
+on expected value ranges and values recommended in the literature. Thus, the problem is further constrained by finding
+parameters $\theta_i$ that lie in the feasible ranges
+
+\begin{equation}
+    \theta_i \in \Omega_\theta = \left\{ \theta_i \mid c_j(\theta_i) \geq 0, j \in \mathcal{I}  \right\}.
+\end{equation}
+
+The presented model suggests that each image $y_i$ will have a corresponding transmission map $x_i$ and
+parameters $\theta_i$. However, the following special cases of the problem can also be considered:
 
 \begin{description}
-    \item[Known parameters] If we assume there is a known set of parameters for the operator $F$ that can model all the observed processed images, then we get
+    \item[Common operator parameters] If we assume that there exists a single set of parameters $\theta$
+    (yet unknown) for all processed images, i.e. $F(x_i, \theta) = y_i$ for all $i = \{1,\dots,N\}$.
+    Then the problem can be modeled as
     \begin{equation}
-        \min_{X} \sum_{i=1}^{N} \left( \ell(y_i, F(x_i, \theta)) + \sum_{j = 1}^{K} \lambda_j R_j(x_i) \right)
+        \min_{x_i, \theta_0 \in \Omega_\theta}  \mathcal{D}(y_i, F(x_i, \theta_0)) + \sum_{j = 1}^{K} \lambda_k R_j(x_i)
     \end{equation}
-    such that $\theta \in \mathbb{R}^d$ is known.
-    \item[Common operator parameters] If we assume that there exists a single set of parameters $\theta$ (yet unknown) for all processed
-    images, i.e. $F(x_i, \theta) = y_i$ for all $i = \{1,\dots,N\}$. Then the problem can be modeled as
+    \item[Known parameters] If we assume there is a known set of parameters $\theta_0$ for the operator
+    $F$ that can model all the observed processed images, then we reduce the problem to
     \begin{equation}
-        \min_{X, \theta} \sum_{i=1}^{N} \left( \ell(y_i, F(x_i, \theta)) + \sum_{j = 1}^{K} \lambda_j R_j(x_i) \right)
+        \min_{x_i}  \mathcal{D}(y_i, F(x_i, \theta_0)) + \sum_{j = 1}^{K} \lambda_k R_j(x_i).
     \end{equation}
-    \item[Per-image operator parameters] If we assume we can model all the observed processed images with $F$, but not necessarily with the same parameters on an image bases,
-    i.e. $F(x_i, \theta_i) = y_i$ for all $i = \{1,\dots,N\}$, with  $\theta = \{ \theta_1, \theta_2, \dots, \theta_N \}$. Then we aim to solve
-    \begin{equation}
-        \min_{X, \theta} \sum_{i=1}^{N} \left( \ell(y_i, F(x_i, \theta_i)) + \sum_{j = 1}^{K} \lambda_j R_j(x_i) \right)
-    \end{equation}
-    where we now have a set of parameters $\theta = \{\theta_1, \theta_2, \dots, \theta_N\} \text{ with }\theta_i \in \mathbb{R}^{d}$.
 \end{description}
 
 
-The method employed in this project involved an iterative process of defining a loss function and regularization,
-which can be applied to all described model variations, and finding a framework that can yield results considered realistic.
-In the following sections, we will discuss the choices made for the functions $F$, $\ell$ and $R$, and how these contribute
-to the reconstruction of transmission maps.
+The method employed in this project involved an iterative process of defining a data fidelity function and
+regularization functions that will recover transmission maps considered realistic (according to a predefined
+set of characteristics). In the following sections, we will discuss the choices made for
+$F$, $\mathcal{D}$ and $R_j$, and their effects on the reconstruction of transmission maps.
 
 \section{Data Collection and Preprocessing}
 \label{sec:dataCollection}
