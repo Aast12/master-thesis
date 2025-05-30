@@ -720,18 +720,22 @@ Concretely, the expected outcomes of this project are the following:
 
 \section{Thesis Structure}
 
-The remainder of this thesis is organized as follows: Chapter 2 presents background information on X-ray transmission,
-digital image processing, and the an overview of the optimization methods applied to solve this problem. Chapter 3
-presents the mathematical description of the problem and the method used to approach it. Chapter 4 includes implementation
+The remainder of this thesis is organized as follows: Chapter 2 presents background information on X-ray transmission and
+digital image processing that are relevant to the problem and motivate the proposed method. Chapter 3
+presents the mathematical description of the problem and the . Chapter 4 includes implementation
 details and computational settings. Chapter 5 presents experimental results, and Chapter 6 discusses implications
 and directions for future work.
 
-\chapter{Background}
-
-\section{X-ray Transmission Model}
+\chapter{X-ray Transmission}
 \label{sec:xrayTransmissionModel}
 
-\subsection{X-ray intensity and Beer's law}
+The lack of ground truth and prior knowledge for our problem incentivizes the analysis of the underlying
+physics of X-ray images, as well as further research on the types of operations that are done in the black boxes
+we aim to invert. This chapter presents the basic principles of X-ray transmission, the process of X-ray image
+acquisition, and the main goals and common algorithms that are used to process radiographic images. The
+knowledge presented in this section motivates the design choices made to develop the proposed method.
+
+\section{X-ray intensity and Beer's law}
 
 X-rays are thought of as a flux of very high-energy, electromagnetic radiation. The x-ray beam is
 described by a vector valued function $I(x)$. The direction of $I$ at $x$ is the direction of the flux at $x$ and
@@ -769,7 +773,7 @@ I_{\text{out}} = I_{\text{in}} \cdot e^{-\mu(x)}
 \label{eq:beer_lambert}
 \end{equation}
 
-\subsection{X-ray Image acquisition}
+\section{X-ray Image acquisition}
 
 In the context of X-ray imaging, we measure intensities at the detector plane. Let
 
@@ -815,7 +819,7 @@ trajectory from the source through the object, and complete detection of the x-r
 These are not realistic assumptions, however, clinical detectors apply methods to counteract nonideal conditions
 \cite[p.~9]{Seibert3}.
 
-\subsection{Application to Human Chest Imaging}
+\section{Application to Human Chest Imaging}
 \label{sec:human_chest_imaging}
 
 In the context of chest radiography, the human thorax can be modeled as a composition of distinct, but
@@ -931,43 +935,101 @@ as they enhance structures of diagnostic interest while avoiding suppression of 
 More complex algorithms such as Multiscale processing can apply the effect of unsharp masking on multiple scales
 by splitting an image into many frequency bands, enabling multiple size-specific enhancements \cite[p.~156]{Prokop2003}.
 
-% \section{Nonlinear Optimization}
+\subsection{Transmission Maps}
 
-% A fundamental tool for problems in science and engineering, and particularly in medical imaging, is
-% nonlinear optimization. In medical imaging, and overall problems in image reconstruction, it is common
-% to formulate the problem as an optimization problem, to find out of a space of images, one that
-% maximizes or minimizes an objective and satisfies some defined criteria.
+Despite the processes behind capturing X-ray images are well studied, to our knowledge, there are currently no open datasets of X-ray
+transmission maps. We had access to, precisely, two images taken from the same chest phantom at the Hard X-ray lab
+in KTH \todo{is this the right source}, one paired with a processed image produced by a clinical-grade detector. Figure
+\ref{fig:chestPhantomImages} shows the obtained sample pair of transmission map and processed image.
 
-% Optimization refers precisely to the minimization or maximization of a function subject
-% to constraints on its variables. Consider a called \textit{objective function} $f$ as a scalar function with
-% variables $x$, and a set of constraint scalar functions $c_i$ define equations and inequalities
-% that $x$ must satisfy \cite[p.~2]{NumericalOptimization2006}. With this notation, an optimization problem
-% can be formulated as:
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[t]{0.45\textwidth}
+        \includegraphics[width=\textwidth]{figures/comm_unprocessed_sample.jpg}
+        \caption{Real transmission map.}
+    \end{subfigure}
+    \begin{subfigure}[t]{0.45\textwidth}
+        \includegraphics[width=\textwidth]{figures/comm_processed_sample.jpg}
+        \caption{Processed X-ray image (clinical detector).}
+    \end{subfigure}
+    \caption{Sample pair of images from chest phantom}
+    \label{fig:chestPhantomImages}
+\end{figure}
 
-% \begin{equation}
-%     \begin{aligned}
-%         \min_{x \in \Omega \quad & f(x) \\
-%         \text{subject to} \quad & c_i(x) \leq 0, \quad i \in \mathcal{I} \\
-%         & c_i(x) = 0, \quad i \in \mathcal{E}.
-%     \end{aligned}
-% \end{equation}
+For this thesis, a method is proposed based on the known physics of x-ray imaging, and insights that can be
+taken from the analysis of the sample pair shown in \autoref{fig:chestPhantomImages}.
 
-% Here, $\mathcal{I}$ and $\mathcal{E}$ are the set of indices corresponding to inequality and equality constraints, respectively.
-% There exist many methods for the solution of these problems, although in most cases, and especially when the
-% objective function is non-linear and non-convex, only seek for a local solution. Reaching a global solution
-% is often difficult
+\begin{description}
+    \item[Collimated area range] Only a fraction of the dynamic range of a transmission map
+   contains diagnostic information. Figure \ref{fig:transmissionMapsHistograms} shows the histograms
+   of the transmission map samples. It can be observed that the captured transmission values are concentrated in
+  the range below 0.4, with the outliers corresponding to non-diagnostic relevant regions.
+  \begin{figure}[H]
+        \centering
+        \includegraphics[width=1.0\textwidth]{figures/transmission_maps_histograms.png}
+        \caption{Histograms of chest phantom transmission maps}
+        \label{fig:transmissionMapsHistograms}
+    \end{figure}
+
+    \item[Body tissue groups by absorption coefficients] \autoref{sec:human_chest_imaging} presented the absorption coefficients
+    for the different body tissues present in the chest. The coefficients for the different soft body tissues
+    vary slightly, by about 2\% of the dynamic range of an X-ray measurement \cite[p.~54]{epstein2008}. On the other hand
+    lung (air filled) and bone regions will have a significant difference in energy absorption. This can lead to
+    the definition of three groups of body regions that will lead to similar transmission values, described in
+    \autoref{tab:segmentationGroups}. It can be noted that these anatomical structures do not span the entirety of the
+   chest. These are limited to structures we can identify via an existing segmentation model, as defined in \autoref{sec:segmentation}.
+
+    \begin{table}[H]
+        \centering
+        \begin{tabular}{l l}
+            \textbf{Group name} & \textbf{Grouped labels} \\
+            \hline
+            Bone &  Left Clavicle\\
+                & Right Clavicle \\
+                & Left Scapula\\
+                &Right Scapula\\
+                &Spine \\
+            \hline
+            Lung &  Left Lung \\
+                & Right Lung \\
+                & Left Hilus Pulmonis \\
+                & Right Hilus Pulmonis \\
+            \hline
+            Soft tissue &  Heart \\
+            & Aorta \\
+            & Mediastinum \\
+            & Facies Diaphragmatica \\
+            & Weasand
+        \end{tabular}
+        \caption{Anatomical structures grouped by absorption coefficients}
+        \label{tab:segmentationGroups}
+    \end{table}
+
+    \item[Histogram cluster ranges] Figure \ref{fig:segmentationTransmissionMapsHistograms} shows the histograms
+    by different tissues (see \ref{sec:segmentation}). Each of the histograms, despite overlapping, all of them
+    have defined boundaries.
+
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width=1.0\textwidth]{figures/segmentation_txm_histograms.png}
+        \caption{Histograms of chest phantom transmission maps grouped by tissue groups}
+        \label{fig:segmentationTransmissionMapsHistograms}
+    \end{figure}
+
+    \item[Non-flatten histogram] Figure \ref{fig:processedHistogramCompare} shows the histograms of a real pair of transmission map
+    and processed image. There is an evident difference with the processed image having more uniform histograms,
+    likely resulting from a histogram equalization process. In contrast, the transmission map histogram has higher
+    density in the values closer to zero.
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width=1.0\textwidth]{figures/processed_hist_cmp.png}
+        \caption{Histograms of processed transmission maps}
+        \label{fig:processedHistogramCompare}
+    \end{figure}
+\end{description}
 
 
-% \section{Related Work}
-% \subsection{Inverse Problems in Medical Imaging}
-% While image recovery from processed versions has been studied in photography \cite{moran2020deeptone}, similar
-% work in medical imaging is limited. Most related work focuses on denoising, deblurring, or super-resolution rather
-% than recovering physically meaningful quantities like transmission maps \cite{jin2017deep}.
-
-% \section{Summary}
-% The background presented establishes the foundation for our approach to transmission map recovery. We understand the physics of X-ray transmission, the typical processing steps applied in digital radiography, and the mathematical framework for tackling the inverse problem. Our approach leverages advanced optimization techniques, appropriate regularization, and insights from the literature on digital radiography processing to recover physically plausible transmission maps from processed images.
-
-\chapter{Method}
+\chapter{Problem Formulation}
 
 The design of the presented method is motivated by the following findings coming from prior knowledge on X-ray images
 and the \acrshort{DIP} algorithms used in the field:
@@ -998,14 +1060,14 @@ Here, $F:[0,1]^{r, c} \times \mathbb{R}^d \to [0, 1]^{r, c}$ denotes a known ima
 parameters $\theta \in \mathbb{R}^d$.
 
 This can be formulated as an optimization problem: for each image $y_i$, we aim to find the transmission map $x_i$
-and parameters $\theta_i$ that satisfy
+and parameters $\theta_i$ that minimize a loss function $\ell(x_i, \theta_i)$:
 
 \begin{equation}
     \label{eq:optimizationProblem}
-    \min_{x_i, \theta_i \in \Omega_\theta}  \mathcal{D}(y_i, F(x_i, \theta_i)) + \sum_{j = 1}^{K} \lambda_k R_j(x_i)
+    \min_{x_i, \theta_i \in \Omega_\theta}  \underbrace{\mathcal{D}(y_i, F(x_i, \theta_i)) + \sum_{j = 1}^{K} \lambda_k R_j(x_i)}_{=: \ell(\cdot)}.
 \end{equation}
 
-where $\mathcal{D}$ is a data fidelity function measuring the discrepancy between the processed versions of
+Here, $\mathcal{D}$ is a data fidelity function measuring the discrepancy between the processed versions of
 our estimated transmission maps and the observed processed images, and $R_1, \dots R_K$ are regularization
 terms on $x_i$ weighted by $\lambda_1, \dots, \lambda_K$.
 
@@ -1041,113 +1103,6 @@ set of characteristics). In the following sections, we will discuss the choices 
 $F$, $\mathcal{D}$ and $R_j$, and their effects on the reconstruction of transmission maps.
 
 
-\section{Analysis of Transmission Map Properties}
-\label{sec:transmissionMapProperties}
-
-
-In order to choose the data fidelity function $\mathcal{D}$ and the regularization functions $R_j$, an
-analysis over the few samples and general X-ray imaging properties was performed. The following insights
-were obtained, and motivate the choices explained in the coming sections.
-
-\begin{description}
-    \item[Collimated area range] Only a fraction of the dynamic range of a transmission map
-   contains diagnostic information. Figure \ref{fig:transmissionMapsHistograms} shows the histograms
-   of the transmission map samples. It can be observed that the captured transmission values are concentrated in
-  the range below 0.4, with the outliers corresponding to non-diagnostic relevant regions.
-  \begin{figure}[H]
-        \centering
-        \includegraphics[width=1.0\textwidth]{figures/transmission_maps_histograms.png}
-        \caption{Histograms of chest phantom transmission maps}
-        \label{fig:transmissionMapsHistograms}
-    \end{figure}
-
-    \item[Body tissue groups by absorption coefficients] \autoref{sec:human_chest_imaging} presented the absorption coefficients
-    for the different body tissues present in the chest. The coefficients for the different soft body tissues
-    vary slightly, by about 2\% of the dynamic range of an X-ray measurement \cite[p.~54]{epstein2008}. On the other hand
-    lung (air filled) and bone regions will have a significant difference in energy absorption. This can lead to
-    the definition of three groups of body regions that will lead to similar transmission values, described in
-    \autoref{tab:segmentationGroups}. The labels correspond to the identifiable structures defined in \autoref{sec:segmentation}.
-
-    \begin{table}[H]
-        \centering
-        \begin{tabular}{l l}
-            \textbf{Group name} & \textbf{Grouped labels} \\
-            \hline
-            Bone &  Left Clavicle\\
-                & Right Clavicle \\
-                & Left Scapula\\
-                &Right Scapula\\
-                &Spine \\
-            \hline
-            Lung &  Left Lung \\
-                & Right Lung \\
-                & Left Hilus Pulmonis \\
-                & Right Hilus Pulmonis \\
-            \hline
-            Soft tissue &  Heart \\
-            & Aorta \\
-            & Mediastinum \\
-            & Facies Diaphragmatica \\
-            & Weasand
-        \end{tabular}
-        \caption{Anatomical structures grouped by absorption coefficients}
-        \label{tab:segmentationGroups}
-    \end{table}
-    \item[Histogram cluster ranges] Figure \ref{fig:segmentationTransmissionMapsHistograms} shows the histograms
-    by different tissues (see \ref{sec:segmentation}). Each of the histograms, despite overlapping, all of them
-    have defined boundaries.
-
-    \begin{figure}[H]
-        \centering
-        \includegraphics[width=1.0\textwidth]{figures/segmentation_txm_histograms.png}
-        \caption{Histograms of chest phantom transmission maps grouped by tissue groups}
-        \label{fig:segmentationTransmissionMapsHistograms}
-    \end{figure}
-
-    \item[Non-uniform histogram] Figure \ref{fig:processedHistogramCompare} shows the histograms of a real pair of transmission map
-    and processed image. There is an evident difference with the processed image having more uniform histograms,
-    likely resulting from a histogram equalization process. In contrast, the transmission map histogram has higher
-    density in the values closer to zero.
-    \begin{figure}[H]
-        \centering
-        \includegraphics[width=1.0\textwidth]{figures/processed_hist_cmp.png}
-        \caption{Histograms of processed transmission maps}
-        \label{fig:processedHistogramCompare}
-    \end{figure}
-\end{description}
-
-\section{Data Collection and Preprocessing}
-\label{sec:dataCollection}
-
-
-\subsection{Transmission Maps}
-
-To our knowledge, there are currently no open datasets of X-ray transmission maps.
-We had access to, precisely, two images taken from the same chest phantom at the Hard X-ray lab in KTH \todo{is this the right source},
-one paired with a processed image produced by a clinical-grade detector. Figure \ref{fig:chestPhantomImages} shows the obtained sample
-pair of transmission map and processed image.
-
-\begin{figure}[H]
-    \centering
-    \begin{subfigure}[t]{0.45\textwidth}
-        \includegraphics[width=\textwidth]{figures/comm_unprocessed_sample.jpg}
-        \caption{Real transmission map.}
-    \end{subfigure}
-    \begin{subfigure}[t]{0.45\textwidth}
-        \includegraphics[width=\textwidth]{figures/comm_processed_sample.jpg}
-        \caption{Processed X-ray image (clinical detector).}
-    \end{subfigure}
-    \caption{Sample pair of images from chest phantom}
-    \label{fig:chestPhantomImages}
-\end{figure}
-
-
-\subsection{Diagnostic chest X-ray images}
-
-Throughout the experimentation, besides the single transmission map-processed image pair, images were sampled from
-cheXpert dataset \cite{chexpert} and NIH Chest X-ray dataset \cite{nih}. Recall the motivation to use these datasets
-is to get value from the diagnostic labels they provide, which can then be tied to the simulated transmission maps.
-However, these labels are not used for the model.
 
 \subsection{Segmentation}
 \label{sec:segmentation}
@@ -1261,6 +1216,7 @@ to values outside this range.
 The parameter vector $\theta$ includes all parameters of these transformations, such as $\{c, w, \alpha, \sigma\}$.
 
 \section{Optimization Approach}
+\label{sec:optimization}
 
 As depicted in \autoref{eq:optimizationProblem}, the transmission map recovery involves solving a constrained
 non-linear optimization problem. The approach taken considers Gradient Descent methods and, for the case of
@@ -1270,29 +1226,41 @@ analytically. Thus, experiments are conducted to find an appropriate loss functi
 that consistently converges to 'valid' solutions.
 
 For a recovered transmission map $x_i$, the concept of a 'valid' solution is defined by meeting the following criteria:
-\begin{itemize}
+
+\begin{enumerate}
     \item $F(x_i, \theta)$ is a close approximation to the observed image $y_i$.
     \item $x_i$ does not contain artifacts or noise.
     \item $x_i$ has suppressed high-frequency components, in contrast to $y_i$.
     \item The transmission values of $x_i$ at the three anatomical groups described in \autoref{tab:segmentationGroups}
     are within their expected range.
-\end{itemize}
+\end{enumerate}
 
 \subsubsection{Data Fidelity Term}
 
-The data fidelity term is assigned to converge on solutions that produce close approximations of $F(x_i, \theta)$
-to $y_i$. However, when it comes to imaging problems, a 'good' score does not necessarily imply a good image
-reconstruction, as presented in \autoref{sec:image_quality_assessment}. Therefore, more than one metric is
-explored to represent the fidelity of our estimated processed images. Concretely, we try
+The data fidelity term is a measure of how close the reconstructed image $F(x_i, \theta)$ is to the original image $y_i$.
+For the proposed model, two alternatives are considered. The first one is \acrlong{MSE} (\acrshort{MSE}),
 
-\begin{itemize}
-    \item \acrshort{MSE},
-    \item \acrshort{SSIM}, and
-    \item \acrshort{MS-SSIM}.
-\end{itemize}
+\begin{equation}
+    \mathcal{D}_1(x, y) = \frac{1}{2} \lVert x - y \rVert_2^2,
+\end{equation}
 
+which has been a popular choice of cost function in image restoration problems, due to its ability to favor a
+high \acrlong{PSNR} (\acrshort{PSNR}), widely used metric for measuring image restoration quality \cite[p.~1]{zhaoLossFunctionsImage2017}, \cite[p.~191]{fleetComputerVisionECCV2014}.
+However, this metric has been shown to not correlate well with human’s perception of image quality,
+and can yield the same quantity over distortions on different scales of the image \cite[Figure~2]{wangMultiscaleStructuralSimilarity2003}.
+For our model, accuracy in the image reconstruction is critical due to the expected operations in the high frequencies
+of the image.
 
-\subsection{Regularization Terms}
+Therefore, an alternative is a loss metric proposed by \cite{zhaoLossFunctionsImage2017} that combines
+\acrfull{MS-SSIM} with the $\ell_1$ loss (Mean Absolute Error). \acrshort{SSIM} is an Image Quality Assessment
+metric that evaluates images accounting for the fact that the \acrfull{HVS} is sensitive to changes in local
+structure. \acrshort{MS-SSIM} was later proposed to extend \acrshort{SSIM} to account for the fact that the
+scale at which local structure should be analyzed depends on the distance to the observer. This extension
+is weights \acrshort{SSIM} computed at different scales. Despite its demonstrated good performance in image reconstruction
+problems, outperforming other loss functions, it is significantly more computationally expensive, which
+incentivates the alternative choice of \acrshort{MSE}.
+
+\subsection{Regularization}
 
 The selection of regularization terms is guided by the soft constraints expected from the reconstructed transmission
 maps. These have the goals of reducing noise and artifacts from the images, as well as promoting the
@@ -1302,18 +1270,15 @@ compliance with the expected transmission ranges at each of the absorption-simil
     \item[Total Variation] TV regularization promotes piecewise smoothness in $x_i$, thus discouraging discontinuities
     in the image. Despite the fact that TV regularization can lead to over-smoothed images, it is still explored due to
     its low computational cost.
-    \item[Total Variation] TV regularization promotes piecewise smoothness in $x_i$, thus discouraging discontinuities
-    in the image. Despite the fact that TV regularization can lead to over-smoothed images, it is still explored due to
-    its low computational cost.
     \item[Segmentation-based regularization] We incorporate physics-based constraints derived from anatomical segmentation
     to ensure realistic transmission values for each tissue type. For each of the anatomical groups discussed in
    \autoref{sec:segmentation}, a value range is extracted from a real transmission map, and is used as ideal bounds for
    recovered transmission. The formulation of this regularization consists of a square penalty for values outside their
-   defined bounds (if any). More formally, let $s_i^{t}(x, y)$ denote the binary mask for $x_i$ of the anatomical group $t$,
+   defined bounds (if any). Let $s_i^{t}(x, y)$ denote the binary mask for $x_i$ of the anatomical group $t$,
    and $v^{t}_{min}, v^{t}_{max}$ be the expected transmission bounds for said group. Then,
 
    \begin{equation}
-   p_t(x_i, s^t_i) = \frac{\sum_{j, k}  s_i^t(j, k) \cdot \left[ \max(0, x_i(j, k) - v^{t}_{max})^2 + \max(0, v^{t}_{min} - x_i(j, k) )^2\right]}{\sum_{j, k}  s_i^t(j, k) }
+   p_t(x_i, s^t_i) = \sum_{j, k}  s_i^t(j, k) \cdot \left[ \max(0, x_i(j, k) - v^{t}_{max})^2 + \max(0, v^{t}_{min} - x_i(j, k) )^2\right]
    \end{equation}
 
    is the penalty on $x_i$ that is zero when all the pixels within the mask $s_i^t$ are within their respective bounds
@@ -1322,360 +1287,131 @@ compliance with the expected transmission ranges at each of the absorption-simil
 \end{description}
 
 
-\subsection{Optimization Procedure}
+\subsection{Solution}
 
-We employ the JAX-based optimization framework with the following steps:
+For finding the solution of the minimization problem, we recurr to iterative descent methods. These refer to
+iterative algorithms that compute a sequence of parameters $x^{(k)}$, $\theta^{(k)}$ that will reduce the
+loss function at each iteration, i.e.
+
+\begin{equation}
+    \ell(x^{(k)}, \theta^{(k)}) <  \ell(x^{(k - 1)}, \theta^{(k - 1)}), \qquad \text{for all } k > 0.
+\end{equation}
+
+The general descent method can be described as follows:
+
 \begin{enumerate}
-    \item Initialize transmission maps $X$ and parameters $\theta$ with reasonable values
-    \item Compute forward process $F(X, \theta)$
-    \item Calculate the composite loss and gradients
-    \item Update parameters using Adam optimizer
-    \item Apply projection to enforce constraints on $X$ and $\theta$
-    \item Repeat until convergence or maximum iterations
+    \item $k := 0$
+    \item Choose initial paramaters $x^{(0)}$, $\theta^{(0)}$.
+    \item If $k > 0$ and $\ell(x^{(k)}, \theta^{(k)}) - \ell(x^{(k - 1)}, \theta^{(k - 1)}) < \epsilon$, stop.
+    \item If $k > max\_iterations$, stop.
+    \item Compute descent directions $d_x^{(k)}$, $d_\theta^{(k)}$
+    \item Compute step sizes $\sigma_x^{(k)}$, $\sigma_\theta^{(k)}$
+    \item $x^{(k + 1)} = x^{(k)} + \sigma_x^{(k)} d_x^{(k)}$
+    \item $\theta^{(k + 1)} = \mathrm{proj}_{\Omega_\theta}(\theta^{(k)} + \sigma_\theta^{(k)} d_\theta^{(k)}$)
+    \item Go to 3.
 \end{enumerate}
 
-The optimization is performed by minimizing the complete loss function with respect to both the transmission maps and the parameters of the forward model.
+The choice of descent direction is typically the negative gradient, since it points in the direction of the steepest
+decrease. However, the choice of a step sizes is non trivial, and we experiment with multiple known gradient descent
+optimizers to compute updates.
+
+Regarding the constraints on the $\theta$ parameters, we recurr to a projected gradient descent method, where
+each update of  $\theta_k$ is first projected into the admissible domain via
+
+\begin{equation}
+    \mathrm{proj}_{\Omega_\theta}(\theta_0) = \arg\min_{\theta \in \Omega_\theta} \lVert \theta - \theta_0 \rVert_2.
+\end{equation}
+
+Since all the specified constraints are box constraints, the minimization is satisfied when each parameter is
+clipped to its respective bounds.
+
 \section{Evaluation Methodology}
 
-We evaluate our method using several metrics:
-\begin{itemize}
-    \item \textbf{Image quality metrics}: SSIM, PSNR between reconstructed processed images and originals
-    \item \textbf{Forward reconstruction error}: MSE between $F(X, \theta)$ and $Y$
-    \item \textbf{Physics compliance}: How well the recovered maps adhere to physical constraints
-    \item \textbf{Visual assessment}: Qualitative evaluation by medical imaging experts
-\end{itemize}
+Due to the lack of ground truth, we rely on qualitative assessments and visual evaluations based on our
+validity criteria. That translates into finding a model that produces solutions that: 1) reproduce estimated processed
+images close to the original images, on multiple scales, and 2) satisfy the set physical constraints.
 
-For the limited cases where ground truth is available (e.g., from phantoms), we also calculate direct error metrics on the recovered transmission maps.
+For the large image datasets, we compute image quality metrics such as SSIM and PSNR between reconstructed processed
+images and originals, and measure an error on the transmission values that are outside the restricted physical bounds.
+For the limited cases where ground truth is available (e.g., from phantoms), we also use the forward model to generate
+alternative processed images, as well as the original paired processed images. That allows us to compare the
+performance of our model on ground truth.
+
 \chapter{Implementation}
 
-\section{Software Architecture}
-Our implementation is structured as a Python package with the following components:
-\begin{itemize}
-    \item \textbf{Data loading and preprocessing}: Modules for handling datasets and preparing images
-    \item \textbf{Forward operators}: Differentiable implementations of radiographic processing steps
-    \item \textbf{Optimization core}: JAX-based optimization framework with automatic differentiation
-    \item \textbf{Regularization functions}: Total variation and other constraints
-    \item \textbf{Evaluation metrics}: Functions for assessing reconstruction quality
-    \item \textbf{Visualization utilities}: Tools for displaying and analyzing results
-\end{itemize}
-
-The code is built using JAX for efficient optimization with automatic differentiation and GPU acceleration.
-
-\section{JAX-Based Optimization Framework}
-Our implementation is built around JAX \cite{jax2018github}, which significantly influenced our design decisions and approach to the optimization problem.
-
-\subsection{Automatic Differentiation Requirements}
-JAX's automatic differentiation capabilities require all operations in the forward model to be differentiable. This constraint directly impacted our design:
-
-\begin{itemize}
-    \item \textbf{Smooth approximations}: We replaced non-differentiable operations with differentiable approximations. For example, we use sigmoid functions instead of hard thresholds.
-
-    \item \textbf{Avoiding discontinuities}: Operations like rounding or thresholding were avoided in favor of continuous alternatives.
-
-    \item \textbf{Epsilon terms}: Small constants were added to prevent numerical instabilities:
-    \begin{lstlisting}[language=Python]
-    def negative_log(image, eps=1e-6):
-        return -jnp.log(jnp.maximum(image, eps))
-    \end{lstlisting}
-\end{itemize}
-
-% \subsection{Vectorization and Performance Optimization}
-% JAX's vectorization capabilities allowed us to efficiently process batches of images:
-
-% \begin{lstlisting}[language=Python]
-% # Create a vectorized version of our forward function
-% batched_forward = jax.vmap(forward, in_axes=(0, None))
-
-% # Create a vectorized version of our loss function
-% def get_batch_mean_loss(unbatched_loss, in_axes=(0, None, 0, 0), **vmap_args):
-%     def loss_fn(*args):
-%         batched_loss = jax.vmap(unbatched_loss, in_axes=in_axes, **vmap_args)
-%         loss_val = batched_loss(*args)
-%         return jnp.mean(loss_val)
-%     return loss_fn
-% \end{lstlisting}
-
-% \subsection{Pure Function Requirements}
-% JAX requires pure functions without side effects, influencing our implementation:
-
-% \begin{itemize}
-%     \item \textbf{Immutable state}: All state changes are handled through function returns rather than in-place modifications.
-%     \item \textbf{Deterministic operations}: Random operations use explicitly managed PRNG keys:
-%     \begin{lstlisting}[language=Python]
-%     key = jax.random.PRNGKey(hyperparams["PRNGKey"])
-%     txm0 = jax.random.uniform(
-%         key, minval=minval, maxval=maxval, shape=batch_shape
-%     )
-%     \end{lstlisting}
-% \end{itemize}
-
-% \section{Data Loading and Preprocessing}
-% \subsection{CheXpert Dataset Handler}
-% We implemented a dataloader for the CheXpert dataset, focusing on frontal chest radiographs:
-
-% \begin{lstlisting}[language=Python, caption=CheXpert dataset loader implementation]
-% def load_chexpert(
-%     root_dir: str,
-%     df_meta_path: str | None = None,
-%     img_dir: str | None = None,
-%     chexpert_version: str = "240401",
-%     limit: int | None = None
-% ) -> list[ChexpertMeta]:
-%     df_meta_path = (
-%         df_meta_path
-%         if df_meta_path is not None
-%         else os.path.join(root_dir, f"df_chexpert_plus_{chexpert_version}.csv")
-%     )
-%     img_dir = img_dir if img_dir is not None else os.path.join(root_dir, "PNG")
-
-%     df_meta_path = os.path.abspath(df_meta_path)
-%     img_dir = os.path.abspath(img_dir)
-
-%     df_meta = pd.read_csv(df_meta_path)
-%     df_meta = df_meta[df_meta["frontal_lateral"] == "Frontal"]
-
-%     images: list[ChexpertMeta] = []
-
-%     for idx, row in df_meta.iterrows():
-%         img_path = f"{img_dir}/{row['path_to_image']}"
-%         patient_id = str(row["deid_patient_id"])
-
-%         if not os.path.exists(img_path):
-%             # chexpert csv reporting jpgs instead of pngs
-%             img_path = img_path.replace(".jpg", ".png")
-%             if not os.path.exists(img_path):
-%                 continue
-
-%         if limit and len(images) >= limit:
-%             break
-
-%         img_label = img_path.split("/")[-1]
-%         study = img_path[img_path.find("study") :][:6]
-
-%         images.append(
-%             {
-%                 "image": cv2.imread(img_path, cv2.IMREAD_UNCHANGED) / 255.0,
-%                 "image_path": img_path,
-%                 "patient_id": patient_id,
-%                 "study": study,
-%                 "image_label": img_label,
-%             }
-%         )
-
-%     return images
-% \end{lstlisting}
-
-% \subsection{Image Preprocessing}
-% Images are preprocessed to ensure consistent dimensions and value ranges:
-
-% \begin{lstlisting}[language=Python, caption=Image preprocessing function]
-% def preprocess_chexpert_batch(
-%     images, target_size=(512, 512)
-% ) -> Float[Array, "batch rows cols"]:
-%     """
-%     Preprocess a batch of CheXpert images with NumPy.
-
-%     Args:
-%         images: Batch of images with shape (batch_size, height, width) or (batch_size, height, width, channels)
-%         target_size: Target size (height, width) for all images
-
-%     Returns:
-%         Batch of preprocessed images with consistent dimensions
-%     """
-%     return np.array([center_crop_with_aspect_ratio(img, target_size) for img in images])
-% \end{lstlisting}
-
-% \section{Forward Operators Implementation}
-% We implemented several operators to model the post-processing pipeline used in digital radiography, ensuring all operations are differentiable for compatibility with JAX:
-
-% \begin{lstlisting}[language=Python, caption=Core forward operators]
-% def negative_log(image: Float[Array, "rows cols"], eps=1e-6):
-%     return -jnp.log(jnp.maximum(image, eps))
-
-% def windowing(image, window_center, window_width, gamma):
-%     x = image
-%     x = (x - window_center) / window_width
-%     x = jax.nn.sigmoid(x) ** gamma
-%     return x
-
-% def unsharp_masking(image, sigma, enhance_factor):
-%     x = jnp.expand_dims(image, axis=2)
-%     kernel_size = 2 * sigma
-%     blurred = gaussian_blur(x, sigma, kernel_size, padding="SAME")
-%     x = (x - enhance_factor * blurred) / (1.0 - enhance_factor)
-%     return x.squeeze()
-
-% def clipping(image):
-%     return jnp.clip(image, 0.0, 1.0)
-
-% def range_normalize(image):
-%     x = image
-%     return (x - x.min()) / (x.max() - x.min())
-% \end{lstlisting}
-
-% \section{Optimization Core}
-% The core optimization function implements gradient descent with support for various optimizers and regularization terms. The optimization process leverages JAX's automatic differentiation to efficiently compute gradients:
-
-% \begin{lstlisting}[language=Python, caption=Base optimization function]
-% def base_optimize(
-%     target: BatchT,
-%     txm0: BatchT,
-%     w0: WeightsT,
-%     loss_fn: LossFnT,
-%     forward_fn: ForwardFnT,
-%     project_fn: ProjectFnT | None = None,
-%     optimizer_builder=optax.adam,
-%     constant_weights=False,
-%     lr=0.001,
-%     n_steps=500,
-%     loss_logger=None,
-%     eps=1e-8,
-% ) -> OptimizationRetT:
-%     def loss_call(weights, tx_maps, target):
-%         pred = forward_fn(tx_maps, weights)
-%         loss = loss_fn(tx_maps, weights, pred, target)
-
-%         if loss_logger:
-%             loss_logger(loss.item(), tx_maps, weights, pred, target)
-
-%         assert pred.shape == target.shape, (
-%             f"Shapes do not match: {pred.shape} != {target.shape}"
-%         )
-
-%         return loss
-
-%     optimizer = optimizer_builder(learning_rate=lr)
-%     state = (txm0, w0)
-%     opt_state = optimizer.init(state)
-%     losses = []
-%     prev_state = (None, None)
-
-%     def update(state, opt_state, target):
-%         original_state = (state, opt_state)
-%         tx_maps, weights = state
-
-%         loss_value_and_grad = jax.value_and_grad(loss_call, argnums=(0, 1))
-%         loss, (weight_grads, tx_grads) = loss_value_and_grad(weights, tx_maps, target)
-%         grads = (tx_grads, weight_grads)
-
-%         updates, new_opt_state = optimizer.update(grads, opt_state)
-%         updates_txm, updates_weights = updates
-
-%         txm_new_state = optax.apply_updates(tx_maps, updates_txm)
-%         weights_new_state = weights
-%         if not constant_weights:
-%             weights_new_state = optax.apply_updates(weights, updates_weights)
-
-%         new_state = (txm_new_state, weights_new_state)
-%         if project_fn:
-%             new_state = project_fn(txm_new_state, weights_new_state)
-
-%         if jnp.isnan(loss):
-%             new_state, new_opt_state = original_state
-
-%         return loss, new_state, new_opt_state
-
-%     for step in range(n_steps):
-%         if step > 2 and jnp.abs(losses[-1] - losses[-2]) < eps:
-%             wandb.log({"convergence_steps": step})
-%             print(f"Converged after {step} steps")
-%             break
-
-%         loss, state, opt_state = update(state, opt_state, target)
-%         losses.append(loss)
-
-%         if jnp.isnan(loss):
-%             state, loss = prev_state
-%             print("Loss is NaN. Last loss:", loss)
-%             break
-
-%         if step % 100 == 0:
-%             print(f"\nStep {step}, Loss: {loss:.6f}")
-
-%         prev_state = (state, loss)
-
-%     if state is None:
-%         return None, losses
-
-%     return state, losses
-% \end{lstlisting}
-
-% \section{Constraint Enforcement}
-% We use Optax's projection operators to enforce constraints while maintaining differentiability:
-
-% \begin{lstlisting}[language=Python, caption=Projection function for constraint enforcement]
-% def projection(txm_state, weights_state):
-%     new_txm_state = optax.projections.projection_hypercube(txm_state)
-%     new_weights_state = optax.projections.projection_non_negative(weights_state)
-%     new_weights_state["low_sigma"] = optax.projections.projection_box(
-%         weights_state["low_sigma"], 0.1, 10
-%     )
-%     new_weights_state["low_enhance_factor"] = optax.projections.projection_box(
-%         new_weights_state["low_enhance_factor"], 0.1, 1.0
-%     )
-%     return new_txm_state, new_weights_state
-% \end{lstlisting}
-
-% \section{Loss Functions and Metrics}
-% We implemented several loss functions and metrics for evaluation:
-
-% \begin{lstlisting}[language=Python, caption=Loss functions and metrics]
-% def mse(pred, target):
-%     return jnp.mean((pred - target) ** 2)
-
-% def total_variation(image):
-%     reg = (jnp.diff(image, axis=0) ** 2).mean() + (jnp.diff(image, axis=1) ** 2).mean()
-%     return 0.5 * reg
-
-% def ssim(x, y, L=1.0):
-%     C1 = (0.01 * L) ** 2
-%     C2 = (0.03 * L) ** 2
-
-%     mu_x = jnp.mean(x)
-%     mu_y = jnp.mean(y)
-
-%     sigma_x = jnp.mean((x - mu_x) ** 2)
-%     sigma_y = jnp.mean((y - mu_y) ** 2)
-%     sigma_xy = jnp.mean((x - mu_x) * (y - mu_y))
-
-%     num = (2 * mu_x * mu_y + C1) * (2 * sigma_xy + C2)
-%     den = (mu_x**2 + mu_y**2 + C1) * (sigma_x + sigma_y + C2)
-
-%     return jnp.clip(num / den, 0.0, 1.0)
-% \end{lstlisting}
-
-% \section{Hyperparameter Search Configuration}
-% We use Weights \& Biases for hyperparameter search:
-
-% \begin{lstlisting}[language=Python, caption=Hyperparameter sweep configuration]
-% sweep_config = {
-%     "name": "unknown-transform-sweep-v2",
-%     "method": "bayes",
-%     "metric": {"name": "mse", "goal": "minimize"},
-%     "parameters": {
-%         "lr": {"min": 1e-5, "max": 1e-1},
-%         "n_steps": {"values": [500, 700, 1200]},
-%         "total_variation": {"values": [0.0, 0.1, 0.01, 0.001]},
-%         "PRNGKey": {"values": [0, 42]},
-%         "tm_distribution": {"values": ["uniform", "normal"]},
-%         "tm_init_range": {
-%             "values": [
-%                 (1e-6, 0.1),
-%                 (1e-6, 0.5),
-%                 (1e-6, 1.0),
-%                 (0.5, 1.0),
-%             ]
-%         },
-%         # Fixed/metadata parameters
-%         "loss": {"value": "MSE + TV"},
-%         "initialization": {"value": "uniform random"},
-%         "window_center_init_range": {"value": [0.1, 0.9]},
-%         "window_width_init_range": {"value": [0.1, 0.9]},
-%         "gamma_init_range": {"value": [0.1, 3.0]},
-%         "eps": {"value": 1e-6},
-%     },
-% }
-% \end{lstlisting}
+The implementation of the proposed model consisted on building a forward operator that can produce images with a similar
+visual appearance to images found in datasets such as CheXpert and ChestX-ray8. As for the optimization task,
+\textit{JAX} \cite{jax2018github} and \textit{Optax} \cite{deepmind2020jax} are used to implement the
+algorithm described in \autoref{sec:optimization}. JAX is a Python array computation library that provides automatic
+differentiation, handling the computation of gradients for the chosen loss function, and consequently, the processing
+operator. \textit{Optax} is an gradient processing and optimization library that provides multiple gradient descent optimizers, ruled
+by additional hyperparameters, such as a learning rate.
+
+Since the approach taken for this project does not involve learning an inverse model, but rather solve an optimization
+on a per-image basis, we aim to find a model and corresponding hyperparameters that can be reused across different
+sets of images and guarantee convergence into valid solutions. Besides optimization-related hyperparameters such as
+learning rates, we also consider different choices that can produce valid solutions but won't match qualitatively
+the expectations for transmission maps. One such choice is a regularization term (besides its corresponding weight)
+that promotes smoothness on the transmission map, which if not chosen properly, can lead to artifacts or over-smoothing.
+Overall, the hyperparameters and configurations to find are listed in \autoref{tab:hyperparametersList}.
+
+\begin{table}
+    \centering
+    \begin{tabular}{|c|l{0.3\linewidth}|}
+        \hline
+        Hyperparameter & Description \\
+        \hline
+        Optimizer & Choice of optimizer, e.g. Adam, SGD, RMSProp. \\
+        \hline
+        Optimizer hyperparameters & Optimizer-specific, such as learning rate, momentum, weight decay, etc. \\
+        \hline
+        Segmentation threshold & Threshold to delimit binary segmentation masks, set to 0.5 for all results. \\
+        \hline
+        Frequency bands & Usharp mask is an operation that amplifies specific frequency bands, which are determined
+        by the kernel size for the blurring operation. The processing model assumes enhancement on at least two
+        frequency bands, low and high. The consequence of this is the exclusion of this parameter from the optimization
+        problem, but it is rather fixed for all images.\\
+        \hline
+        Regularization weights & Weights for the smoothing and segmentation regularization. \\
+        \hline
+        Smoothing regularization & The choice among Tikhonov, Total Variation, and no regularization, to penalize discontinuities in the transmission maps. \\
+        \hline
+        Max steps & Maximum number of iterations for the optimization. \\
+        \hline
+        Max steps & Maximum number of iterations for the optimization. \\
+        \hline
+    \end{tabular}
+    \label{tab:hyperparametersList}
+    \caption{Model hyperparameters}
+\end{table}
+
+For finding hyperparameters, a Bayesian search was done, optimizing for the perceptual metric MS-SSIM.
+An optimal choice of parameters can later be found by picking the set that also satisfies the
+segmentation constraints. To implement this search, we used Weights \& Biases \cite{wandb} sweep
+functionality.
+
+\section{Data Collection and Preprocessing}
+\label{sec:dataCollection}
+
+Throughout the experimentation, besides the single transmission map-processed image pair, images were sampled from
+cheXpert dataset \cite{chexpert} and NIH Chest X-ray dataset \cite{nih}. Recall the motivation to use these datasets
+is to get value from the diagnostic labels they provide, which can then be tied to the simulated transmission maps.
+However, these labels are not used for the model.
+
+Although we present an optimization problem that operates per-image, it is expected that multiple images will
+be processed in parallel to speed up the optimization process. Thus, a fixed image size is set for the implementation.
+Images from the datasets also do not have a standard size or aspect ratio, so all images are preprocessed by
+cropping by the center to keep a square aspect ratio and resized to 512 pixels width, as well as rescaling the
+grayscale values to the range [0, 1]. The choice of the size 512 is set to match the input size of the selected
+segmentation model implemented in torchxrayvision \cite{torchxrayvision}, however, an arbitrary size can be chosen
+by upscaling the masks. The full data preprocessing steps are shown in \autoref{fig:preprocessing_steps}
+
+\begin{figure}
+    \centering
+    \includegraphics[width=0.8\textwidth]{figures/data_loading.png}
+    \caption{Data preprocessing pipeline}
+    \label{fig:preprocessing_steps}
+\end{figure}
 
 \section{Experimental Setup}
 Our experiments are configured to explore different models and hyperparameters:
