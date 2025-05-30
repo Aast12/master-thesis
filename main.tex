@@ -596,8 +596,6 @@ We would like to thank xxxx for having yyyy.
 %\printglossary[type=\acronymtype, title={List of acronyms and abbreviations}]
 
 %\printnoidxglossary[style=mylong, title={List of acronyms and abbreviations}]
-\engExpl{The list of acronyms and abbreviations should be in alphabetical order based on the spelling of the acronym or abbreviation.
-}
 
 % if the nomenclature option was specified, then include the nomenclature page(s)
 \ifnomenclature
@@ -706,8 +704,6 @@ modern archiving systems (PACS) keeping long histories of X-ray studies \cite[p.
 to translate existing datasets into representations of any other imaging system will bring existing and
 coming advancements in X-ray related automation to all scenarios.
 
-\todo{add references to x-ray detector accessibility}
-
 \section{Goals}
 
 Concretely, the expected outcomes of this project are the following:
@@ -722,8 +718,8 @@ Concretely, the expected outcomes of this project are the following:
 
 The remainder of this thesis is organized as follows: Chapter 2 presents background information on X-ray transmission and
 digital image processing that are relevant to the problem and motivate the proposed method. Chapter 3
-presents the mathematical description of the problem and the . Chapter 4 includes implementation
-details and computational settings. Chapter 5 presents experimental results, and Chapter 6 discusses implications
+presents the mathematical description of the problem and the methods used to solve it. Chapter 4 includes implementation
+details. Chapter 5 presents experimental results, and Chapter 6, implications
 and directions for future work.
 
 \chapter{X-ray Transmission}
@@ -907,8 +903,8 @@ are driven by multiple parameters that can also change on a per-image basis. Nev
 changing by vendor (Agfa [Mortsel, Belgium] uses MUSICA; Fuji [Tokyo, Japan] uses Gradation; and Kodak uses Tonescaling),
 they all share the same effect and purpose \cite[p.~119]{carterDigitalRadiographyPACS2010}.
 
-Unsharp masking is a simple method for edge enhancement and sharpening of images, and consist of
-three core steps:
+An example of a spatial frequency filter is Unsharp masking, which is a simple method for edge enhancement and sharpening of images,
+and consists of three core steps:
 
 \begin{description}
     \item[Step 1] The image is blurred using low-pass filtering, e.g. via a Gaussian filter. The wider the kernel size,
@@ -936,11 +932,12 @@ More complex algorithms such as Multiscale processing can apply the effect of un
 by splitting an image into many frequency bands, enabling multiple size-specific enhancements \cite[p.~156]{Prokop2003}.
 
 \subsection{Transmission Maps}
+\label{sec:transmissionMaps}
 
 Despite the processes behind capturing X-ray images are well studied, to our knowledge, there are currently no open datasets of X-ray
-transmission maps. We had access to, precisely, two images taken from the same chest phantom at the Hard X-ray lab
-in KTH \todo{is this the right source}, one paired with a processed image produced by a clinical-grade detector. Figure
-\ref{fig:chestPhantomImages} shows the obtained sample pair of transmission map and processed image.
+transmission maps. We had access to, precisely, two images taken from the same chest phantom, provided by the Hard X-ray lab
+iat KTH, one paired with a processed image produced by a clinical-grade detector. \autoref{fig:chestPhantomImages} shows the obtained sample
+pair of transmission map and processed image.
 
 \begin{figure}[H]
     \centering
@@ -981,7 +978,8 @@ taken from the analysis of the sample pair shown in \autoref{fig:chestPhantomIma
 
     \begin{table}[H]
         \centering
-        \begin{tabular}{l l}
+        \begin{tabular}{|l| l|}
+            \hline
             \textbf{Group name} & \textbf{Grouped labels} \\
             \hline
             Bone &  Left Clavicle\\
@@ -999,7 +997,8 @@ taken from the analysis of the sample pair shown in \autoref{fig:chestPhantomIma
             & Aorta \\
             & Mediastinum \\
             & Facies Diaphragmatica \\
-            & Weasand
+            & Weasand \\
+            \hline
         \end{tabular}
         \caption{Anatomical structures grouped by absorption coefficients}
         \label{tab:segmentationGroups}
@@ -1016,9 +1015,9 @@ taken from the analysis of the sample pair shown in \autoref{fig:chestPhantomIma
         \label{fig:segmentationTransmissionMapsHistograms}
     \end{figure}
 
-    \item[Non-flatten histogram] Figure \ref{fig:processedHistogramCompare} shows the histograms of a real pair of transmission map
-    and processed image. There is an evident difference with the processed image having more uniform histograms,
-    likely resulting from a histogram equalization process. In contrast, the transmission map histogram has higher
+    \item[Non-flattened histogram] Figure \ref{fig:processedHistogramCompare} shows the histograms of a real pair of transmission map
+    and processed image. Processed images tend to have a flattened histogram as consequence of
+    contrast enhacement operations. In contrast, the transmission map histogram has higher
     density in the values closer to zero.
     \begin{figure}[H]
         \centering
@@ -1038,7 +1037,7 @@ and the \acrshort{DIP} algorithms used in the field:
     \item Despite differences in processing algorithms across vendors, all seek the same perceptual effects
     \cite[p.~119]{carterDigitalRadiographyPACS2010}, and iterations of such algorithms avoid changes in the appearance
     that radiologists expect from X-ray images \cite[p.~57]{STA00a}.
-    \item If we recover an appropriate forward model (image processing algorithm) that can produce images perceptually
+    \item If we recover an appropriate image processing model that can produce images perceptually
     similar to the target X-ray images, we may use it as a basis to reconstruct 'realistic' transmission maps from
     the processed images.
 \end{itemize}
@@ -1053,6 +1052,7 @@ latent images to the observed X-ray datasets.
 For a dataset of observed, grayscale processed X-ray images $Y = \{y_i\}^N_{i=1}$, we aim to recover a corresponding
 set of transmission maps $X = \{x_i\}^N_{i=1}$, with $x_i, y_i \in [0, 1]^{r, c}$ that satisfy
 \begin{equation}
+    \label{eq:dataFidelity}
     F(x_i, \theta) = y_i.
 \end{equation}
 
@@ -1064,16 +1064,31 @@ and parameters $\theta_i$ that minimize a loss function $\ell(x_i, \theta_i)$:
 
 \begin{equation}
     \label{eq:optimizationProblem}
-    \min_{x_i, \theta_i \in \Omega_\theta}  \underbrace{\mathcal{D}(y_i, F(x_i, \theta_i)) + \sum_{j = 1}^{K} \lambda_k R_j(x_i)}_{=: \ell(\cdot)}.
+    \min_{x_i, \theta_i \in \Omega_\theta}  \underbrace{\mathcal{D}(y_i, F(x_i, \theta_i)) + \lambda_{\text{smooth}} R_{\text{smooth}}(x_i) + \lambda_{\text{anatomy}} R_{\text{anatomy}}(x_i)}_{=: \ell(\cdot)}.
 \end{equation}
 
-Here, $\mathcal{D}$ is a data fidelity function measuring the discrepancy between the processed versions of
-our estimated transmission maps and the observed processed images, and $R_1, \dots R_K$ are regularization
-terms on $x_i$ weighted by $\lambda_1, \dots, \lambda_K$.
+$\mathcal{D}$ is a data fidelity function measuring the discrepancy between the processed versions of
+our estimated transmission maps and the observed processed images, becoming zero only when \autoref{eq:dataFidelity}
+is satisfied. Nevertheless, ensuring accuracy with the processed images is not a sufficient condition to solve the
+problem. Consider the case of a set of parameters $\theta_i$ that produce no effect on the image, for instance,
+applying a linear \acrshort{LUT} that spans the original image's dynamic range, or applying unsharp masking
+with a factor of zero. Besides aiming to inject prior information through the operations in $F$, additional
+constraints can be imposed to ensure that the reconstructed transmission maps are physically plausible.
 
+One expectation of the images $x_i$ is for them to not have discontinuities or noise. An approach to promote that is
+to introduce a smoothness regularization term $R_{\text{smooth}}$, weighted by $\lambda_{\text{smooth}}$.
+In \autoref{sec:transmissionMaps} I also discussed broad constraints the images should meet, regarding
+the range of the transmission values, particularly in regions where the traversing tissues have close absorption
+coefficients. This anatomical value ranges can't be strictly enforced due to the diversity of body compositions,
+as well as the potential of it creating block artifacts. Therefore, these are promoted with the regularization
+$R_{\text{anatomy}}$, with corresponding weight $\lambda_{\text{anatomy}}$.
+
+Our transformation $F$ can be  further constrained by restricting the parameters $\theta_i$ to take values
+that produce effects that are assumed to happen in real settings. In that case, the optimization is considered
+constrained, and has an admissible solution only when $\theta_i$ is in a defined domain $\Omega_\theta$.
 As $F$ is chosen based on existing \acrshort{DIP} algorithms, we can therefore constraint the parameters $\theta_i$
-on expected value ranges and values recommended in the literature. Thus, the problem is further constrained by finding
-parameters $\theta_i$ that lie in the feasible ranges
+on expected value ranges and values recommended in the literature, and $\Omega_\theta$ can be expressed as
+multiple inequality constraints:
 
 \begin{equation}
     \theta_i \in \Omega_\theta = \left\{ \theta_i \mid c_j(\theta_i) \geq 0, j \in \mathcal{I}  \right\}.
@@ -1100,9 +1115,7 @@ parameters $\theta_i$. However, the following special cases of the problem can a
 The method employed in this project involved an iterative process of defining a data fidelity function and
 regularization functions that will recover transmission maps considered realistic (according to a predefined
 set of characteristics). In the following sections, we will discuss the choices made for
-$F$, $\mathcal{D}$ and $R_j$, and their effects on the reconstruction of transmission maps.
-
-
+$F$, $\mathcal{D}$, regularizations, and their effects on the reconstruction of transmission maps.
 
 \subsection{Segmentation}
 \label{sec:segmentation}
@@ -1130,7 +1143,6 @@ starting from the groups with higher absorption (bone) up to lower absorption va
 the mask that produces the higher attenuation. The complete merging operation is described in algorithm \ref{alg:mergeSegmentationMasks}. Figure
 \ref{fig:segmentationMasks} shows a sample set of the processed segmentation masks over a CheXpert image using a threshold of 0.5.
 
-\input{algorithms/merge_segmentation_masks.tex}
 
 \begin{figure}[H]
     \centering
@@ -1139,13 +1151,12 @@ the mask that produces the higher attenuation. The complete merging operation is
     \label{fig:segmentationMasks}
 \end{figure}
 
-\section{Forward Operator Model}
+\section{Processing Operator Model}
 
-Throughout the entire model experimentation, a fixed forward operator is used to represent a
-digital radiography processing pipeline. The goal when building an operator is to work with a
-model that can produce X-ray images with an appearance consistent to the existing image datasets.
-Then, there is the expectation that inverting this would produce transmission maps with realistic
-values.
+Throughout the entire model experimentation, a fixed parameterized processing operator is used to represent a
+digital radiography processing pipeline. The goal of building such function is so it can produce
+X-ray images with an appearance consistent to the existing image datasets. If the function and its parameters
+allow it, then, there is the expectation that inverting this would produce transmission maps
 
 The choices of the steps for the operator are driven by the goals of image processing described
 in \autoref{sec:DigitalImageProcessing}. These guide the design of our operator $F$ as a composition
@@ -1158,7 +1169,7 @@ F = F_n \circ F_{n-1} \circ \cdots \circ F_1
 that include:
 \begin{description}
 
-\item[Negative logarithm] $F_1(x) = -\log(x + \epsilon)$, where $\epsilon$ is a small constant to avoid numerical instability
+\item[Negative logarithm] $F_{1}(x) = -\log(x + \epsilon)$, where $\epsilon$ is a small constant to avoid numerical instability on values close to zero.
 
     Transmission maps represent the ratio of X-ray intensities $I_1$ and $I_0$,
 
@@ -1166,28 +1177,21 @@ that include:
         \frac{I_1}{I_0} = e^{-\mu x}.
     \end{equation}
 
-    However, processed images operate on the thickness terms $\mu x$
-    (explaining the negative relationship between transmission maps and diagnostic images),
-    which can be extracted through a negative logarithm.
+    However, processed images operate on the densities term $\mu x$, explaining the color-negative relationship between
+    transmission maps and diagnostic images.
 
-\item[Windowing] As a way of implementing gradational adjustment, a window function is implemented, that creates
+\item[Windowing] As a way of implementing gradational adjustment, a window function is implemented that creates
 an S-shape lookup table to achieve signal normalization:
 
 \begin{equation}
-    F_2(x) = \frac{1}{1+e^{-\gamma \frac{x - c}{w}}},
+    F_2(x) = \frac{1}{1+e^{-\gamma \frac{x - c}{w}}}.
 \end{equation}
 
-where $c$ is the center of the sigmoid function, $w$ is a width parameter, and $\gamma$ is a steepness parameter.
+$c$ denotes the center of the sigmoid function, $w$ is a width parameter, and $\gamma$ is a steepness parameter.
 The effect of these parameters and how these translate into a LUT is shown in \autoref{fig:windowingParams}.
 By definition, $c$ and $w$ are restricted to the domain $(0, 1)$, thus introduce box constraints on
 $\theta$. For $gamma$.
 
-\begin{figure}
-    \centering
-    \includegraphics[width=1.0\textwidth]{figures/window_params.png}
-    \caption{Windowing function with different parameter settings.}
-    \label{fig:windowingParams}
-\end{figure}
 
 \item[Unsharp masking]
 \begin{equation}
@@ -1195,8 +1199,9 @@ $\theta$. For $gamma$.
 \end{equation}
 
 where $G_\sigma$ is a Gaussian kernel with standard deviation $\sigma$, and $\alpha$ is the enhance factor.
-The chosen formulation bounds $\alpha$ to $(0, 1)$. However, since it is known that images go through
-some edge enhancement, the lower bound is increased to 0.1. Regarding the frequency band represented by
+The chosen formulation bounds $\alpha$ to $(0, 1)$ . However, since it is known that images go through
+some edge enhancement, the lower bound can be increased to a non-zero value to assume some edge enhancement is
+being applied in the processed image. Regarding the frequency band represented by
 $\sigma$, the implementation considers a fixed value, or a range that will capture higher-frequencies,
 following the recommendation of targeting a 20-30mm kernel size \cite[p.~153]{Prokop2003}.
 
@@ -1238,27 +1243,21 @@ For a recovered transmission map $x_i$, the concept of a 'valid' solution is def
 \subsubsection{Data Fidelity Term}
 
 The data fidelity term is a measure of how close the reconstructed image $F(x_i, \theta)$ is to the original image $y_i$.
-For the proposed model, two alternatives are considered. The first one is \acrlong{MSE} (\acrshort{MSE}),
+The function to consider is \acrfull{MSE}, defined as
 
 \begin{equation}
-    \mathcal{D}_1(x, y) = \frac{1}{2} \lVert x - y \rVert_2^2,
+    \mathcal{D}(x, y) = \frac{1}{2} \lVert x - y \rVert_2^2.
 \end{equation}
 
-which has been a popular choice of cost function in image restoration problems, due to its ability to favor a
-high \acrlong{PSNR} (\acrshort{PSNR}), widely used metric for measuring image restoration quality \cite[p.~1]{zhaoLossFunctionsImage2017}, \cite[p.~191]{fleetComputerVisionECCV2014}.
+\arcshort{MSE} has been a popular choice of cost function in image restoration problems, due to its ability to favor a
+high \acrfull{PSNR}, widely used metric for measuring image restoration quality \cite[p.~1]{zhaoLossFunctionsImage2017}, \cite[p.~191]{fleetComputerVisionECCV2014}.
+
 However, this metric has been shown to not correlate well with human’s perception of image quality,
 and can yield the same quantity over distortions on different scales of the image \cite[Figure~2]{wangMultiscaleStructuralSimilarity2003}.
-For our model, accuracy in the image reconstruction is critical due to the expected operations in the high frequencies
-of the image.
+Despite this caveat, it is still the choice to represent data fidelity due to its simplicity and computational efficiency.
+However, other metrics are used to evaluate and compare the performance of the model, as having accuracy in
+different frequency bands of our image is critical to claim the model yields a valid solution.
 
-Therefore, an alternative is a loss metric proposed by \cite{zhaoLossFunctionsImage2017} that combines
-\acrfull{MS-SSIM} with the $\ell_1$ loss (Mean Absolute Error). \acrshort{SSIM} is an Image Quality Assessment
-metric that evaluates images accounting for the fact that the \acrfull{HVS} is sensitive to changes in local
-structure. \acrshort{MS-SSIM} was later proposed to extend \acrshort{SSIM} to account for the fact that the
-scale at which local structure should be analyzed depends on the distance to the observer. This extension
-is weights \acrshort{SSIM} computed at different scales. Despite its demonstrated good performance in image reconstruction
-problems, outperforming other loss functions, it is significantly more computationally expensive, which
-incentivates the alternative choice of \acrshort{MSE}.
 
 \subsection{Regularization}
 
@@ -1267,7 +1266,15 @@ maps. These have the goals of reducing noise and artifacts from the images, as w
 compliance with the expected transmission ranges at each of the absorption-similar regions.
 
 \begin{description}
-    \item[Total Variation] TV regularization promotes piecewise smoothness in $x_i$, thus discouraging discontinuities
+    \item[Smoothing regularization] Two alternatives of smoothing regularization are considered:
+
+   \acrfull{TV}, defined as
+
+   \begin{equation}
+    TV(x) =  \sum_{i, j} \left( \lvert x_{i + 1, j} - x_{i, j} \rvert + \sum_{i, j} \lvert x_{i, j + 1} - x_{i, j} \rvert \right)
+    \end{equation}
+
+    prompiecewise smoothness in $x_i$, thus discouraging discontinuities
     in the image. Despite the fact that TV regularization can lead to over-smoothed images, it is still explored due to
     its low computational cost.
     \item[Segmentation-based regularization] We incorporate physics-based constraints derived from anatomical segmentation
@@ -1325,21 +1332,37 @@ each update of  $\theta_k$ is first projected into the admissible domain via
 Since all the specified constraints are box constraints, the minimization is satisfied when each parameter is
 clipped to its respective bounds.
 
+The concrete implementation of such descent methods, as well as the choice of parameters present in the loss function
+and processing operator are ruled by hyperparameters fixed for the entire iterative process.
+
 \section{Evaluation Methodology}
 
 Due to the lack of ground truth, we rely on qualitative assessments and visual evaluations based on our
 validity criteria. That translates into finding a model that produces solutions that: 1) reproduce estimated processed
 images close to the original images, on multiple scales, and 2) satisfy the set physical constraints.
 
+It was mentioned previously that \arcshort{MSE} does not necessarily favor solutions that are perceptually close
+to the original images. There are multiple alternative loss functions designed specifically for Image Quality Assessment
+metrics, an alternative is a mixed loss metric $\mathcal{L}^\text{Mix}$ proposed by \cite{zhaoLossFunctionsImage2017} that combines
+\acrfull{MS-SSIM} with the $\ell_1$ loss (Mean Absolute Error). \acrshort{SSIM} is an Image Quality Assessment
+metric that evaluates images accounting for the fact that the \acrfull{HVS} is sensitive to changes in local
+structure. \acrshort{MS-SSIM} was later proposed to extend \acrshort{SSIM} to account for the fact that the
+scale at which local structure should be analyzed depends on the distance to the observer. This extension
+weighs \acrshort{SSIM} computed at different scales. Nonetheless, its demonstrated good performance in image
+reconstruction problems, outperforming other loss functions by correlating to other image quality indices,
+comes at the cost of a higher computational cost, which can scale well for Deep Learning settings,
+but for the current approach, it incentivates the alternative choice of \acrshort{MSE}. The $\matchal{L}^{\text{Mix}}$ loss
+is still used as an evaluation metric to discern the best choice of hyperparameters.
+
 For the large image datasets, we compute image quality metrics such as SSIM and PSNR between reconstructed processed
 images and originals, and measure an error on the transmission values that are outside the restricted physical bounds.
-For the limited cases where ground truth is available (e.g., from phantoms), we also use the forward model to generate
+For the limited cases where ground truth is available (e.g., from phantoms), we also use the processing model to generate
 alternative processed images, as well as the original paired processed images. That allows us to compare the
 performance of our model on ground truth.
 
 \chapter{Implementation}
 
-The implementation of the proposed model consisted on building a forward operator that can produce images with a similar
+The implementation of the proposed model consisted on building a processing operator that can produce images with a similar
 visual appearance to images found in datasets such as CheXpert and ChestX-ray8. As for the optimization task,
 \textit{JAX} \cite{jax2018github} and \textit{Optax} \cite{deepmind2020jax} are used to implement the
 algorithm described in \autoref{sec:optimization}. JAX is a Python array computation library that provides automatic
@@ -1355,11 +1378,11 @@ the expectations for transmission maps. One such choice is a regularization term
 that promotes smoothness on the transmission map, which if not chosen properly, can lead to artifacts or over-smoothing.
 Overall, the hyperparameters and configurations to find are listed in \autoref{tab:hyperparametersList}.
 
-\begin{table}
+\begin{table}[H]
     \centering
-    \begin{tabular}{|c|l{0.3\linewidth}|}
+    \begin{tabular}{ | c | p{0.7\linewidth}| }
         \hline
-        Hyperparameter & Description \\
+        \textbf{Hyperparameter} & \textbf{Description} \\
         \hline
         Optimizer & Choice of optimizer, e.g. Adam, SGD, RMSProp. \\
         \hline
@@ -1378,11 +1401,9 @@ Overall, the hyperparameters and configurations to find are listed in \autoref{t
         \hline
         Max steps & Maximum number of iterations for the optimization. \\
         \hline
-        Max steps & Maximum number of iterations for the optimization. \\
-        \hline
     \end{tabular}
+    \caption{Optimization hyperparameters}
     \label{tab:hyperparametersList}
-    \caption{Model hyperparameters}
 \end{table}
 
 For finding hyperparameters, a Bayesian search was done, optimizing for the perceptual metric MS-SSIM.
@@ -1406,142 +1427,15 @@ grayscale values to the range [0, 1]. The choice of the size 512 is set to match
 segmentation model implemented in torchxrayvision \cite{torchxrayvision}, however, an arbitrary size can be chosen
 by upscaling the masks. The full data preprocessing steps are shown in \autoref{fig:preprocessing_steps}
 
-\begin{figure}
+\begin{figure}[H]
     \centering
     \includegraphics[width=0.8\textwidth]{figures/data_loading.png}
     \caption{Data preprocessing pipeline}
     \label{fig:preprocessing_steps}
 \end{figure}
 
-\section{Experimental Setup}
-Our experiments are configured to explore different models and hyperparameters:
-
-\begin{itemize}
-    \item \textbf{Known vs. Unknown Transformation}: We compare scenarios where the forward transformation is known versus when it must be inferred
-    \item \textbf{Single vs. Batch Processing}: We evaluate optimizing for individual images versus batches
-    \item \textbf{Regularization Strength}: We vary the total variation regularization parameter
-    \item \textbf{Initialization Strategies}: We test different initialization methods for the transmission maps
-\end{itemize}
-
-Each experiment is run with multiple random seeds to ensure robustness, and results are logged to Weights \& Biases for analysis.
 \chapter{Results and Analysis}
 \label{ch:resultsAndAnalysis}
-
-In this chapter, we present the experimental results of our transmission map recovery method and analyze its performance across different configurations and datasets.
-
-\section{Experimental Setup}
-Our experiments were conducted on subsets of the CheXpert dataset, with the following configurations:
-\begin{itemize}
-    \item \textbf{Batch sizes}: 8, 16, and 32 images
-    \item \textbf{Image resolution}: 512×512 pixels (downsampled from original)
-    \item \textbf{Optimization steps}: 300, 600, and 1200 iterations
-    \item \textbf{Hardware}: NVIDIA RTX 3090 GPU with 24GB memory
-\end{itemize}
-
-\section{Hyperparameter Optimization Results}
-Through Bayesian optimization over 200 sweep runs, we identified optimal hyperparameter ranges:
-
-\begin{table}[ht]
-\centering
-\caption{Optimal hyperparameter ranges identified through Bayesian optimization}
-\label{tab:hyperparameters}
-\begin{tabular}{l|c|c}
-\hline
-\textbf{Parameter} & \textbf{Optimal Range} & \textbf{Best Value} \\
-\hline
-Learning rate & 0.005 - 0.04 & 0.0084 \\
-Gradient penalty weight ($\lambda_{\text{grad}}$) & 0 - 0.0001 & 9.8e-6 \\
-Anatomical prior weight ($\lambda_{\text{anat}}$) & 0.1 - 0.5 & 0.261 \\
-Detail similarity weight ($\lambda_{\text{detail}}$) & 0.1 - 0.45 & 0.384 \\
-\hline
-\end{tabular}
-\end{table}
-
-\section{Reconstruction Quality Metrics}
-[Note: Insert actual results here once experiments are complete]
-
-\subsection{Image Quality Assessment}
-The reconstruction quality was evaluated using:
-\begin{itemize}
-    \item \textbf{SSIM}: Structural similarity between reconstructed processed images and targets
-    \item \textbf{PSNR}: Peak signal-to-noise ratio
-    \item \textbf{Anatomical Compliance}: Percentage of pixels within expected physical ranges for each tissue type
-\end{itemize}
-
-\subsection{Physical Plausibility}
-We assess the physical plausibility of recovered transmission maps through:
-\begin{itemize}
-    \item Distribution analysis of transmission values per anatomical region
-    \item Comparison with the limited ground truth phantom data
-    \item Expert radiologist evaluation (planned)
-\end{itemize}
-
-\section{Computational Performance}
-\subsection{Scaling Analysis}
-The computational requirements scale as:
-\begin{itemize}
-    \item \textbf{Memory}: $O(B \times H \times W)$ where $B$ is batch size
-    \item \textbf{Time}: Approximately linear in number of optimization steps
-    \item \textbf{Convergence}: Typically achieved within 300-600 iterations for well-chosen hyperparameters
-\end{itemize}
-
-\subsection{Bottlenecks and Limitations}
-The primary computational bottlenecks identified are:
-\begin{enumerate}
-    \item Segmentation model inference (can be mitigated through pre-computation)
-    \item Gaussian blur operations in unsharp masking (limited by convolution efficiency)
-    \item Hyperparameter search space exploration (requires extensive parallel computation)
-\end{enumerate}
-
-\cleardoublepage
-\chapter{Discussion}
-\label{ch:discussion}
-
-\section{Interpretation of Results}
-Our method demonstrates the feasibility of recovering physically plausible transmission maps from processed chest X-rays, though several challenges remain for practical deployment at scale.
-
-\subsection{Success Factors}
-The combination of gradient-based smoothness regularization with anatomically-informed constraints proves effective in producing transmission maps that:
-\begin{itemize}
-    \item Maintain appropriate value ranges for different tissue types
-    \item Preserve diagnostic features when re-processed
-    \item Exhibit smooth transitions consistent with physical X-ray attenuation
-\end{itemize}
-
-\subsection{Limitations and Challenges}
-\subsubsection{Scalability}
-The current approach faces significant scalability challenges:
-\begin{itemize}
-    \item \textbf{Computational Cost}: Processing the full CheXpert dataset would require approximately 100-400 GPU-hours depending on batch size and convergence criteria
-    \item \textbf{Hyperparameter Sensitivity}: Optimal parameters vary with image characteristics, requiring adaptive strategies
-    \item \textbf{Memory Constraints}: Large batch sizes improve parameter estimation but are limited by GPU memory
-\end{itemize}
-
-\subsubsection{Model Assumptions}
-Our forward model makes several simplifying assumptions:
-\begin{itemize}
-    \item Single processing pipeline for all manufacturers (may not capture vendor-specific variations)
-    \item Fixed order of operations (actual pipelines may vary)
-    \item Deterministic processing (ignores potential adaptive or ML-based enhancements)
-\end{itemize}
-
-\section{Comparison with Alternative Approaches}
-Unlike direct inverse mapping approaches, our optimization-based method:
-\begin{itemize}
-    \item Provides interpretable parameters for the forward model
-    \item Allows incorporation of physical constraints
-    \item Can adapt to different processing pipelines through parameter adjustment
-\end{itemize}
-
-However, it requires significantly more computation than learned inverse mappings.
-
-\section{Practical Implications}
-For practical deployment, we recommend:
-\begin{enumerate}
-    \item \textbf{Hierarchical Processing}: Start with low-resolution optimization to identify good initialization points
-    \item \textbf{Transfer Learning}: Use parameters learned from one batch to initialize nearby batches
-    \item \textbf{Selective Processing}: Focus on high-value images (e.g., those with specific pathologies)
-\end{enumerate}
 
 \cleardoublepage
 \chapter{Conclusions and Future work}
@@ -1550,17 +1444,6 @@ For practical deployment, we recommend:
 \section{Conclusions}
 \label{sec:conclusions}
 
-This thesis presents a novel approach to recovering X-ray transmission maps from processed chest radiographs through constrained optimization. Our key contributions include:
-
-\begin{enumerate}
-    \item \textbf{Differentiable Forward Model}: We developed a fully differentiable pipeline modeling common radiographic processing steps, enabling gradient-based optimization.
-
-    \item \textbf{Anatomically-Informed Regularization}: By incorporating segmentation-guided constraints, we ensure recovered transmission maps respect the physical properties of different tissue types.
-
-    \item \textbf{Multi-Objective Optimization Framework}: Our approach balances data fidelity, spatial smoothness, and perceptual quality through carefully designed loss functions.
-\end{enumerate}
-
-The method successfully recovers transmission maps that, when processed through our forward model, closely match the target clinical images while maintaining physical plausibility.
 
 \section{Limitations}
 \label{sec:limitations}
@@ -1649,132 +1532,107 @@ xxxx.
 
 
 
-\warningExpl{If you do not have an appendix, do not include the \textbackslash cleardoublepage command below; otherwise, the last page number in the metadata will be one too large.}
-\cleardoublepage
+% \warningExpl{If you do not have an appendix, do not include the \textbackslash cleardoublepage command below; otherwise, the last page number in the metadata will be one too large.}
+% \cleardoublepage
 \appendix
 \renewcommand{\chaptermark}[1]{\markboth{Appendix \thechapter\relax:\thinspace\relax#1}{}}
-\chapter{Supporting materials}
-\label{sec:supportingMaterial}
-\generalExpl{Here is a place to add supporting material that can help others build upon your work. You can include files as attachments to the PDF file or indirectly via URLs. Alternatively, consider adding supporting material uploaded as separate files in DiVA.}
+\chapter{Supporting Material}
+% \label{sec:supportingMaterial}
+
+\begin{figure}
+    \centering
+    \includegraphics[width=1.0\textwidth]{figures/window_params.png}
+    \caption{Windowing function with different parameter settings.}
+    \label{fig:windowingParams}
+\end{figure}
+
+\input{algorithms/merge_segmentation_masks.tex}
+
+
+% \generalExpl{Here is a place to add supporting material that can help others build upon your work. You can include files as attachments to the PDF file or indirectly via URLs. Alternatively, consider adding supporting material uploaded as separate files in DiVA.}
 
 % Attach the BibTeX for your references to make it easy for a reader to find and use them
-The BibTeX references used in this thesis are attached. \attachfile[description={references.bib}]{references.bib}
+% The BibTeX references used in this thesis are attached. \attachfile[description={references.bib}]{references.bib}
 
-% Attach source code file(s) or add a URL to the github or other repository
-Some source code relevant to this project can be found at \url{https://github.com/gqmaguirejr/E-learning} and \url{https://github.com/gqmaguirejr/Canvas-tools}.
+% % Attach source code file(s) or add a URL to the github or other repository
+% Some source code relevant to this project can be found at \url{https://github.com/gqmaguirejr/E-learning} and \url{https://github.com/gqmaguirejr/Canvas-tools}.
 
-Your reader can access the attached (embedded) files using a PDF tool such as Adobe Acrobat Reader using the paperclip icon in the left menu, as shown in \Cref{fig:PDFreaderPaperclipExample} or by right-clicking on the push-pin icon in the PDF file and then using the menu to save the embedded file as shown in \Cref{fig:PDFreaderPushpinExample}.
+% Your reader can access the attached (embedded) files using a PDF tool such as Adobe Acrobat Reader using the paperclip icon in the left menu, as shown in \Cref{fig:PDFreaderPaperclipExample} or by right-clicking on the push-pin icon in the PDF file and then using the menu to save the embedded file as shown in \Cref{fig:PDFreaderPushpinExample}.
 
-An argument for including supporting material in the PDF file is that it will be available to anyone who has a copy of the PDF file. As a result, they do not have to look elsewhere for this material. This comes at the cost of a larger PDF file. However, the embedded files are encoded into a compressed stream within the PDF file; thus, reducing the number of additional bytes. For example, the references.bib file that was used in this example is \SI{10617}{\byte} in size but only occupies \SI{4261}{\byte} in the PDF file.
+% An argument for including supporting material in the PDF file is that it will be available to anyone who has a copy of the PDF file. As a result, they do not have to look elsewhere for this material. This comes at the cost of a larger PDF file. However, the embedded files are encoded into a compressed stream within the PDF file; thus, reducing the number of additional bytes. For example, the references.bib file that was used in this example is \SI{10617}{\byte} in size but only occupies \SI{4261}{\byte} in the PDF file.
 
-\warningExpl{DiVA is limited to $\approx$\SI{1}{\giga\byte} for each supporting file. If you have very large amounts of supporting material, you will probably want to use one of the data repositories. For additional help with this, contact KTH Library via
-\href{mailto:researchdata@kth.se}{researchdata@kth.se}.\\As of Spring 2024, there are plans to migrate this supporting data from DiVA to a research data repository.
-}
+% \warningExpl{DiVA is limited to $\approx$\SI{1}{\giga\byte} for each supporting file. If you have very large amounts of supporting material, you will probably want to use one of the data repositories. For additional help with this, contact KTH Library via
+% \href{mailto:researchdata@kth.se}{researchdata@kth.se}.\\As of Spring 2024, there are plans to migrate this supporting data from DiVA to a research data repository.
+% }
 
-\begin{figure}[!ht]
-  \begin{center}
-    \includegraphics[width=0.50\textwidth]{README_notes/pdf-viewer-attached-files.png}
-  \end{center}
-  \caption{Adobe Acrobat Reader using the paperclip icon for the attached references.bib file}
-  \label{fig:PDFreaderPaperclipExample}
-\end{figure}
-\FloatBarrier
+% \begin{figure}[!ht]
+%   \begin{center}
+%     \includegraphics[width=0.50\textwidth]{README_notes/pdf-viewer-attached-files.png}
+%   \end{center}
+%   \caption{Adobe Acrobat Reader using the paperclip icon for the attached references.bib file}
+%   \label{fig:PDFreaderPaperclipExample}
+% \end{figure}
+% \FloatBarrier
 
-\begin{figure}[!ht]
-  \begin{center}
-    \includegraphics[width=0.99\textwidth]{README_notes/Bib-save-embedded-example.png}
-  \end{center}
-  \caption{Adobe Acrobat Reader after right-clicking on the push-pin icon for the attached references.bib file}
-  \label{fig:PDFreaderPushpinExample}
-\end{figure}
-\FloatBarrier
-\cleardoublepage
+% \begin{figure}[!ht]
+%   \begin{center}
+%     \includegraphics[width=0.99\textwidth]{README_notes/Bib-save-embedded-example.png}
+%   \end{center}
+%   \caption{Adobe Acrobat Reader after right-clicking on the push-pin icon for the attached references.bib file}
+%   \label{fig:PDFreaderPushpinExample}
+% \end{figure}
+% \FloatBarrier
+% \cleardoublepage
 
-\chapter{Something Extra}
-\sweExpl{svensk: Extra Material som Bilaga}
+% \chapter{Something Extra}
+% \sweExpl{svensk: Extra Material som Bilaga}
 
-\section{Just for testing KTH colors}
-\ifdigitaloutput
-    \textbf{You have selected to optimize for digital output}
-\else
-    \textbf{You have selected to optimize for print output}
-\fi
-\begin{itemize}[noitemsep]
-    \item Primary color
-    \begin{itemize}
-    \item \textcolor{kth-blue}{kth-blue \ifdigitaloutput
-    actually Deep sea
-    \fi} {\color{kth-blue} \rule{0.3\linewidth}{1mm} }\\
 
-    \item \textcolor{kth-blue80}{kth-blue80} {\color{kth-blue80} \rule{0.3\linewidth}{1mm} }\\
-\end{itemize}
+% \textcolor{black}{black} {\color{black} \rule{\linewidth}{1mm} }
 
-\item  Secondary colors
-\begin{itemize}[noitemsep]
-    \item \textcolor{kth-lightblue}{kth-lightblue \ifdigitaloutput
-    actually Stratosphere
-    \fi} {\color{kth-lightblue} \rule{0.3\linewidth}{1mm} }\\
+% % Include an example of using nomenclature
+% \ifnomenclature
+%     \cleardoublepage
+%     \chapter{Main equations}
+%     \label{ch:NomenclatureExamples}
+%     This appendix gives some examples of equations that are used throughout this thesis.
+%     \section{A simple example}
+%     The following example is adapted from Figure 1 of the documentation for the package nomencl (\url{https://ctan.org/pkg/nomencl}).
+%     \begin{equation}\label{eq:mainEq}
+%     a=\frac{N}{A}
+%     \end{equation}
+%     \nomenclature{$a$}{The number of angels per unit area\nomrefeq}%       %% include the equation number in the list
+%     \nomenclature{$N$}{The number of angels per needle point\nomrefpage}%  %% include the page number in the list
+%     \nomenclature{$A$}{The area of the needle point}%
+%     The equation $\sigma = m a$%
+%     \nomenclature{$\sigma$}{The total mass of angels per unit area\nomrefeqpage}%
+%     \nomenclature{$m$}{The mass of one angel}
+% follows easily from \Cref{eq:mainEq}.
 
-    \item \textcolor{kth-lightred}{kth-lightred \ifdigitaloutput
-    actually Fluorescence\fi} {\color{kth-lightred} \rule{0.3\linewidth}{1mm} }\\
+%     \section{An even simpler example}
+%     The formula for the diameter of a circle is shown in \Cref{eq:secondEq} area of a circle in \cref{eq:thirdEq}.
+%     \begin{equation}\label{eq:secondEq}
+%     D_{circle}=2\pi r
+%     \end{equation}
+%     \nomenclature{$D_{circle}$}{The diameter of a circle\nomrefeqpage}%
+%     \nomenclature{$r$}{The radius of a circle\nomrefeqpage}%
 
-    \item \textcolor{kth-lightred80}{kth-lightred80} {\color{kth-lightred80} \rule{0.3\linewidth}{1mm} }\\
+%     \begin{equation}\label{eq:thirdEq}
+%     A_{circle}=\pi r^2
+%     \end{equation}
+%     \nomenclature{$A_{circle}$}{The area of a circle\nomrefeqpage}%
 
-    \item \textcolor{kth-lightgreen}{kth-lightgreen \ifdigitaloutput
-    actually Front-lawn\fi} {\color{kth-lightgreen} \rule{0.3\linewidth}{1mm} }\\
+%     Some more text that refers to \eqref{eq:thirdEq}.
+% \fi  %% end of nomenclature example
 
-    \item \textcolor{kth-coolgray}{kth-coolgray \ifdigitaloutput
-    actually Office\fi} {\color{kth-coolgray} \rule{0.3\linewidth}{1mm} }\\
+% \cleardoublepage
+% % Information for authors
+% %\include{README_author}
+% \subfile{README_author}
 
-    \item \textcolor{kth-coolgray80}{kth-coolgray80} {\color{kth-coolgray80} \rule{0.3\linewidth}{1mm} }
-\end{itemize}
-\end{itemize}
-
-\textcolor{black}{black} {\color{black} \rule{\linewidth}{1mm} }
-
-% Include an example of using nomenclature
-\ifnomenclature
-    \cleardoublepage
-    \chapter{Main equations}
-    \label{ch:NomenclatureExamples}
-    This appendix gives some examples of equations that are used throughout this thesis.
-    \section{A simple example}
-    The following example is adapted from Figure 1 of the documentation for the package nomencl (\url{https://ctan.org/pkg/nomencl}).
-    \begin{equation}\label{eq:mainEq}
-    a=\frac{N}{A}
-    \end{equation}
-    \nomenclature{$a$}{The number of angels per unit area\nomrefeq}%       %% include the equation number in the list
-    \nomenclature{$N$}{The number of angels per needle point\nomrefpage}%  %% include the page number in the list
-    \nomenclature{$A$}{The area of the needle point}%
-    The equation $\sigma = m a$%
-    \nomenclature{$\sigma$}{The total mass of angels per unit area\nomrefeqpage}%
-    \nomenclature{$m$}{The mass of one angel}
-follows easily from \Cref{eq:mainEq}.
-
-    \section{An even simpler example}
-    The formula for the diameter of a circle is shown in \Cref{eq:secondEq} area of a circle in \cref{eq:thirdEq}.
-    \begin{equation}\label{eq:secondEq}
-    D_{circle}=2\pi r
-    \end{equation}
-    \nomenclature{$D_{circle}$}{The diameter of a circle\nomrefeqpage}%
-    \nomenclature{$r$}{The radius of a circle\nomrefeqpage}%
-
-    \begin{equation}\label{eq:thirdEq}
-    A_{circle}=\pi r^2
-    \end{equation}
-    \nomenclature{$A_{circle}$}{The area of a circle\nomrefeqpage}%
-
-    Some more text that refers to \eqref{eq:thirdEq}.
-\fi  %% end of nomenclature example
-
-\cleardoublepage
-% Information for authors
-%\include{README_author}
-\subfile{README_author}
-
-\cleardoublepage
-% information about the template for everyone
-\input{README_notes/README_notes}
+% \cleardoublepage
+% % information about the template for everyone
+% \input{README_notes/README_notes}
 
 \begin{comment}
 % information for examiners
