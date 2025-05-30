@@ -1151,7 +1151,7 @@ the mask that produces the higher attenuation. The complete merging operation is
     \label{fig:segmentationMasks}
 \end{figure}
 
-\section{Processing Operator Model}
+\section{Processing Model}
 
 Throughout the entire model experimentation, a fixed parameterized processing operator is used to represent a
 digital radiography processing pipeline. The goal of building such function is so it can produce
@@ -1198,27 +1198,17 @@ $\theta$. For $gamma$.
     F_3(x) = \frac{x - \alpha \cdot G_\sigma * x}{1.0 - \alpha}
 \end{equation}
 
-where $G_\sigma$ is a Gaussian kernel with standard deviation $\sigma$, and $\alpha$ is the enhance factor.
+where $G_\sigma$ is a Gaussian kernel with standard deviation $\sigma$, and $\alpha$ is an enhance factor.
 The chosen formulation bounds $\alpha$ to $(0, 1)$ . However, since it is known that images go through
-some edge enhancement, the lower bound can be increased to a non-zero value to assume some edge enhancement is
-being applied in the processed image. Regarding the frequency band represented by
-$\sigma$, the implementation considers a fixed value, or a range that will capture higher-frequencies,
-following the recommendation of targeting a 20-30mm kernel size \cite[p.~153]{Prokop2003}.
+some edge enhancement, the lower bound can be increased to a non-zero value to force an effect
+in the resulting image, and consequently, conditioning $x_i$ to have less sharp edges compared to $y_i$.
+Regarding the frequency band represented by $\sigma$, the implementation considers a fixed value, or a
+range that will capture higher-frequencies, following the recommendation of targeting a 20-30mm kernel
+size \cite[p.~153]{Prokop2003}.
 
-\item[Range normalization]
-\begin{equation}
-    F_4(x) = \frac{x - \min(x)}{\max(x) - \min(x)},
-\end{equation}
-as a mean to normalize values to the $[0,1]$ range, since operations such as windowing and unsharp masking can lead
-to values outside this range.
-
-\item[Clipping]
-\begin{equation}
-    F_5(x) = \min(\max(x, 0), 1)
-\end{equation}
 \end{description}
 
-The parameter vector $\theta$ includes all parameters of these transformations, such as $\{c, w, \alpha, \sigma\}$.
+The parameter variable $\theta$ includes all the parameters described for these transformations, such as $\{c, w, \alpha\}$.
 
 \section{Optimization Approach}
 \label{sec:optimization}
@@ -1254,16 +1244,85 @@ high \acrfull{PSNR}, widely used metric for measuring image restoration quality 
 
 However, this metric has been shown to not correlate well with human’s perception of image quality,
 and can yield the same quantity over distortions on different scales of the image \cite[Figure~2]{wangMultiscaleStructuralSimilarity2003}.
-Despite this caveat, it is still the choice to represent data fidelity due to its simplicity and computational efficiency.
-However, other metrics are used to evaluate and compare the performance of the model, as having accuracy in
-different frequency bands of our image is critical to claim the model yields a valid solution.
-
+Despite this caveat, it is still a choice to compute data fidelity due to its simplicity and computational efficiency.
+Other metrics are used to evaluate and compare the performance of the model, as having accuracy in different frequency bands of our
+image is critical to claim the model yields a valid solution.
 
 \subsection{Regularization}
 
-The selection of regularization terms is guided by the soft constraints expected from the reconstructed transmission
-maps. These have the goals of reducing noise and artifacts from the images, as well as promoting the
+The selection of regularization terms is guided by the observed characteristics detailed in \autoref{sec:transmissionMaps}
+. These have the goals of reducing noise and artifacts from the images, as well as promoting the
 compliance with the expected transmission ranges at each of the absorption-similar regions.
+
+
+\begin{description}
+    \item[Total Variation Regularization] The Total Variation (TV) functional, introduced by Rudin, Osher, and Fatemi \cite{rudinNonlinearTotalVariation1992},
+    is a regularization for noise removal that preserves sharp edges, defined as
+      \begin{equation}
+        R_{TV}^{aniso}(x) = \sum_{i,j} |x_{i+1,j} - x_{i,j}| + |x_{i,j+1} - x_{i,j}|.
+    \end{equation}
+
+    For transmission maps, TV regularization is particularly suitable as it promotes recovering images with sharp edges,
+    under the expectation that the chosen weight does not introduce excessive smoothing or blurring. However, the method has been shown
+    to introduce staircasing artifacts, which may conflict to our interest of preserving small structures.
+
+    \item[Tikhonov Regularization] As an alternative to TV, a Tikhonov regularization on the image gradient can be defined as
+    \begin{equation}
+        R_{Tikh}(x) = \sum_{i,j} (x_{i+1,j} - x_{i,j})^2 + (x_{i,j+1} - x_{i,j})^2.
+    \end{equation}
+
+    This quadratic penalty promotes smooth solutions and offers computational efficiency through its convexity and differentiability.
+    While Tikhonov regularization avoids the staircasing artifacts associated with TV, it tends to over-smooth edges, potentially obscuring
+    important anatomical boundaries. The choice between TV and Tikhonov regularization thus represents a trade-off between edge preservation
+    and smoothness in homogeneous regions. Despite this caveat, it is expected to lose sharp edges from the assumption of operations
+    in the high-frequency space, which can make it an appropriate choice to our case.
+
+    \item[Anatomical Regularization] Leveraging the segmentation masks described in Section \ref{sec:segmentation}, we incorporate anatomically-informed
+    constraints that encode the expected transmission characteristics of different tissue types.
+    For each anatomical group $t \in \{\text{bone}, \text{lung}, \text{soft}\}$, we define region-specific penalties:
+
+    \begin{equation}
+        R_{anatomy}(x_i) = \sum_{t} \sum_{(j,k) \in S_i^t} \rho_t(x_i(j,k))
+    \end{equation}
+
+    where $S_i^t$ denotes the set of pixels belonging to anatomical group $t$, and $\rho_t$ is a penalty function defined as:
+
+    \begin{equation}
+        \rho_t(v) = \begin{cases}
+            (v - v_{\max}^t)^2 & \text{if } v > v_{\max}^t \\
+            (v_{\min}^t - v)^2 & \text{if } v < v_{\min}^t \\
+            0 & \text{otherwise}
+        \end{cases}
+    \end{equation}
+
+    The bounds $[v_{\min}^t, v_{\max}^t]$ are derived from the analysis of real transmission maps as described in Section \ref{sec:transmissionMaps}. This soft constraint formulation allows for natural variations in tissue density while penalizing physically implausible transmission values. The normalization by $|S_i^t|$ ensures that the penalty contribution is independent of the region size, preventing bias toward larger anatomical structures.
+
+    \item[Adaptive Weighting Strategy] The segmentation confidence values from the ChestXDet model can be incorporated to create spatially-varying regularization weights:
+
+    \begin{equation}
+        \lambda_{anatomy}(j,k) = \lambda_{base} \cdot \max_{t} c_i^t(j,k)
+    \end{equation}
+
+    where $c_i^t(j,k) \in [0,1]$ represents the confidence of pixel $(j,k)$ belonging to anatomical group $t$. This adaptive approach applies stronger regularization in regions with high segmentation confidence while allowing more flexibility in uncertain regions, such as tissue boundaries.
+
+    \item[Frequency-Selective Regularization] Given that transmission maps exhibit suppressed high-frequency content compared to processed images (Section \ref{sec:transmissionMaps}), we consider frequency-selective regularization:
+
+    \begin{equation}
+        R_{freq}(x) = \sum_{\omega \in \Omega_{high}} |\hat{x}(\omega)|^2
+    \end{equation}
+
+    where $\hat{x}$ denotes the Fourier transform of $x$ and $\Omega_{high}$ represents the high-frequency domain. This penalty directly suppresses high-frequency components that are unlikely to be present in real transmission maps but may arise from noise or optimization artifacts.
+\end{description}
+
+The complete regularization functional combines these terms with appropriate weighting:
+
+\begin{equation}
+    R(x_i, s_i) = \lambda_{smooth} R_{smooth}(x_i) + \lambda_{anatomy} R_{anatomy}(x_i, s_i) + \lambda_{freq} R_{freq}(x_i)
+\end{equation}
+
+where $R_{smooth} \in \{R_{TV}, R_{Tikh}\}$ is selected based on the desired trade-off between edge preservation and smoothness. The regularization weights $\{\lambda_{smooth}, \lambda_{anatomy}, \lambda_{freq}\}$ control the relative importance of each term and are determined through hyperparameter optimization as described in Chapter 4.
+
+The interplay between these regularization terms addresses different aspects of the ill-posedness: smoothness regularization stabilizes the inversion by restricting the solution space, anatomical regularization incorporates domain-specific knowledge to ensure physical plausibility, and frequency-selective regularization suppresses artifacts that do not conform to the expected spectral characteristics of transmission maps. This multi-faceted approach enables the recovery of transmission maps that are not only consistent with the observed processed images but also adhere to the physical constraints governing X-ray transmission through human tissue.}
 
 \begin{description}
     \item[Smoothing regularization] Two alternatives of smoothing regularization are considered:
@@ -1370,6 +1429,38 @@ differentiation, handling the computation of gradients for the chosen loss funct
 operator. \textit{Optax} is an gradient processing and optimization library that provides multiple gradient descent optimizers, ruled
 by additional hyperparameters, such as a learning rate.
 
+Regarding the actual choice of the processing operator, the following snippet shows the proper order and operations
+it uses:
+
+\begin{lstlisting}[
+    basicstyle=\small
+]
+def processing(txm, theta):
+    x = window(txm, theta.window_center, theta.window_width, theta.gamma)
+    x = negative_log(x)
+    x = unsharp_mask(x, low_sigma, theta.low_enhance_factor)
+    x = clip(x, 0., 1.)
+    x = unsharp_mask(x, high_sigma, theta.high_enhance_factor)
+    x = clip(x, 0., 1.)
+
+    return x
+\end{lstlisting}
+
+The actual box constraints set to these parameters are shown below:
+
+\begin{equation}
+\begin{aligned}
+    0.1 \leq & \text{low_enhance_factor} &<= 0.8 \\
+    0.3 \leq & \text{high_enhance_factor} &= 1.0 \\
+    0.1 \leq & \text{window_center} &<= 0.8 \\
+    0.1 \leq & \text{window_width} &<= 1.0 \\
+\end{aligned}
+\end{equation}
+
+These values are set empirically, based on the assumption that high-frequencies are always amplified to some degree,
+while not a necessity for low-frequencies. The windowing params are set arbitrarily to allow centering in the first
+half of the dynamic range, as observed in the sample transmission map.
+
 Since the approach taken for this project does not involve learning an inverse model, but rather solve an optimization
 on a per-image basis, we aim to find a model and corresponding hyperparameters that can be reused across different
 sets of images and guarantee convergence into valid solutions. Besides optimization-related hyperparameters such as
@@ -1384,31 +1475,31 @@ Overall, the hyperparameters and configurations to find are listed in \autoref{t
         \hline
         \textbf{Hyperparameter} & \textbf{Description} \\
         \hline
-        Optimizer & Choice of optimizer, e.g. Adam, SGD, RMSProp. \\
+        Optimizer & Due to the non-smoothness and overall lack of favorable properties, we
+       use the AMSGrad \cite{reddiConvergenceAdam2019} optimizer, chosen empirically on an initial search of hyperparameters. \\
         \hline
-        Optimizer hyperparameters & Optimizer-specific, such as learning rate, momentum, weight decay, etc. \\
+        Optimizer hyperparameters & The optimizer's learning rate. \\
         \hline
         Segmentation threshold & Threshold to delimit binary segmentation masks, set to 0.5 for all results. \\
         \hline
         Frequency bands & Usharp mask is an operation that amplifies specific frequency bands, which are determined
         by the kernel size for the blurring operation. The processing model assumes enhancement on at least two
         frequency bands, low and high. The consequence of this is the exclusion of this parameter from the optimization
-        problem, but it is rather fixed for all images.\\
+        variables. The choice can be set empirically as a mean to constrain high frequencies in the transmission maps.  \\
         \hline
         Regularization weights & Weights for the smoothing and segmentation regularization. \\
         \hline
-        Smoothing regularization & The choice among Tikhonov, Total Variation, and no regularization, to penalize discontinuities in the transmission maps. \\
-        \hline
-        Max steps & Maximum number of iterations for the optimization. \\
+        Smoothing regularization & The choice among Tikhonov, Total Variation, and no regularization,
+        to penalize discontinuities in the transmission maps. \\
         \hline
     \end{tabular}
     \caption{Optimization hyperparameters}
     \label{tab:hyperparametersList}
 \end{table}
 
-For finding hyperparameters, a Bayesian search was done, optimizing for the perceptual metric MS-SSIM.
-An optimal choice of parameters can later be found by picking the set that also satisfies the
-segmentation constraints. To implement this search, we used Weights \& Biases \cite{wandb} sweep
+For finding hyperparameters, a Bayesian search was done, optimizing for the perceptual metric \mathcal{L}^{Mix}.
+An analysis is then done on the choices of hyperparameters and how they affect qualitative results and
+the compliance with the anatomical constraints. To implement this search, we used Weights \& Biases \cite{wandb} sweep
 functionality.
 
 \section{Data Collection and Preprocessing}
@@ -1433,6 +1524,32 @@ by upscaling the masks. The full data preprocessing steps are shown in \autoref{
     \caption{Data preprocessing pipeline}
     \label{fig:preprocessing_steps}
 \end{figure}
+
+
+\section{Anatomical Bounds}
+
+The bounds for the regularization $R_{\text{anatomy}}$ are computed by extracting the max and minimum values
+for each anatomical region on the sample transmission map. These bounds are defined in \autoref{tab:anatomical_bounds}
+
+\begin{table}
+\centering
+\begin{tabular}{|c|c|}
+    \hline
+    Anatomical Region & Bounds \\
+    \hline
+    Soft tissue & [0.0, 0.251] \\
+    Lung & [0.01961 , 0.3373] \\
+    Bone & [0.0, 0.2235] \\
+    \hline
+\end{tabular}
+\label{tab:anatomical_bounds}
+\caption{Anatomical bounds for regularization}
+\end{table}
+
+\section{Trivial transformation}
+
+One way of approximating the transmission map of a transmission map trivially is to compute a negative transformation of the image,
+and squeezing the image range to effectively give an image that is close to the expected anatomical bounds.
 
 \chapter{Results and Analysis}
 \label{ch:resultsAndAnalysis}
