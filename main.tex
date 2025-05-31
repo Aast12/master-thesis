@@ -1523,44 +1523,6 @@ of this metric is shown in \autoref{fig:transmission_maps}.
 
 An inital set of hyperparameter searches was set out to perform the choice of a smoothing regularization,
 
-\begin{tabular}{lllrrrrrrl}
- & sweep_id & run_id & Lmix_min & Lmix_mean & Lmix_max & penalties_min & penalties_mean & penalties_max & smooth_metric \\
-29 & qotz6ywd & cuhsitz3 & 0.014564 & 0.014564 & 0.014564 & \bfseries 0.000287 & 0.001207 & 0.002088 & none \\
-30 & qotz6ywd & f5pcifw7 & 0.016656 & 0.016656 & 0.016656 & \bfseries 0.000361 & 0.001449 & 0.002668 & none \\
-34 & qotz6ywd & y5mbdtj4 & 0.024338 & 0.024338 & 0.024338 & \bfseries 0.000465 & 0.002035 & 0.003494 & none \\
-12 & lbatytmn & 1yt7love & 0.027394 & 0.027394 & 0.027394 & \bfseries 0.000474 & 0.003872 & 0.008513 & tikonov \\
-18 & lbatytmn & dymyvrve & 0.033039 & 0.033039 & 0.033039 & \bfseries 0.003235 & 0.012455 & 0.023823 & tikonov \\
-21 & lbatytmn & nh8xw2jx & 0.049602 & 0.049602 & 0.049602 & \bfseries 0.040945 & 0.156652 & 0.225820 & tikonov \\
-0 & 9bvn7f41 & 2mr7krlq & 0.053848 & 0.053848 & 0.053848 & \bfseries 0.002437 & 0.010680 & 0.017355 & tv \\
-3 & 9bvn7f41 & efczlrb8 & \bfseries 0.054773 & \bfseries 0.054773 & \bfseries 0.054773 & 0.082736 & 0.309372 & 0.461081 & tv \\
-8 & 9bvn7f41 & vyorg6ne & \bfseries 0.055080 & \bfseries 0.055080 & \bfseries 0.055080 & 0.260411 & 0.989059 & 1.400800 & tv \\
-5 & 9bvn7f41 & nsp0dnvp & 0.055580 & 0.055580 & 0.055580 & \bfseries 0.005125 & 0.026585 & 0.042069 & tv \\
-17 & lbatytmn & d251fat8 & 0.060227 & 0.060227 & 0.060227 & \bfseries 0.006956 & 0.027634 & 0.042527 & tikonov \\
-10 & 9bvn7f41 & z6h2dn1p & \bfseries 0.064878 & \bfseries 0.064878 & \bfseries 0.064878 & 0.132809 & 0.535663 & 0.817127 & tv \\
-7 & 9bvn7f41 & subuyjkx & 0.070741 & 0.070741 & 0.070741 & \bfseries 0.007767 & 0.032396 & 0.050166 & tv \\
-16 & lbatytmn & 7xx3vx71 & 0.071043 & 0.071043 & 0.071043 & \bfseries 0.004885 & 0.017630 & 0.026470 & tikonov \\
-20 & lbatytmn & ild3hngm & 0.074267 & 0.074267 & 0.074267 & \bfseries 0.011122 & 0.039111 & 0.058911 & tikonov \\
-32 & qotz6ywd & p5itz6hp & 0.076598 & 0.076598 & 0.076598 & \bfseries 0.001888 & 0.006835 & 0.010584 & none \\
-1 & 9bvn7f41 & 8xmmxeh8 & 0.098334 & 0.098334 & 0.098334 & \bfseries 0.079049 & 0.351899 & 0.531292 & tv \\
-27 & qotz6ywd & 23xsu2zt & 0.100650 & 0.100650 & 0.100650 & \bfseries 0.000490 & 0.002064 & 0.003729 & none \\
-2 & 9bvn7f41 & djis8va4 & 0.111593 & 0.111593 & 0.111593 & \bfseries 0.011737 & 0.049376 & 0.072859 & tv \\
-4 & 9bvn7f41 & gs5zrun5 & \bfseries 0.115705 & \bfseries 0.115705 & \bfseries 0.115705 & 7.034859 & 28.410555 & 53.563359 & tv \\
-9 & 9bvn7f41 & w08jjgae & 0.117600 & 0.117600 & 0.117600 & \bfseries 0.039605 & 0.129439 & 0.180728 & tv \\
-15 & lbatytmn & 7luz0fd6 & 0.121181 & 0.121181 & 0.121181 & \bfseries 0.026185 & 0.085257 & 0.131638 & tikonov \\
-23 & lbatytmn & t4gsc10v & 0.122585 & 0.122585 & 0.122585 & \bfseries 0.002936 & 0.022226 & 0.046193 & tikonov \\
-26 & qotz6ywd & 0tv4t7mv & 0.122605 & 0.122605 & 0.122605 & \bfseries 0.009619 & 0.029769 & 0.044969 & none \\
-33 & qotz6ywd & wdk88gt4 & 0.130073 & 0.130073 & 0.130073 & \bfseries 0.007643 & 0.022843 & 0.034582 & none \\
-14 & lbatytmn & 4hhq55ca & \bfseries 0.135629 & \bfseries 0.135629 & \bfseries 0.135629 & 0.152677 & 0.267444 & 0.411746 & tikonov \\
-11 & 9bvn7f41 & zhhntppc & 0.161249 & 0.161249 & 0.161249 & \bfseries 0.018805 & 0.072276 & 0.119187 & tv \\
-25 & lbatytmn & xgmzyhmn & \bfseries 0.172976 & \bfseries 0.172976 & \bfseries 0.172976 & 0.181141 & 1.707338 & 3.434707 & tikonov \\
-13 & lbatytmn & 1yvo14gw & 0.233034 & 0.233034 & 0.233034 & \bfseries 0.131148 & 0.259505 & 0.377141 & tikonov \\
-31 & qotz6ywd & jzbv8i69 & 0.233104 & 0.233104 & 0.233104 & \bfseries 0.171111 & 0.362827 & 0.541947 & none \\
-19 & lbatytmn & halaetrx & 0.233258 & 0.233258 & 0.233258 & \bfseries 0.028415 & 0.063041 & 0.095529 & tikonov \\
-24 & lbatytmn & u3pm6q1q & 0.250945 & 0.250945 & 0.250945 & \bfseries 0.066464 & 0.135459 & 0.199567 & tikonov \\
-6 & 9bvn7f41 & so8ixncj & \bfseries 0.325268 & \bfseries 0.325268 & \bfseries 0.325268 & 0.521823 & 1.017381 & 1.481525 & tv \\
-22 & lbatytmn & pmfu6q16 & \bfseries 0.365707 & \bfseries 0.365707 & \bfseries 0.365707 & 50.077217 & 149.642599 & 268.766052 & tikonov \\
-28 & qotz6ywd & 6gk7sb75 & \bfseries 0.406647 & \bfseries 0.406647 & \bfseries 0.406647 & 1.204770 & 3.725257 & 6.747360 & none \\
-\end{tabular}
 
 \textbf{Convergence in non-set constraints}
 
@@ -1685,6 +1647,57 @@ xxxx.
 \end{figure}
 
 \input{algorithms/merge_segmentation_masks.tex}
+
+\chapter{Initial hyperparameter search}
+\label{sec:initialHyperparameterSearch}
+
+\begin{table}
+\centering
+\begin{tabular}{lrrrrrrrl}
+ & Runtime & $\mathcal{L}^{\text{Mix}}$ max & $\mathcal{L}^{\text{Mix}}$ mean & $\mathcal{L}^{\text{Mix}}$ min & Penalties max & Penalties mean & Penalties min & Smooth reg. \\
+ 29 & 563.109801 & \bfseries 0.016853 & \bfseries 0.014564 & \bfseries 0.012100 & \bfseries 0.003202 & \bfseries 0.001207 & 0.000044 & none \\
+ 30 & 1071.619600 & 0.018997 & 0.016656 & 0.013023 & 0.003599 & 0.001449 & 0.000052 & none \\
+ 34 & 1017.985566 & 0.027841 & 0.024338 & 0.018678 & 0.004580 & 0.002035 & 0.000077 & none \\
+ 12 & 699.119695 & 0.030976 & 0.027394 & 0.023818 & 0.017649 & 0.003872 & 0.000143 & tikonov \\
+ 18 & 476.124311 & 0.036701 & 0.033039 & 0.029165 & 0.029165 & 0.012455 & 0.000625 & tikonov \\
+ 21 & 475.003554 & 0.054005 & 0.049602 & 0.046968 & 0.242348 & 0.156652 & 0.017277 & tikonov \\
+ 0 & 713.010703 & 0.058910 & 0.053848 & 0.049643 & 0.020831 & 0.010680 & 0.000624 & tv \\
+ 3 & 970.882263 & 0.060052 & 0.054773 & 0.047618 & 0.523728 & 0.309372 & 0.044149 & tv \\
+ 8 & 539.165788 & 0.059271 & 0.055080 & 0.052517 & 1.536641 & 0.989059 & 0.135147 & tv \\
+ 5 & 245.019457 & 0.059813 & 0.055580 & 0.051776 & 0.054485 & 0.026585 & 0.001869 & tv \\
+ 17 & 468.220039 & 0.065625 & 0.060227 & 0.054002 & 0.048943 & 0.027634 & 0.003310 & tikonov \\
+ 10 & 368.075797 & 0.068312 & 0.064878 & 0.059608 & 0.951185 & 0.535663 & 0.066518 & tv \\
+ 7 & 376.274129 & 0.075618 & 0.070741 & 0.066959 & 0.058924 & 0.032396 & 0.003098 & tv \\
+ 16 & 661.980748 & 0.076345 & 0.071043 & 0.064878 & 0.030261 & 0.017630 & 0.002333 & tikonov \\
+ 20 & 605.175529 & 0.080235 & 0.074267 & 0.068925 & 0.067765 & 0.039111 & 0.006383 & tikonov \\
+ 32 & 687.701262 & 0.085997 & 0.076598 & 0.069191 & 0.012257 & 0.006835 & 0.000804 & none \\
+ 1 & 595.768241 & 0.226541 & 0.098334 & 0.053218 & 0.583420 & 0.351899 & 0.000231 & tv \\
+ 27 & 730.086226 & 0.344054 & 0.100650 & 0.015107 & 0.005781 & 0.002064 & \bfseries 0.000000 & none \\
+ 2 & 514.845521 & 0.255809 & 0.111593 & 0.054730 & 0.078831 & 0.049376 & \bfseries 0.000000 & tv \\
+ 4 & 717.700773 & 0.197577 & 0.115705 & 0.033487 & 119.200302 & 28.410555 & 0.982594 & tv \\
+ 9 & \bfseries 244.023881 & 0.310923 & 0.117600 & 0.045247 & 0.254540 & 0.129439 & 0.000000 & tv \\
+ 15 & 784.657229 & 0.127563 & 0.121181 & 0.113680 & 0.155192 & 0.085257 & 0.013254 & tikonov \\
+ 23 & 461.161033 & 0.370886 & 0.122585 & 0.033377 & 0.084576 & 0.022226 & 0.000004 & tikonov \\
+ 26 & 692.708670 & 0.129267 & 0.122605 & 0.114367 & 0.051751 & 0.029769 & 0.005660 & none \\
+ 33 & 756.872708 & 0.141169 & 0.130073 & 0.116452 & 0.040259 & 0.022843 & 0.004338 & none \\
+ 14 & 287.046453 & 0.147056 & 0.135629 & 0.124201 & 0.451391 & 0.267444 & 0.129689 & tikonov \\
+ 11 & 1502.621316 & 0.172000 & 0.161249 & 0.147474 & 0.149162 & 0.072276 & 0.008850 & tv \\
+ 25 & 1142.076985 & 0.184621 & 0.172976 & 0.159600 & 4.722511 & 1.707338 & 0.045966 & tikonov \\
+ 13 & 863.810063 & 0.248246 & 0.233034 & 0.224911 & 0.461262 & 0.259505 & 0.101780 & tikonov \\
+ 31 & 609.036502 & 0.247875 & 0.233104 & 0.212421 & 0.668524 & 0.362827 & 0.131232 & none \\
+ 19 & 1382.335828 & 0.246748 & 0.233258 & 0.222307 & 0.117650 & 0.063041 & 0.020512 & tikonov \\
+ 24 & 891.642819 & 0.267730 & 0.250945 & 0.243238 & 0.242788 & 0.135459 & 0.051026 & tikonov \\
+ 6 & 1019.439793 & 0.337225 & 0.325268 & 0.310967 & 1.855743 & 1.017381 & 0.396396 & tv \\
+ 22 & 944.191942 & 0.375721 & 0.365707 & 0.357103 & 335.244873 & 149.642599 & 17.020586 & tikonov \\
+ 28 & 1113.942507 & 0.421934 & 0.406647 & 0.390264 & 8.849885 & 3.725257 & 0.548269 & none \\
+ \end{tabular}
+\caption{Initial hyperparameter search results, ordered by the average $\mathcal{L}$.
+The table also include penalty values, which correspond to the total sum of the
+segmentation penalties (averaged over all images), and the smoothing regularization
+used.
+\label{tab:hyperparameterSearch}
+\end{table}
+
 
 
 % \generalExpl{Here is a place to add supporting material that can help others build upon your work. You can include files as attachments to the PDF file or indirectly via URLs. Alternatively, consider adding supporting material uploaded as separate files in DiVA.}
