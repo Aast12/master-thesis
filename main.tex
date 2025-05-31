@@ -251,8 +251,8 @@ nopostdot]{glossaries}
 % Enter the English and Swedish keywords here for use in the PDF metadata _and_ for later use
 % following the respective abstract.
 % Try to put the words in the same order in both languages to facilitate matching. For example:
-\EnglishKeywords{Nonlinear Optimization, Medical Imaging, Digital Image Processing}
-\SwedishKeywords{Canvas Lärplattform, Dockerbehållare, Prestandajustering}
+\EnglishKeywords{Nonlinear Optimization, Medical Imaging, Digital Image Processing, Chest X-ray, Inverse Problems, Constrained Optimization}
+\SwedishKeywords{Icke-linjär optimering, Medicinsk bildvetenskap, digital bildbehandling, Lungröntgen, Inversa problem, Begränsad optimering}
 
 %%%%% For the oral presentation
 %% Add this information once your examiner has scheduled your oral presentation
@@ -443,27 +443,6 @@ An abstract is (typically) about 250 and 350 words (1/2 A4-page) with the follow
 \end{itemize}
 
 \end{scontents}
-% \engExpl{The following are some notes about what can be included (in terms of LaTeX) in your abstract.}
-Choice of typeface with \textbackslash textit, \textbackslash textbf, and \textbackslash texttt:  \textit{x}, \textbf{x}, and \texttt{x}.
-
-Text superscripts and subscripts with \textbackslash textsubscript and \textbackslash textsuperscript: A\textsubscript{x} and A\textsuperscript{x}.
-
-Some symbols that you might find useful are available, such as: \textbackslash textregistered, \textbackslash texttrademark, and \textbackslash textcopyright. For example,
-the copyright symbol: \textbackslash textcopyright Maguire 2022 results in \textcopyright Maguire 2022. Additionally, here are some examples of text superscripts (which can be combined with some symbols): \textbackslash textsuperscript\{99m\}Tc, A\textbackslash textsuperscript\{*\}, A\textbackslash textsuperscript\{\textbackslash textregistered\}, and A\textbackslash texttrademark resulting in \textsuperscript{99m}Tc, A\textsuperscript{*}, A\textsuperscript{\textregistered}, and A\texttrademark. Two examples of subscripts are: H\textbackslash textsubscript\{2\}O and CO\textbackslash textsubscript\{2\} which produce  H\textsubscript{2}O and CO\textsubscript{2}.
-
-You can use simple environments with begin and end: itemize and enumerate and within these use instances of \textbackslash item.
-
-The following commands can be used: \textbackslash eg, \textbackslash Eg, \textbackslash ie, \textbackslash Ie, \textbackslash etc, and \textbackslash etal: \eg, \Eg, \ie, \Ie, \etc, and \etal.
-
-The following commands for numbering with lowercase Roman numerals: \textbackslash first, \textbackslash Second, \textbackslash third, \textbackslash fourth, \textbackslash fifth, \textbackslash sixth, \textbackslash seventh, and \textbackslash eighth: \first, \Second, \third, \fourth, \fifth, \sixth, \seventh, and \eighth. Note that the second case is set with a capital 'S' to avoid conflicts with the use of second of as a unit in the \texttt{siunitx} package.
-
-Equations using \textbackslash( xxxx \textbackslash) or \textbackslash[ xxxx \textbackslash] can be used in the abstract. For example: \( (C_5O_2H_8)_n \)
-or \[ \int_{a}^{b} x^2 \,dx \]
-Note that you \textbf{cannot} use an equation between dollar signs.
-
-
-Even LaTeX comments can be handled by using a backslash to quote the percent symbol, for example: \% comment.
-Note that one can include percentages, such as: 51\% or \SI{51}{\percent}.
 
 \subsection*{Keywords}
 \begin{scontents}[store-env=keywords,print-env=true]
@@ -472,18 +451,7 @@ Note that one can include percentages, such as: 51\% or \SI{51}{\percent}.
 % If you did not set the EnglishKeywords earlier then simply enter the keywords here:
 % comma separate keywords, such as: Canvas Learning Management System, Docker containers, Performance tuning
 \end{scontents}
-\engExpl{\textbf{Choosing good keywords can help others to locate your paper, thesis, dissertation, \ldots and related work.}}
-Choose the most specific keyword from those used in your domain, see for example: the ACM Computing Classification System ({\small \url{https://www.acm.org/publications/computing-classification-system/how-to-use})},
-the IEEE Taxonomy ({\small \url{https://www.ieee.org/publications/services/thesaurus-thank-you.html}}), PhySH (Physics Subject Headings)\linebreak[4] ({\small \url{https://physh.aps.org/}}), \ldots or keyword selection tools such as the  National Library of Medicine's Medical Subject Headings (MeSH)  ({\small \url{https://www.nlm.nih.gov/mesh/authors.html}}) or Google's Keyword Tool ({\small \url{https://keywordtool.io/}})\\
 
-\textbf{Formatting the keywords}:
-\begin{itemize}
-  \item The first letter of a keyword should be set with a capital letter and proper names should be capitalized as usual.
-  \item Spell out acronyms and abbreviations.
-  \item Avoid "stop words" - as they generally carry little or no information.
-  \item List your keywords separated by commas (``,'').
-\end{itemize}
-Since you should have both English and Swedish keywords - you might think of ordering the keywords in corresponding order (\ie, so that the n\textsuperscript{th} word in each list correspond) - this makes it easier to mechanically find matching keywords.
 \end{abstract}
 \cleardoublepage
 \babelpolyLangStart{swedish}
@@ -617,10 +585,10 @@ We would like to thank xxxx for having yyyy.
 \section{Background}
 
 
-Digital radiography systems and their technological advancements for better x-ray image acquisition play a vital role in
+Digital radiography systems and their technological advancements for better X-ray image acquisition play a vital role in
 enabling accurate disease diagnosis and progression monitoring. Naturally, a demand for automated image interpretation
-and diagnosis has emerged, followed by a need of large and diverse x-ray image datasets. Collecting
-such data is however a challenge given the complexity of the acquisition, annotation process,
+and diagnosis has emerged, followed by a need for large and diverse X-ray image datasets. Collecting
+such data is, however, a challenge given the complexity of the acquisition, annotation process,
 and the tendency of these datasets to have an imbalance when underrepresenting certain conditions, such as normal cases,
 while simultaneously overrepresenting pneumonia \cite{ansariMitigatingRiskMedical2025}.
 
@@ -640,9 +608,9 @@ Most importantly, any conditions that are not represented in the data can lead t
 A potential solution to these dataset biases lies in the fundamental physics of x-ray imaging.
 In projection radiography, all imaging systems—whether using film, computed radiography phosphor plates, or flat panel
 detectors—measure the spatial distribution of x-ray radiation incident on the detector after passing through
-the patient \cite{Seibert3}. Different detector technologies employ various methods to convert the incoming x-rays
+the patient \cite{Seibert3}. Different detector technologies employ various methods to convert the incoming X-rays
 into a visual representation, potentially losing information in the process. Furthermore, digital
-detectors perform image processing algorithms to increase the image quality for diagnosis, but also contribute to the
+detectors perform image processing algorithms to increase the image quality for diagnosis, but they also contribute to the
 differences in image appearance across different detectors.
 
 This observation suggests a promising approach: by recovering these fundamental transmission patterns from
@@ -653,7 +621,7 @@ requiring new data for each specific detector.
 \section{Problem Statement}
 \subsection{Original Problem Definition}
 
-All projection radiography technologies, and their subsequent processing pipelines operate on the same
+All projection radiography technologies, and their subsequent processing pipelines, operate on the same
 \textit{transmission maps}, which represent the x-ray radiation that passed through the patient's body, and consequently
 absorbed by the device. For digital radiography systems, if no processing were applied and the images captured were directly transformed
 into gray levels, they would appear as extremely dark due to the lack of contrast \cite[p.~148]{Prokop2003}.
@@ -663,27 +631,27 @@ and dynamic range adjustments. These operations form a "black-box" that varies a
 image-by-image basis.
 
 This describes the primary goal of this project: to develop a framework that inverts the image processing transformations
-from high-quality, chest x-ray images. This will recover the latent images that pass through all radiography devices (as
+from high-quality chest x-ray images. This will recover the latent images that pass through all radiography devices (as
 described in \autoref{fig:image_processing_pipeline}), and enable the extension of existing labeled datasets by simulating
 non-represented radiography systems.
 
 \begin{figure}
     \centering
     \includegraphics[width=0.8\textwidth]{figures/latent_image.jpg}
-    \caption{x-ray image acquisition pipeline. All projection radiography capture the same x-ray energies and
-   form a latent image, which is distorted by the systems' methods to capture x-rays and subsequent processing steps.
+    \caption{x-ray image acquisition pipeline. All projection radiography captures the same x-ray energies and
+   forms a latent image, which is distorted by the system's methods to capture x-rays and subsequent processing steps.
     Taken from \cite[p.~13]{Seibert3}}
     \label{fig:image_processing_pipeline}
 \end{figure}
 
 \subsection{Scientific and Engineering Challenges}
 
-The problem to solve lies in the category of inverse problems, and has several critical challenges:
+The problem to solve lies in the category of inverse problems and has several critical challenges:
 
 \begin{description}
     \item[Ill-posedness]
         A single processed image can map back to multiple possible "realistic" transmission maps.
-        The same holds on the other way around, where a single transmission map can map back to multiple processed images.
+        The same holds on the other direction, where a single transmission map can map back to multiple processed images.
        This makes the inverse problem fundamentally ill-posed.
     \item[Diversity of processing approaches]
         Each manufacturer implements proprietary image processing pipelines that differ in their specific algorithms and parameters.
@@ -693,16 +661,16 @@ The problem to solve lies in the category of inverse problems, and has several c
 
 \section{Purpose}
 
-The primary use case that motivates this project is the development of alternative x-ray detector technologies.
+The primary use case that motivates this project is the development of alternative X-ray detector technologies.
 Large chest x-ray datasets like CheXpert \cite{chexpert} and ChestX-ray8 \cite{nih} collect images from large
-and modern hospitals with extensive archives of x-ray imaging studies. While these can drive x-ray models to be
-used in most clinical environments, they may not be effective on resource-limited settings. These include portable,
+and modern hospitals with extensive archives of x-ray imaging studies. While these can drive X-ray models to be
+used in most clinical environments, they may not be effective in resource-limited settings. These include portable
 or cost-effective alternatives.
 
-Building large datasets for these subset of technologies is unlikely, given this has been possible due to
+Building large datasets for this subset of technologies is unlikely, given that this has been possible due to
 modern archiving systems (PACS) keeping long histories of x-ray studies \cite[p.~3462]{nih}. Being able
 to translate existing datasets into representations of any other imaging system will bring existing and
-coming advancements in x-ray related automation to all scenarios.
+coming advancements in x-ray-related automation to all scenarios.
 
 \section{Goals}
 
@@ -727,15 +695,15 @@ and directions for future work.
 \label{sec:xrayTransmissionModel}
 
 The lack of ground truth and prior knowledge for our problem incentivizes the analysis of the underlying
-physics of x-ray images, as well as further research on the types of operations that are done in the black boxes
+physics of X-ray images, as well as further research on the types of operations that are done in the black boxes
 we aim to invert. This chapter presents the basic principles of x-ray transmission, the process of x-ray image
 acquisition, and the main goals and common algorithms that are used to process radiographic images. The
 knowledge presented in this section motivates the design choices made to develop the proposed method.
 
 \section{X-ray intensity and Beer's law}
 
-X-rays are thought of as a flux of very high-energy, electromagnetic radiation. The x-ray beam is
-described by a vector valued function $I(x)$. The direction of $I$ at $x$ is the direction of the flux at $x$ and
+X-rays are thought of as a flux of very high-energy electromagnetic radiation. The x-ray beam is
+described by a vector-valued function $I(x)$. The direction of $I$ at $x$ is the direction of the flux at $x$ and
 its magnitude,
 \begin{equation}
     I (x) = \lVert I(x) \rVert
@@ -747,7 +715,7 @@ $|dS|$, placed at right angles to $I(x)$, then the energy-per-unit-time passing 
     I (x) |dS|.
 \end{equation}
 
-When x-rays encounter any form of matter, they are partly transmitted and partly absorbed.
+When X-rays encounter any form of matter, they are partly transmitted and partly absorbed.
 The fractional decrease in the intensity $I$ of an x-ray beam as it passes
 through any homogeneous substance is proportional to the distance traversed $x$
 and the material encountered\cite[p.~11]{cullityElementsXrayDiffraction2014}.
@@ -772,7 +740,7 @@ I_{\text{out}} = I_{\text{in}} \cdot e^{-\mu(x)}
 
 \section{X-ray Image acquisition}
 
-In the context of x-ray imaging, we measure intensities at the detector plane. Let
+In the context of X-ray imaging, we measure intensities at the detector plane. Let
 
 \begin{itemize}
 \item $I_0(x,y)$ denote the intensity measured at detector position $(x,y)$ in the absence
@@ -793,7 +761,7 @@ where $\mu(s)$ represents the spatially varying attenuation coefficient along th
 
 In a real measurement, the x-ray source is turned on for a known period of time. The total energy
 $I$ incident on the object along a given line $l$ is known. The total energy, $I_0$, emerging from the object
-along $l$ is then measured by an x-ray detector. Integrating Beer’s law we obtain \cite[p.~60]{epstein2008}
+along $l$ is then measured by an X-ray detector. Integrating Beer’s law, we obtain \cite[p.~60]{epstein2008}
 
 \begin{equation}
     -\log \frac{I(x,y)}{I_0(x,y)} = \int_l \mu(s) \, ds,
@@ -854,7 +822,7 @@ Hounsfield unit, which is a measure relative to the attenuation coefficient of w
         soft tissue & 51 \\
         \hline
     \end{tabular}
-    \caption{Body tissue attenuation coefficients in Hounsfeld units. Adapted from \cite[p.~54]{epstein2008}.}
+    \caption{Body tissue attenuation coefficients in Hounsfield units. Adapted from \cite[p.~54]{epstein2008}.}
     \label{fig:tissue_attenuation}
 \end{figure}
 
@@ -883,7 +851,7 @@ To overcome this, different algorithms are applied to the captured x-ray image, 
 
 \subsection{Dynamic range reduction}
 
-Particularly for \acrshort{DR} systems, the dynamic range is large, only a small portion of it contains diagnostically
+Particularly for \acrshort{DR} systems, the dynamic range is large, and only a small portion of it contains diagnostically
 relevant information. The image histogram can be 'stretched' via a \acrfull{LUT} that excludes
 any values outside the relevant range. As depicted in \autoref{fig:histogram_stretching}, this improves the overall
 image contrast, and normalizes for different doses and patient body types \cite[p.~151]{Prokop2003}.
@@ -898,9 +866,9 @@ image contrast, and normalizes for different doses and patient body types \cite[
 
 \subsection{Spatial Frequency Processing}
 
-As a mean to improve structural contrast and achieve edge enhancement, spatial frequency algorithms are applied.
+As a means to improve structural contrast and achieve edge enhancement, spatial frequency algorithms are applied.
 Unlike dynamic range operations, these types of processings can vary drastically across manufacturers, and
-are driven by multiple parameters that can also change on a per-image basis. Nevertheles, despite the algorithms
+are driven by multiple parameters that can also change on a per-image basis. Nevertheless, despite the algorithms
 changing by vendor (Agfa [Mortsel, Belgium] uses MUSICA; Fuji [Tokyo, Japan] uses Gradation; and Kodak uses Tonescaling),
 they all share the same effect and purpose \cite[p.~119]{carterDigitalRadiographyPACS2010}.
 
@@ -908,12 +876,12 @@ An example of a spatial frequency filter is Unsharp masking, which is a simple m
 and consists of three core steps:
 
 \begin{description}
-    \item[Step 1] The image is blurred using low-pass filtering, e.g. via a Gaussian filter. The wider the kernel size,
+    \item[Step 1] The image is blurred using low-pass filtering, e.g., via a Gaussian filter. The wider the kernel size,
     the more blurred the low-pass image is, and structures lower than the kernel size are almost completely suppressed.
     \item[Step 2] Subtracting the low-pass image from the original yields the high-pass information and contains those
-    details that are suppressed on the low-pass image. If the kernel size is not too small, most sharp contours on the
+    details that are suppressed in the low-pass image. If the kernel size is not too small, most sharp contours on the
     original image will be retained in the high-pass image.
-    \item[Step 3] For the enhanced image, various weighted combinations of the original, low-pass or high-pass images
+    \item[Step 3] For the enhanced image, various weighted combinations of the original, low-pass, or high-pass images
     can be created. A common approach is to add the weighted high-pass image to the original image, leading to an
     amplification of the detail information contained in it \cite[p.~152-153]{Prokop2003},.
 \end{description}
@@ -929,13 +897,13 @@ The effects of unsharp masking depend critically on the size of the filter kerne
 Kernels of 20-30mm typically give the best results for general chest imaging \cite[p.~153]{Prokop2003},
 as they enhance structures of diagnostic interest while avoiding suppression of diagnostic information.
 
-More complex algorithms such as Multiscale processing can apply the effect of unsharp masking on multiple scales
+More complex algorithms, such as Multiscale processing, can apply the effect of unsharp masking on multiple scales
 by splitting an image into many frequency bands, enabling multiple size-specific enhancements \cite[p.~156]{Prokop2003}.
 
 \subsection{Transmission Maps}
 \label{sec:transmissionMaps}
 
-Despite the processes behind capturing x-ray images are well studied, to our knowledge, there are currently no open datasets of x-ray
+Despite the processes behind capturing x-ray images being well studied, to our knowledge, there are currently no open datasets of x-ray
 transmission maps. We had access to, precisely, two images taken from the same chest phantom, provided by the Hard X-ray lab
 at KTH, one paired with a processed image produced by a clinical-grade detector. \autoref{fig:chestPhantomImages} shows the obtained sample
 pair of transmission map and processed image.
@@ -970,8 +938,8 @@ taken from the analysis of the sample pair.
 
     \item[Body tissue groups by absorption coefficients] \autoref{sec:human_chest_imaging} presented the absorption coefficients
     for the different body tissues in the chest. The coefficients for the different soft body tissues
-    vary slightly, by about 2\% of the dynamic range of an x-ray measurement \cite[p.~54]{epstein2008}. On the other hand
-    lung (air filled) and bone regions will have a significant difference in energy absorption. This allows the
+    vary slightly, by about 2\% of the dynamic range of an x-ray measurement \cite[p.~54]{epstein2008}. On the other hand,
+    lung (air-filled) and bone regions will have a significant difference in energy absorption. This allows the
     definition of three groups of anatomical regions that can expect similar transmission values, described in
     \autoref{tab:segmentationGroups}. It can be noted that these structures do not span the entirety of the
    chest. These are limited to structures we can identify via an existing segmentation model.
@@ -1016,8 +984,8 @@ taken from the analysis of the sample pair.
     \end{figure}
 
     \item[Non-flattened histogram] Figure \ref{fig:processedHistogramCompare} shows the histograms of a real pair of transmission map
-    and processed image. Processed images tend to have a flattened histogram as consequence of
-    contrast enhacement operations. In contrast, the transmission map histogram has higher
+    and processed image. Processed images tend to have a flattened histogram as a consequence of
+    contrast enhancement operations. In contrast, the transmission map histogram has higher
     density in the values closer to zero.
     \begin{figure}[H]
         \centering
@@ -1032,14 +1000,14 @@ taken from the analysis of the sample pair.
 
 
 Regardless of differences in processing algorithms across vendors, all seek the same perceptual effects
-\cite[p.~119]{carterDigitalRadiographyPACS2010}, and is also worth noting that iterations of such algorithms typically
-avoid changes in the appearance that may conflict with radiologists expectations \cite[p.~57]{STA00a}.
+\cite[p.~119]{carterDigitalRadiographyPACS2010}, and it is also worth noting that iterations of such algorithms typically
+avoid changes in the appearance that may conflict with radiologists' expectations \cite[p.~57]{STA00a}.
 Based on this claim and the built knowledge around x-ray images and \acrfull{DIP} algorithms, a concrete problem
 formulation can be proposed. As a result of the scarcity of ground-truth transmission map data, conventional supervised learning
-approaches become infeasible. However, the patterns studied in \arcshort{DIP} algorithms hints to the possibility
-of injecting prior knowledge into a learning process by means of the transformations the processed images undergo.
-The assumption then is that, if there is a known image processsing model that can produce images perceptually similar to the
-target x-ray images, then inverting these common operations can lead to a "realistic" transmission map.
+approaches become infeasible. However, the patterns studied in \arcshort{DIP} algorithms hint at the possibility
+of injecting prior knowledge into a learning process through the transformations the processed images undergo.
+The assumption then is that, if there is a known image processing model that can produce images perceptually similar to the
+Target X-ray images; then, inverting these common operations can lead to a "realistic" transmission map.
 
 \section{Mathematical Model}
 \label{sec:mathematicalModel}
@@ -1054,8 +1022,7 @@ set of transmission maps $X = \{x_i\}^N_{i=1}$, with $x_i, y_i \in [0, 1]^{r, c}
 Here, $F:[0,1]^{r, c} \times \mathbb{R}^d \to [0, 1]^{r, c}$ denotes a known image processing algorithm governed by
 parameters $\theta \in \mathbb{R}^d$.
 
-This can be formulated as an optimization problem: for each image $y_i$, it is looked for a pair of a transmission map $x_i$
-and parameters $\theta_i$ that minimize a loss function $\ell(x_i, \theta_i)$:
+This can be formulated as an optimization problem: for each image $y_i$, a pair of a transmission map $x_i$ and parameters $\theta_i$ is looked for that minimizes a loss function $\ell(x_i, \theta_i)$:
 
 \begin{equation}
     \label{eq:optimizationProblem}
@@ -1070,17 +1037,17 @@ applying a linear \acrshort{LUT} that spans the original image's dynamic range, 
 with a factor of zero. Besides aiming to inject prior information through the operations in $F$, additional
 constraints can be imposed to ensure that the reconstructed transmission maps are physically plausible.
 
-One expectation of the images $x_i$ is for them to not have discontinuities or noise. An approach to promote that is
+One expectation of the images $x_i$ is that they do not have discontinuities or noise. An approach to promote that is
 to introduce a smoothness regularization term $R_{\text{smooth}}$, weighted by $\lambda_{\text{smooth}}$.
 In \autoref{sec:transmissionMaps} it is discussed about the broad constraints the images should meet, regarding
 the range of the transmission values, particularly in regions where the traversing tissues have similar attenuation
-coefficients. This anatomical value ranges can't be set as strict constraints due to the diversity of body compositions,
+coefficients. This anatomical value ranges can't be set as a strict constraint due to the diversity of body compositions,
 as well as the potential of it creating block artifacts. Therefore, these are promoted with the regularization
 $R_{\text{anatomy}}$, with corresponding weight $\lambda_{\text{anatomy}}$.
 
-The transformation $F$ can be  further constrained by restricting the parameters $\theta_i$ to take values
+The transformation $F$ can be further constrained by restricting the parameters $\theta_i$ to take values
 that produce effects that are assumed to happen in real settings. In that case, the optimization is considered
-constrained, and has an admissible solution only when $\theta_i$ is in a defined domain $\Omega_\theta$.
+constrained and has an admissible solution only when $\theta_i$ is in a defined domain $\Omega_\theta$.
 As $F$ is chosen based on existing \acrshort{DIP} algorithms, the parameters $\theta_i$ can be constrained
 on expected value ranges and values recommended in the literature, and $\Omega_\theta$ can be expressed as
 multiple inequality constraints:
@@ -1093,7 +1060,7 @@ The presented model suggests that each image $y_i$ will have a corresponding tra
 parameters $\theta_i$. However, the following special cases of the problem can also be considered:
 
 \begin{description}
-    \item[Common operator parameters] If it is assumed that there exist a single set of parameters $\theta$
+    \item[Common operator parameters] If it is assumed that there exists a single set of parameters $\theta$
     (yet unknown) for all processed images, i.e. $F(x_i, \theta) = y_i$ for all $i = \{1,\dots,N\}$.
     Then the problem can be modeled as
     \begin{equation}
@@ -1108,14 +1075,14 @@ parameters $\theta_i$. However, the following special cases of the problem can a
 
 
 The method employed in this project involved an iterative process of defining a data fidelity function and
-regularization functions that will recover transmission maps considered realistic (according to a predefined
+regularization functions that would recover transmission maps considered realistic (according to a predefined
 set of characteristics). In the following sections, it will be discussed the choices made for
 $F$, $\mathcal{D}$, regularizations, and their effects on the reconstruction of transmission maps.
 
 \section{Processing Model}
 
 Throughout the entire model experimentation, a fixed parameterized processing operator is used to represent a
-digital radiography processing pipeline. The goal of building such function is so it can produce
+digital radiography processing pipeline. The goal of building such a function is so that it can produce
 x-ray images with an appearance consistent to the existing image datasets. If the function and its parameters
 allow it, then, there is the expectation that inverting this would produce transmission maps
 
@@ -1206,10 +1173,10 @@ The function to consider is \acrfull{MSE}, defined as
 \arcshort{MSE} has been a popular choice of cost function in image restoration problems, due to its ability to favor a
 high \acrfull{PSNR}, widely used metric for measuring image restoration quality \cite[p.~1]{zhaoLossFunctionsImage2017}, \cite[p.~191]{fleetComputerVisionECCV2014}.
 
-However, this metric has been shown to not correlate well with human’s perception of image quality,
+However, this metric has been shown not to correlate well with humans’ perception of image quality,
 and can yield the same quantity over distortions on different scales of the image \cite[Figure~2]{wangMultiscaleStructuralSimilarity2003}.
-Despite this caveat, it is still a choice to compute data fidelity due to its simplicity and computational efficiency.
-Other metrics are used to evaluate and compare the performance of the model, as having accuracy in different scales of the
+Despite this caveat, it remains a viable option to compute data fidelity due to its simplicity and computational efficiency.
+Other metrics are used to evaluate and compare the performance of the model, as having accuracy on different scales of the
 recovered images is critical to claim the model yields a valid solution.
 
 \subsection{Regularization}
@@ -1221,7 +1188,7 @@ compliance with the expected transmission ranges at each of the absorption-simil
 
 \begin{description}
     \item[Total Variation Regularization] The Total Variation (TV) functional, introduced by Rudin, Osher, and Fatemi \cite{rudinNonlinearTotalVariation1992},
-    is a regularization for noise removal that preserves sharp edges, annd can be defined as
+    is a regularization for noise removal that preserves sharp edges, and can be defined as
       \begin{equation}
         R_{TV}(x) = \sum_{i,j} |x_{i+1,j} - x_{i,j}| + |x_{i,j+1} - x_{i,j}|.
     \end{equation}
@@ -1236,10 +1203,10 @@ compliance with the expected transmission ranges at each of the absorption-simil
     \end{equation}
 
     This quadratic penalty promotes smooth solutions and offers computational efficiency through its convexity and differentiability.
-    The risk of Tikhonov regularization is a tendency to over-smooth edges, potentially obscuring important anatomical boundaries.
+    The risk of Tikhonov regularization is a tendency to over-smooth edges, potentially obscuring critical anatomical boundaries.
     The choice between TV and Tikhonov regularization thus represents a trade-off between edge preservation
     and smoothness in homogeneous regions. Nevertheless, it is expected to lose sharp edges from the assumption of operations
-    in the high-frequency space, which can make it an appropriate choice to our case.
+    in the high-frequency space, which can make it an appropriate choice for our case.
 
     \item[Anatomical Regularization] Following on the knowledge of anatomical regions with similar thicknesses
     and attenuation coefficients, an anatomically informed regularization is set to penalize transmission values that are beyond
@@ -1267,7 +1234,7 @@ compliance with the expected transmission ranges at each of the absorption-simil
 
 \subsection{Descent method}
 
-For finding the solution of the minimization problem, we recurr to iterative descent methods. These refer to
+For finding the solution of the minimization problem, we resort to iterative descent methods. These refer to
 iterative algorithms that compute a sequence of parameters $x^{(k)}$, $\theta^{(k)}$ that reduce an
 objective function $\ell$ at each iteration, i.e.
 
@@ -1290,10 +1257,10 @@ The general descent method can be described as follows:
 \end{enumerate}
 
 The choice of descent direction is typically the negative gradient, since it points in the direction of the steepest
-decrease. However, the choice of a step sizes is non trivial, and we experiment with multiple known gradient descent
+decrease. However, the choice of a step size is non-trivial, and we experiment with multiple known gradient descent
 optimizers to compute updates.
 
-Regarding the constraints on the $\theta$ parameters, we recurr to a projected gradient descent method, where
+Regarding the constraints on the $\theta$ parameters, consider a projected gradient descent method, where
 each update of  $\theta_k$ is first projected into the admissible domain via
 
 \begin{equation}
@@ -1304,7 +1271,7 @@ Since all the specified constraints are box constraints, the minimization is sat
 clipped to its respective bounds.
 
 The concrete implementation of such descent methods, as well as the choice of parameters present in the loss function
-and processing operator are ruled by hyperparameters fixed for the entire iterative process.
+and processing operators are ruled by hyperparameters fixed for the entire iterative process.
 
 \chapter{Implementation}
 
@@ -1313,7 +1280,7 @@ visual appearance to images found in datasets such as CheXpert and ChestX-ray8. 
 \textit{JAX} \cite{jax2018github} and \textit{Optax} \cite{deepmind2020jax} are used to implement the
 algorithm described in \autoref{sec:optimization}. JAX is a Python array computation library that provides automatic
 differentiation, handling the computation of gradients for the chosen loss function, and consequently, the processing
-operator. \textit{Optax} is an gradient processing and optimization library that provides multiple gradient descent optimizers, ruled
+operator. \textit{Optax} is a gradient processing and optimization library that provides multiple gradient descent optimizers, ruled
 by additional hyperparameters, such as a learning rate.
 
 Regarding the actual choice of the processing operator, the following snippet shows the proper order and operations
@@ -1345,15 +1312,15 @@ The actual box constraints set to these parameters are shown below:
 \end{equation}
 
 These values are set empirically, based on the assumption that high-frequencies are always amplified to some degree,
-while not a necessity for low-frequencies. The windowing params are set arbitrarily to allow centering in the first
+while not a necessity for low-frequencies. The windowing parameters are set arbitrarily to allow centering in the first
 half of the dynamic range, as observed in the sample transmission map.
 
-Since the approach taken for this project does not involve learning an inverse model, but rather solve an optimization
+Since the approach taken for this project does not involve learning an inverse model, but rather solving an optimization
 on a per-image basis, we aim to find a model and corresponding hyperparameters that can be reused across different
 sets of images and guarantee convergence into valid solutions. Besides optimization-related hyperparameters such as
 learning rates, we also consider different choices that can produce valid solutions but won't match qualitatively
 the expectations for transmission maps. One such choice is a regularization term (besides its corresponding weight)
-that promotes smoothness on the transmission map, which if not chosen properly, can lead to artifacts or over-smoothing.
+that promotes smoothness on the transmission map, which, if not appropriately chosen, can lead to artifacts or over-smoothing.
 Overall, the hyperparameters and configurations to find are listed in \autoref{tab:hyperparametersList}.
 
 \begin{table}[H]
@@ -1397,13 +1364,13 @@ cheXpert dataset \cite{chexpert} and NIH Chest x-ray dataset \cite{nih}. Recall 
 is to get value from the diagnostic labels they provide, which can then be tied to the simulated transmission maps.
 However, these labels are not used for the model.
 
-Although we present an optimization problem that operates per-image, it is expected that multiple images will
+Although we present an optimization problem that operates per image, it is expected that multiple images will
 be processed in parallel to speed up the optimization process. Thus, a fixed image size is set for the implementation.
 Images from the datasets also do not have a standard size or aspect ratio, so all images are preprocessed by
-cropping by the center to keep a square aspect ratio and resized to 512 pixels width, as well as rescaling the
+cropping to the center to keep a square aspect ratio and resized to 512 pixels width, as well as rescaling the
 grayscale values to the range [0, 1]. The choice of the size 512 is set to match the input size of the selected
-segmentation model implemented in torchxrayvision \cite{torchxrayvision}, however, an arbitrary size can be chosen
-by upscaling the masks. The full data preprocessing steps are shown in \autoref{fig:preprocessing_steps}
+segmentation model implemented in torchxrayvision \cite{torchxrayvision}, although an arbitrary size can be chosen
+by upscaling the masks. The complete data preprocessing steps are shown in \autoref{fig:preprocessing_steps}
 
 \begin{figure}[H]
     \centering
@@ -1418,7 +1385,7 @@ by upscaling the masks. The full data preprocessing steps are shown in \autoref{
 
 One of the core validation measures for the recovered transmission maps is the expected transmitted x-rays on
 different body tissues. As shown in \autoref{tab:segmentationGroups}, three groups of tissues
-can be defined that will have similar transmission values, and differ significantly across them. This
+can be defined that will have similar transmission values and differ significantly across them. This
 will drive the choice of a regularization term based on the expected transmission values relative to
 the location of a pixel.
 
@@ -1436,7 +1403,7 @@ OR of the masks.
 
 Since the mask groups may contain overlapping regions, a difference is applied to obtain exclusive masks. This is done in an ordered manner,
 starting from the groups with higher absorption (bone) up to lower absorption values (lung). This ensures that each pixel is assigned to
-the mask that produces the higher attenuation. The complete merging operation is described in algorithm \ref{alg:mergeSegmentationMasks}. Figure
+the mask that produces the highest attenuation. The complete merging operation is described in algorithm \ref{alg:mergeSegmentationMasks}. Figure
 \ref{fig:segmentationMasks} shows a sample set of the processed segmentation masks over a CheXpert image using a threshold of 0.5.
 
 
@@ -1458,7 +1425,7 @@ for each anatomical region on the sample transmission map. These bounds are defi
     Anatomical Region & Bounds \\
     \hline
     Soft tissue & [0.0, 0.251] \\
-    Lung & [0.01961 , 0.3373] \\
+    Lung & [0.01961, 0.3373] \\
     Bone & [0.0, 0.2235] \\
     \hline
 \end{tabular}
@@ -1469,13 +1436,13 @@ for each anatomical region on the sample transmission map. These bounds are defi
 \section{Trivial inversion}
 
 One way of approximating the transmission map trivially is to compute a negative transformation of the image,
-and squeezing (e.g. scaling to the range [0, 0.5]) the image range. This will effectively give an image that is close to the expected
+and squeeze (e.g., scaling to the range [0, 0.5]) the image range. This will effectively give an image that is close to the expected
 anatomical bounds. Let \textit{trivial inversion} refer to the type of transmission mas produced in this way. This concept can
-be useful as a baseline for evaluating against ground truth, even though there is a single pair of such data. This transformation
-also resulted to be a good initial value for the optimization, so unless otherwise specified, for the hyperparameter searches done
+be helpful as a baseline for evaluating against ground truth, even though there is a single pair of such data. This transformation
+also resulted in a good initial value for the optimization, so unless otherwise specified, for the hyperparameter searches done,
 it is assumed that the images are initialized with this transformation.
 
-An additional note on this transformation is that these kind of images can't be considered physically plausible, as they present
+An additional note on this transformation is that this kind of images can't be considered physically plausible, as they present
 a flattened histogram characteristic of processed images.
 
 \begin{figure}[h]
@@ -1490,7 +1457,7 @@ a flattened histogram characteristic of processed images.
 
 Let's recall that there are two variants of the optimization problem proposed. One consists in solving an optimization problem
 on a per-image basis, computing a solution independent of other images and parameters. Although solving multiple optimization
-problems at once is possible to speed up computing, but the parameter updates are still independent across images. The second appoach
+problems at once can speed up computing, but the parameter updates are still independent across images. The second approach
 is to find a single set of parameters that can revert multiple images simultaneously. This approach may allow for more efficient
 computation, even though it still will consist of an iterative optimization process to scale to an arbitrary number of images.
 
@@ -1499,8 +1466,8 @@ validity criteria. That translates into finding a model that produces solutions 
 images close to the original images, on multiple scales, and 2) satisfy the set physical constraints.
 
 It was mentioned previously that \arcshort{MSE} does not necessarily favor solutions that are perceptually close
-to the original images. There are multiple alternative loss functions designed specifically for Image Quality Assessment
-metrics, an alternative is a mixed loss metric $\mathcal{L}^\text{Mix}$ proposed by \cite{zhaoLossFunctionsImage2017} that combines
+to the original images. There are multiple alternative loss functions explicitly designed for Image Quality Assessment
+metrics; an alternative is a mixed loss metric $\mathcal{L}^\text{Mix}$ proposed by \cite{zhaoLossFunctionsImage2017} that combines
 \acrfull{MS-SSIM} with the $\ell_1$ loss (Mean Absolute Error). \acrshort{SSIM} is an Image Quality Assessment
 metric that evaluates images accounting for the fact that the \acrfull{HVS} is sensitive to changes in local
 structure. \acrshort{MS-SSIM} was later proposed to extend \acrshort{SSIM} to account for the fact that the
@@ -1573,7 +1540,7 @@ Several limitations constrain the current approach:
 \section{Future work}
 \label{sec:futureWork}
 
-Even though the current project could find solutions that, accrding to our criteria
+Even though the current project could find solutions that, according to our criteria
 
 \subsection{Immediate Extensions}
 \begin{enumerate}
@@ -1622,11 +1589,6 @@ The thesis contributes to the \gls{UN}\enspace\glspl{SDG} numbers 1 and 9 by
 xxxx.
 
 
-
-
-\noindent\rule{\textwidth}{0.4mm}
-\engExpl{In the references, let Zotero or other tool fill this in for you. I suggest an extended version of the IEEE style, to include URLs, DOIs, ISBNs, etc., to make it easier for your reader to find them. This will make life easier for your opponents and examiner. \\IEEE Editorial Style Manual: \url{https://www.ieee.org/content/dam/ieee-org/ieee/web/org/conferences/style_references_manual.pdf}}
-\sweExpl{Låt Zotero eller annat verktyg fylla i det här för dig. Jag föreslår en utökad version av IEEE stil - att inkludera webbadresser, DOI, ISBN osv. - för att göra det lättare för läsaren att hitta dem. Detta kommer att göra livet lättare för dina opponenter och examinator.}
 
 \cleardoublepage
 % Print the bibliography (and make it appear in the table of contents)
@@ -1807,3 +1769,4 @@ commentstyle=\color{black}, backgroundcolor=\color{white}]{lib/acronyms-for-pdfl
 
 
 \end{document}
+ 
