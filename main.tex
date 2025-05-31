@@ -605,9 +605,9 @@ Most importantly, any conditions that are not represented in the data can lead t
     \label{fig:imagingBias}
 \end{figure}
 
-A potential solution to these dataset biases lies in the fundamental physics of x-ray imaging.
+A potential solution to these dataset biases lies in the fundamental physics of X-ray imaging.
 In projection radiography, all imaging systems—whether using film, computed radiography phosphor plates, or flat panel
-detectors—measure the spatial distribution of x-ray radiation incident on the detector after passing through
+detectors—measure the spatial distribution of X-ray radiation incident on the detector after passing through
 the patient \cite{Seibert3}. Different detector technologies employ various methods to convert the incoming X-rays
 into a visual representation, potentially losing information in the process. Furthermore, digital
 detectors perform image processing algorithms to increase the image quality for diagnosis, but they also contribute to the
@@ -622,7 +622,7 @@ requiring new data for each specific detector.
 \subsection{Original Problem Definition}
 
 All projection radiography technologies, and their subsequent processing pipelines, operate on the same
-\textit{transmission maps}, which represent the x-ray radiation that passed through the patient's body, and consequently
+\textit{transmission maps}, which represent the X-ray radiation that passed through the patient's body, and consequently
 absorbed by the device. For digital radiography systems, if no processing were applied and the images captured were directly transformed
 into gray levels, they would appear as extremely dark due to the lack of contrast \cite[p.~148]{Prokop2003}.
 Thus, clinical grade equipment manufacturers (e.g., Siemens, Philips, GE) apply proprietary digital image processing
@@ -631,14 +631,14 @@ and dynamic range adjustments. These operations form a "black-box" that varies a
 image-by-image basis.
 
 This describes the primary goal of this project: to develop a framework that inverts the image processing transformations
-from high-quality chest x-ray images. This will recover the latent images that pass through all radiography devices (as
+from high-quality chest X-ray images. This will recover the latent images that pass through all radiography devices (as
 described in \autoref{fig:image_processing_pipeline}), and enable the extension of existing labeled datasets by simulating
 non-represented radiography systems.
 
 \begin{figure}
     \centering
     \includegraphics[width=0.8\textwidth]{figures/latent_image.jpg}
-    \caption{x-ray image acquisition pipeline. All projection radiography captures the same x-ray energies and
+    \caption{X-ray image acquisition pipeline. All projection radiography captures the same X-ray energies and
    forms a latent image, which is distorted by the system's methods to capture x-rays and subsequent processing steps.
     Taken from \cite[p.~13]{Seibert3}}
     \label{fig:image_processing_pipeline}
@@ -662,22 +662,22 @@ The problem to solve lies in the category of inverse problems and has several cr
 \section{Purpose}
 
 The primary use case that motivates this project is the development of alternative X-ray detector technologies.
-Large chest x-ray datasets like CheXpert \cite{chexpert} and ChestX-ray8 \cite{nih} collect images from large
-and modern hospitals with extensive archives of x-ray imaging studies. While these can drive X-ray models to be
+Large chest X-ray datasets like CheXpert \cite{chexpert} and ChestX-ray8 \cite{nih} collect images from large
+and modern hospitals with extensive archives of X-ray imaging studies. While these can drive X-ray models to be
 used in most clinical environments, they may not be effective in resource-limited settings. These include portable
 or cost-effective alternatives.
 
 Building large datasets for this subset of technologies is unlikely, given that this has been possible due to
-modern archiving systems (PACS) keeping long histories of x-ray studies \cite[p.~3462]{nih}. Being able
+modern archiving systems (PACS) keeping long histories of X-ray studies \cite[p.~3462]{nih}. Being able
 to translate existing datasets into representations of any other imaging system will bring existing and
-coming advancements in x-ray-related automation to all scenarios.
+coming advancements in X-ray-related automation to all scenarios.
 
 \section{Goals}
 
 Concretely, the expected outcomes of this project are the following:
 
 \begin{enumerate}
-    \item Analyze limited x-ray transmission map data to identify and characterize the essential features that define
+    \item Analyze limited X-ray transmission map data to identify and characterize the essential features that define
     radiologically realistic representations.
     \item Characterize the diversity of image processing pipelines applied to these maps in commercial systems.
     \item Develop and evaluate optimization algorithms that can recover plausible transmission maps from processed images.
@@ -685,24 +685,24 @@ Concretely, the expected outcomes of this project are the following:
 
 \section{Thesis Structure}
 
-The remainder of this thesis is organized as follows: Chapter 2 presents background information on x-ray transmission and
+The remainder of this thesis is organized as follows: Chapter 2 presents background information on X-ray transmission and
 digital image processing that are relevant to the problem and motivate the proposed method. Chapter 3
 presents the mathematical description of the problem and the methods used to solve it. Chapter 4 includes implementation
 details. Chapter 5 presents experimental results, and Chapter 6, implications
 and directions for future work.
 
-\chapter{x-ray Transmission}
+\chapter{X-ray Transmission}
 \label{sec:xrayTransmissionModel}
 
 The lack of ground truth and prior knowledge for our problem incentivizes the analysis of the underlying
 physics of X-ray images, as well as further research on the types of operations that are done in the black boxes
-we aim to invert. This chapter presents the basic principles of x-ray transmission, the process of x-ray image
+we aim to invert. This chapter presents the basic principles of X-ray transmission, the process of X-ray image
 acquisition, and the main goals and common algorithms that are used to process radiographic images. The
 knowledge presented in this section motivates the design choices made to develop the proposed method.
 
 \section{X-ray intensity and Beer's law}
 
-X-rays are thought of as a flux of very high-energy electromagnetic radiation. The x-ray beam is
+X-rays are thought of as a flux of very high-energy electromagnetic radiation. The X-ray beam is
 described by a vector-valued function $I(x)$. The direction of $I$ at $x$ is the direction of the flux at $x$ and
 its magnitude,
 \begin{equation}
@@ -716,7 +716,7 @@ $|dS|$, placed at right angles to $I(x)$, then the energy-per-unit-time passing 
 \end{equation}
 
 When X-rays encounter any form of matter, they are partly transmitted and partly absorbed.
-The fractional decrease in the intensity $I$ of an x-ray beam as it passes
+The fractional decrease in the intensity $I$ of an X-ray beam as it passes
 through any homogeneous substance is proportional to the distance traversed $x$
 and the material encountered\cite[p.~11]{cullityElementsXrayDiffraction2014}.
 This phenomenon is described by Beer's law:
@@ -726,7 +726,7 @@ This phenomenon is described by Beer's law:
     \label{eq:BeerLambert}
 \end{equation}
 
-where $s$ is the arc-length along the straight-line trajectory of the x-ray beam.
+where $s$ is the arc-length along the straight-line trajectory of the X-ray beam.
 Each material encountered has a characteristic \textit{linear attenuation coefficient} $\mu$ for x-rays of a
 given energy, and is dependent on the substance composition, density, and the wavelength of the x-rays \cite[p.~57]{epstein2008}.
 
@@ -759,7 +759,7 @@ I(x,y) = I_0(x,y) \cdot \exp\left(-\int_L \mu(s) \, ds\right)
 
 where $\mu(s)$ represents the spatially varying attenuation coefficient along the ray path \cite[p.~57]{epstein2008}.
 
-In a real measurement, the x-ray source is turned on for a known period of time. The total energy
+In a real measurement, the X-ray source is turned on for a known period of time. The total energy
 $I$ incident on the object along a given line $l$ is known. The total energy, $I_0$, emerging from the object
 along $l$ is then measured by an X-ray detector. Integrating Beer’s law, we obtain \cite[p.~60]{epstein2008}
 
@@ -779,8 +779,8 @@ a simplified model can be expressed as
     \label{eq:discrete_materials}
 \end{equation}
 
-Note that ideal x-ray image acquisition and the described model assume a point x-ray source, a straight line
-trajectory from the source through the object, and complete detection of the x-ray beam that strikes the detector.
+Note that ideal X-ray image acquisition and the described model assume a point X-ray source, a straight line
+trajectory from the source through the object, and complete detection of the X-ray beam that strikes the detector.
 These are not realistic assumptions, however, clinical detectors apply methods to counteract nonideal conditions
 \cite[p.~9]{Seibert3}.
 
@@ -839,7 +839,7 @@ resolution, they have a non-linear (S-shaped) response, leading to under- or ove
 Regardless of the imaging modality, digital image processing is not only used to take full advantage of the positive
 characteristics of the radiography systems, but also to amend the intrinsic limitations of each detector.
 
-To overcome this, different algorithms are applied to the captured x-ray image, with the goals of:
+To overcome this, different algorithms are applied to the captured X-ray image, with the goals of:
 
 \begin{itemize}
     \item displaying the full range of attenuation differences in the chest,
@@ -859,7 +859,7 @@ image contrast, and normalizes for different doses and patient body types \cite[
 \begin{figure}[H]
     \centering
     \includegraphics[width=1.0\textwidth]{figures/LUT.png}
-    \caption{Gradational curves applied to normalize signal over different x-ray doses\cite[Figure~3]{Prokop2003}.}
+    \caption{Gradational curves applied to normalize signal over different X-ray doses\cite[Figure~3]{Prokop2003}.}
     \label{fig:histogram_stretching}
 \end{figure}
 
@@ -903,7 +903,7 @@ by splitting an image into many frequency bands, enabling multiple size-specific
 \subsection{Transmission Maps}
 \label{sec:transmissionMaps}
 
-Despite the processes behind capturing x-ray images being well studied, to our knowledge, there are currently no open datasets of x-ray
+Despite the processes behind capturing X-ray images being well studied, to our knowledge, there are currently no open datasets of X-ray
 transmission maps. We had access to, precisely, two images taken from the same chest phantom, provided by the Hard X-ray lab
 at KTH, one paired with a processed image produced by a clinical-grade detector. \autoref{fig:chestPhantomImages} shows the obtained sample
 pair of transmission map and processed image.
@@ -916,13 +916,13 @@ pair of transmission map and processed image.
     \end{subfigure}
     \begin{subfigure}[t]{0.45\textwidth}
         \includegraphics[width=\textwidth]{figures/comm_processed_sample.jpg}
-        \caption{Processed x-ray image (clinical detector).}
+        \caption{Processed X-ray image (clinical detector).}
     \end{subfigure}
     \caption{Sample pair of images from chest phantom}
     \label{fig:chestPhantomImages}
 \end{figure}
 
-For this thesis, a method is proposed based on the known physics of x-ray imaging, and insights that can be
+For this thesis, a method is proposed based on the known physics of X-ray imaging, and insights that can be
 taken from the analysis of the sample pair.
 \begin{description}
     \item[Collimated area range] Only a fraction of the dynamic range of a transmission map
@@ -938,7 +938,7 @@ taken from the analysis of the sample pair.
 
     \item[Body tissue groups by absorption coefficients] \autoref{sec:human_chest_imaging} presented the absorption coefficients
     for the different body tissues in the chest. The coefficients for the different soft body tissues
-    vary slightly, by about 2\% of the dynamic range of an x-ray measurement \cite[p.~54]{epstein2008}. On the other hand,
+    vary slightly, by about 2\% of the dynamic range of an X-ray measurement \cite[p.~54]{epstein2008}. On the other hand,
     lung (air-filled) and bone regions will have a significant difference in energy absorption. This allows the
     definition of three groups of anatomical regions that can expect similar transmission values, described in
     \autoref{tab:segmentationGroups}. It can be noted that these structures do not span the entirety of the
@@ -1002,7 +1002,7 @@ taken from the analysis of the sample pair.
 Regardless of differences in processing algorithms across vendors, all seek the same perceptual effects
 \cite[p.~119]{carterDigitalRadiographyPACS2010}, and it is also worth noting that iterations of such algorithms typically
 avoid changes in the appearance that may conflict with radiologists' expectations \cite[p.~57]{STA00a}.
-Based on this claim and the built knowledge around x-ray images and \acrfull{DIP} algorithms, a concrete problem
+Based on this claim and the built knowledge around X-ray images and \acrfull{DIP} algorithms, a concrete problem
 formulation can be proposed. As a result of the scarcity of ground-truth transmission map data, conventional supervised learning
 approaches become infeasible. However, the patterns studied in \arcshort{DIP} algorithms hint at the possibility
 of injecting prior knowledge into a learning process through the transformations the processed images undergo.
@@ -1012,7 +1012,7 @@ Target X-ray images; then, inverting these common operations can lead to a "real
 \section{Mathematical Model}
 \label{sec:mathematicalModel}
 
-For a dataset of observed, grayscale processed x-ray images $Y = \{y_i\}^N_{i=1}$, it is aimed to recover a corresponding
+For a dataset of observed, grayscale processed X-ray images $Y = \{y_i\}^N_{i=1}$, it is aimed to recover a corresponding
 set of transmission maps $X = \{x_i\}^N_{i=1}$, with $x_i, y_i \in [0, 1]^{r, c}$ that satisfy
 \begin{equation}
     \label{eq:dataFidelity}
@@ -1083,7 +1083,7 @@ $F$, $\mathcal{D}$, regularizations, and their effects on the reconstruction of 
 
 Throughout the entire model experimentation, a fixed parameterized processing operator is used to represent a
 digital radiography processing pipeline. The goal of building such a function is so that it can produce
-x-ray images with an appearance consistent to the existing image datasets. If the function and its parameters
+X-ray images with an appearance consistent to the existing image datasets. If the function and its parameters
 allow it, then, there is the expectation that inverting this would produce transmission maps
 
 The choices of the steps for the operator are driven by the goals of image processing described
@@ -1104,7 +1104,7 @@ that include:
 
 where $\epsilon$ is a small constant to avoid numerical instability on values close to zero.
 
-    Transmission maps represent the ratio of x-ray intensities $I_1$ and $I_0$,
+    Transmission maps represent the ratio of X-ray intensities $I_1$ and $I_0$,
 
     \begin{equation}
         \frac{I_1}{I_0} = e^{-\mu x}.
@@ -1316,9 +1316,9 @@ while not a necessity for low-frequencies. The windowing parameters are set arbi
 half of the dynamic range, as observed in the sample transmission map.
 
 Since the approach taken for this project does not involve learning an inverse model, but rather solving an optimization
-on a per-image basis, we aim to find a model and corresponding hyperparameters that can be reused across different
+on a per-image basis, the objective is then to find a model and corresponding hyperparameters that can be reused across different
 sets of images and guarantee convergence into valid solutions. Besides optimization-related hyperparameters such as
-learning rates, we also consider different choices that can produce valid solutions but won't match qualitatively
+learning rates, other choices are considered that can produce valid solutions but won't match qualitatively
 the expectations for transmission maps. One such choice is a regularization term (besides its corresponding weight)
 that promotes smoothness on the transmission map, which, if not appropriately chosen, can lead to artifacts or over-smoothing.
 Overall, the hyperparameters and configurations to find are listed in \autoref{tab:hyperparametersList}.
@@ -1351,7 +1351,7 @@ Overall, the hyperparameters and configurations to find are listed in \autoref{t
     \label{tab:hyperparametersList}
 \end{table}
 
-For finding hyperparameters, a Bayesian search was done, optimizing for the perceptual metric \mathcal{L}^{Mix}.
+For finding hyperparameters, a Bayesian search was done, optimizing for the perceptual metric $\mathcal{L}^{Mix}$.
 An analysis is then done on the choices of hyperparameters and how they affect qualitative results and
 the compliance with the anatomical constraints. To implement this search, we used Weights \& Biases \cite{wandb} sweep
 functionality.
@@ -1360,7 +1360,7 @@ functionality.
 \label{sec:dataCollection}
 
 Throughout the experimentation, besides the single transmission map-processed image pair, images were sampled from
-cheXpert dataset \cite{chexpert} and NIH Chest x-ray dataset \cite{nih}. Recall the motivation to use these datasets
+cheXpert dataset \cite{chexpert} and NIH Chest X-ray dataset \cite{nih}. Recall the motivation to use these datasets
 is to get value from the diagnostic labels they provide, which can then be tied to the simulated transmission maps.
 However, these labels are not used for the model.
 
@@ -1453,50 +1453,114 @@ a flattened histogram characteristic of processed images.
     \label{fig:trivial_inversion}
 \end{figure}
 
-\section{Evaluation Methodology}
+\section{Experiment Methodology}
 
-Let's recall that there are two variants of the optimization problem proposed. One consists in solving an optimization problem
-on a per-image basis, computing a solution independent of other images and parameters. Although solving multiple optimization
-problems at once can speed up computing, but the parameter updates are still independent across images. The second approach
-is to find a single set of parameters that can revert multiple images simultaneously. This approach may allow for more efficient
-computation, even though it still will consist of an iterative optimization process to scale to an arbitrary number of images.
+Let's recall that there are two core cases of the optimization problem proposed. One consists in solving an optimization problem
+on a per-image basis, assuming there is no set of parameters that can map a plausible transmission map with the processed image.
+Note that, in terms of implementation, it is possible to solve multiple optimization problems at once to speed up computing.
+For this case, the hyperparameter search is done by choosing a new set of parameters and performing the minimization algorithm
+for a small set of images at once, and repeat it for other sets of images. Evaluation metrics are then aggregated across all the
+seen images and iterations. The batches of images and iterations are kept small to speed up the computation, specifically,
+batches of 4 images for 4 different batches. For validation, a larger set of images is used to evaluate the scaling suitability
+of the chosen parameters.
 
-Due to the lack of ground truth, we rely on qualitative assessments and visual evaluations based on our
-validity criteria. That translates into finding a model that produces solutions that: 1) reproduce estimated processed
-images close to the original images, on multiple scales, and 2) satisfy the set physical constraints.
+The second approach is to find a single set of parameters that can produce a valid solution for all images.
+The approach taken in this case is analogous to the first one. However, there is the significant difference that image
+updates are not independent, since the updates of $\theta$ will aim to reduce the loss across the selected subset.
 
-It was mentioned previously that \arcshort{MSE} does not necessarily favor solutions that are perceptually close
-to the original images. There are multiple alternative loss functions explicitly designed for Image Quality Assessment
-metrics; an alternative is a mixed loss metric $\mathcal{L}^\text{Mix}$ proposed by \cite{zhaoLossFunctionsImage2017} that combines
+The expected outcome of the implementation is to find a set of hyperparameters and a concrete model (e.g. choosing the
+proper smoothing regularization) that can be used to solve the inverse problem for any given image without any further tuning,
+and ideally, in an efficient manner. For the selection of the optimal hyperparameters, there are certain considerations that may
+conflict with each other. The ideal model should
+
+\begin{itemize}
+    \item recover the processed images accurately,
+    \item recover transmission maps with values within the restricted physical bounds, and
+    \item be computationally efficient.
+\end{itemize}
+
+Regarding measuring the fidelity of the processed images, it was mentioned previously that \arcshort{MSE} does not necessarily favor
+solutions that are perceptually close to the original images. There are multiple alternative loss functions explicitly designed for
+Image Quality Assessment metrics; an alternative is a mixed loss metric $\mathcal{L}^\text{Mix}$ proposed by \cite{zhaoLossFunctionsImage2017} that combines
 \acrfull{MS-SSIM} with the $\ell_1$ loss (Mean Absolute Error). \acrshort{SSIM} is an Image Quality Assessment
 metric that evaluates images accounting for the fact that the \acrfull{HVS} is sensitive to changes in local
 structure. \acrshort{MS-SSIM} was later proposed to extend \acrshort{SSIM} to account for the fact that the
 scale at which local structure should be analyzed depends on the distance to the observer. This extension
-weighs \acrshort{SSIM} computed at different scales. Nonetheless, its demonstrated good performance in image
-reconstruction problems, outperforming other loss functions by correlating to other image quality indices,
-comes at the cost of a higher computational cost, which can scale well for Deep Learning settings,
-but for the current approach, it incentivates the alternative choice of \acrshort{MSE}. The $\matchal{L}^{\text{Mix}}$ loss
-is still used as an evaluation metric to discern the best choice of hyperparameters.
+weighs \acrshort{SSIM} computed at different scales and outperforms other loss functions by correlating to good scores
+in multiple image quality indices. Nonetheless, its demonstrated good performance in image reconstruction problems comes
+at the cost of a higher computational cost, which can scale well for Deep Learning settings, but for the current
+approach, it incentivates the alternative choice of \acrshort{MSE}. As for the evaluation the $\matchal{L}^{\text{Mix}}$ loss
+will be used to discern the best choice of hyperparameters, and the next chapter will present further insights on this choice.
 
-For the large image datasets, we compute image quality metrics such as SSIM and PSNR between reconstructed processed
-images and originals, and measure an error on the transmission values that are outside the restricted physical bounds.
-For the limited cases where ground truth is available (e.g., from phantoms), we also use the processing model to generate
-alternative processed images, as well as the original paired processed images. That allows us to compare the
-performance of our model on ground truth.
+As for ensuring the physical bounds, it is addressed by computing the total square error of the transmission maps,
+and aiming to minimize the error simultaneously. Finally, a set of hyperparameters that can reduce the overall amount of
+iterations to converge is preferred.
 
 
-\section{Evaluation metrics}
-
-The proposed model can be implemented in two different fashions: a per-image optimization, such that every image has its own
-set of parameters
 \chapter{Results and Analysis}
 \label{ch:resultsAndAnalysis}
 
+This chapter will cover the results of the multiple hyperparameter searches done, and characterize the effect of
+these parameters on the overall performance of the model, as well as the process of choosing the best hyperparameters.
+
+\section{Data Fidelity}
+
+In the last section, the loss $\mathcal{L}^{\text{Mix}}$ was mentioned as the core evaluation metric for the model performance,
+in terms of quality of the recovered transmission maps and the estimated processed images. An evidence of the suitability
+of this metric is shown in \autoref{fig:transmission_maps}.
+
+\begin{figure}
+    \centering
+    \includegraphics[width=0.8\textwidth]{figures/L_mix.png}
+    \caption{The data points in the scatter plots represent different optimization runs and the average of the metric values
+    (MSE, SSIM, $\mathcal{L}$) over the images used on each run. It can be observed a correlation of $\mathcal{L}^{\text{Mix}}$,
+    getting closer to zero as SSIM gets close to one, and as MSE gets close to zero. However, $\mathcal{L}^{\text{Mix}}$
+    converges at a much slower rate than the other metrics.}
+    \label{fig:transmission_maps}
+\end{figure}
 
 \section{Per-image optimization}
 
-An inital set of hyperparameter searches was set to perform the choice of a smoothing regularization, and
-its corresponding parameters, as well as validating the model hyperparameters on new data.
+An inital set of hyperparameter searches was set out to perform the choice of a smoothing regularization,
+
+\begin{tabular}{lllrrrrrrl}
+ & sweep_id & run_id & Lmix_min & Lmix_mean & Lmix_max & penalties_min & penalties_mean & penalties_max & smooth_metric \\
+29 & qotz6ywd & cuhsitz3 & 0.014564 & 0.014564 & 0.014564 & \bfseries 0.000287 & 0.001207 & 0.002088 & none \\
+30 & qotz6ywd & f5pcifw7 & 0.016656 & 0.016656 & 0.016656 & \bfseries 0.000361 & 0.001449 & 0.002668 & none \\
+34 & qotz6ywd & y5mbdtj4 & 0.024338 & 0.024338 & 0.024338 & \bfseries 0.000465 & 0.002035 & 0.003494 & none \\
+12 & lbatytmn & 1yt7love & 0.027394 & 0.027394 & 0.027394 & \bfseries 0.000474 & 0.003872 & 0.008513 & tikonov \\
+18 & lbatytmn & dymyvrve & 0.033039 & 0.033039 & 0.033039 & \bfseries 0.003235 & 0.012455 & 0.023823 & tikonov \\
+21 & lbatytmn & nh8xw2jx & 0.049602 & 0.049602 & 0.049602 & \bfseries 0.040945 & 0.156652 & 0.225820 & tikonov \\
+0 & 9bvn7f41 & 2mr7krlq & 0.053848 & 0.053848 & 0.053848 & \bfseries 0.002437 & 0.010680 & 0.017355 & tv \\
+3 & 9bvn7f41 & efczlrb8 & \bfseries 0.054773 & \bfseries 0.054773 & \bfseries 0.054773 & 0.082736 & 0.309372 & 0.461081 & tv \\
+8 & 9bvn7f41 & vyorg6ne & \bfseries 0.055080 & \bfseries 0.055080 & \bfseries 0.055080 & 0.260411 & 0.989059 & 1.400800 & tv \\
+5 & 9bvn7f41 & nsp0dnvp & 0.055580 & 0.055580 & 0.055580 & \bfseries 0.005125 & 0.026585 & 0.042069 & tv \\
+17 & lbatytmn & d251fat8 & 0.060227 & 0.060227 & 0.060227 & \bfseries 0.006956 & 0.027634 & 0.042527 & tikonov \\
+10 & 9bvn7f41 & z6h2dn1p & \bfseries 0.064878 & \bfseries 0.064878 & \bfseries 0.064878 & 0.132809 & 0.535663 & 0.817127 & tv \\
+7 & 9bvn7f41 & subuyjkx & 0.070741 & 0.070741 & 0.070741 & \bfseries 0.007767 & 0.032396 & 0.050166 & tv \\
+16 & lbatytmn & 7xx3vx71 & 0.071043 & 0.071043 & 0.071043 & \bfseries 0.004885 & 0.017630 & 0.026470 & tikonov \\
+20 & lbatytmn & ild3hngm & 0.074267 & 0.074267 & 0.074267 & \bfseries 0.011122 & 0.039111 & 0.058911 & tikonov \\
+32 & qotz6ywd & p5itz6hp & 0.076598 & 0.076598 & 0.076598 & \bfseries 0.001888 & 0.006835 & 0.010584 & none \\
+1 & 9bvn7f41 & 8xmmxeh8 & 0.098334 & 0.098334 & 0.098334 & \bfseries 0.079049 & 0.351899 & 0.531292 & tv \\
+27 & qotz6ywd & 23xsu2zt & 0.100650 & 0.100650 & 0.100650 & \bfseries 0.000490 & 0.002064 & 0.003729 & none \\
+2 & 9bvn7f41 & djis8va4 & 0.111593 & 0.111593 & 0.111593 & \bfseries 0.011737 & 0.049376 & 0.072859 & tv \\
+4 & 9bvn7f41 & gs5zrun5 & \bfseries 0.115705 & \bfseries 0.115705 & \bfseries 0.115705 & 7.034859 & 28.410555 & 53.563359 & tv \\
+9 & 9bvn7f41 & w08jjgae & 0.117600 & 0.117600 & 0.117600 & \bfseries 0.039605 & 0.129439 & 0.180728 & tv \\
+15 & lbatytmn & 7luz0fd6 & 0.121181 & 0.121181 & 0.121181 & \bfseries 0.026185 & 0.085257 & 0.131638 & tikonov \\
+23 & lbatytmn & t4gsc10v & 0.122585 & 0.122585 & 0.122585 & \bfseries 0.002936 & 0.022226 & 0.046193 & tikonov \\
+26 & qotz6ywd & 0tv4t7mv & 0.122605 & 0.122605 & 0.122605 & \bfseries 0.009619 & 0.029769 & 0.044969 & none \\
+33 & qotz6ywd & wdk88gt4 & 0.130073 & 0.130073 & 0.130073 & \bfseries 0.007643 & 0.022843 & 0.034582 & none \\
+14 & lbatytmn & 4hhq55ca & \bfseries 0.135629 & \bfseries 0.135629 & \bfseries 0.135629 & 0.152677 & 0.267444 & 0.411746 & tikonov \\
+11 & 9bvn7f41 & zhhntppc & 0.161249 & 0.161249 & 0.161249 & \bfseries 0.018805 & 0.072276 & 0.119187 & tv \\
+25 & lbatytmn & xgmzyhmn & \bfseries 0.172976 & \bfseries 0.172976 & \bfseries 0.172976 & 0.181141 & 1.707338 & 3.434707 & tikonov \\
+13 & lbatytmn & 1yvo14gw & 0.233034 & 0.233034 & 0.233034 & \bfseries 0.131148 & 0.259505 & 0.377141 & tikonov \\
+31 & qotz6ywd & jzbv8i69 & 0.233104 & 0.233104 & 0.233104 & \bfseries 0.171111 & 0.362827 & 0.541947 & none \\
+19 & lbatytmn & halaetrx & 0.233258 & 0.233258 & 0.233258 & \bfseries 0.028415 & 0.063041 & 0.095529 & tikonov \\
+24 & lbatytmn & u3pm6q1q & 0.250945 & 0.250945 & 0.250945 & \bfseries 0.066464 & 0.135459 & 0.199567 & tikonov \\
+6 & 9bvn7f41 & so8ixncj & \bfseries 0.325268 & \bfseries 0.325268 & \bfseries 0.325268 & 0.521823 & 1.017381 & 1.481525 & tv \\
+22 & lbatytmn & pmfu6q16 & \bfseries 0.365707 & \bfseries 0.365707 & \bfseries 0.365707 & 50.077217 & 149.642599 & 268.766052 & tikonov \\
+28 & qotz6ywd & 6gk7sb75 & \bfseries 0.406647 & \bfseries 0.406647 & \bfseries 0.406647 & 1.204770 & 3.725257 & 6.747360 & none \\
+\end{tabular}
 
 \textbf{Convergence in non-set constraints}
 
@@ -1563,7 +1627,7 @@ Even though the current project could find solutions that, according to our crit
 \end{enumerate}
 
 \subsection{Practical Deployment}
-For practical deployment in support of low-cost x-ray system development:
+For practical deployment in support of low-cost X-ray system development:
 \begin{itemize}
     \item Create a cloud-based processing pipeline for batch transmission map recovery
     \item Develop quality metrics to automatically identify successfully recovered maps
@@ -1574,7 +1638,7 @@ For practical deployment in support of low-cost x-ray system development:
 \section{Reflections}
 \label{sec:reflections}
 
-This work contributes to global health equity by enabling the development of affordable diagnostic imaging systems. The ability to generate training data for alternative x-ray detectors could significantly reduce the cost barrier for medical imaging in resource-limited settings.
+This work contributes to global health equity by enabling the development of affordable diagnostic imaging systems. The ability to generate training data for alternative X-ray detectors could significantly reduce the cost barrier for medical imaging in resource-limited settings.
 
 The project also highlights the importance of physics-informed machine learning approaches in medical imaging, demonstrating how domain knowledge can guide optimization in under-constrained problems.
 
@@ -1769,4 +1833,3 @@ commentstyle=\color{black}, backgroundcolor=\color{white}]{lib/acronyms-for-pdfl
 
 
 \end{document}
- 
