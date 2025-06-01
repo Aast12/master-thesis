@@ -491,7 +491,7 @@ från sådana bilder och som kan mappas tillbaka till sina bearbetade versioner.
 % SwedishKeywords were set earlier, hence we can use alternative 2
 \InsertKeywords{swedish}
 \end{scontents}
-\sweExpl{Nyckelord som beskriver innehållet i uppsatsen eller rapporten}
+% \sweExpl{Nyckelord som beskriver innehållet i uppsatsen eller rapporten}
 \end{abstract}
 \babelpolyLangStop{swedish}
 
@@ -546,9 +546,9 @@ från sådana bilder och som kan mappas tillbaka till sina bearbetade versioner.
 
 
 I would like to thank Kian Shaker, who introduced me to the problem studied in this thesis,
-as well as introducing me to my first research experience in a welcoming group. I appreciate
+as well as introducing me to my first research experience in a very welcoming group. I appreciate
 his continuous and great mentorship throughout the past few months. I also want to thank
-my colleagues at the Hard X-ray lab and Bio-Opto-Nano groups, whom I learned a lot about
+my colleagues at the Hard X-ray lab and Bio-Opto-Nano Physics groups, from whom I learned a lot about
 research life and other cultures. Additionally, I would like to thank Ozan Öktem for
 his valuable insights and feedback on the development of my project.
 
@@ -569,7 +569,7 @@ and encouragement.
 
 \listoftables
 \cleardoublepage
-\lstlistoflistings\engExpl{If you have listings in your thesis. If not, then remove this preface page.}
+ \lstlistoflistings %\engExpl{If you have listings in your thesis. If not, then remove this preface page.}
 \cleardoublepage
 % Align the text expansion of the glossary entries
 \newglossarystyle{mylong}{%
@@ -1039,10 +1039,13 @@ parameters $\theta \in \mathbb{R}^d$.
 
 This can be formulated as an optimization problem: for each image $y_i$, a pair of a transmission map $x_i$ and parameters $\theta_i$ is looked for that minimizes a loss function $\ell(x_i, \theta_i)$:
 
-\begin{equation}
+% \begin{equation}
+\begin{align}
     \label{eq:optimizationProblem}
-    \min_{x_i, \theta_i \in \Omega_\theta}  \underbrace{\mathcal{D}(y_i, F(x_i, \theta_i)) + \lambda_{\text{smooth}} R_{\text{smooth}}(x_i) + \lambda_{\text{anatomy}} R_{\text{anatomy}}(x_i)}_{=: \ell(\cdot, \cdot)}.
-\end{equation}
+     &\min_{x_i, \theta_i \in \Omega_\theta} \ell(x_i, \theta_i) \\
+    &=\min_{x_i, \theta_i \in \Omega_\theta}  \mathcal{D}(y_i, F(x_i, \theta_i)) + \lambda_{\text{smooth}} R_{\text{smooth}}(x_i) + \lambda_{\text{anatomy}} R_{\text{anatomy}}(x_i).
+    \end{align}
+% \end{equation}
 
 $\mathcal{D}$ is a data fidelity function measuring the discrepancy between the processed versions of
 the estimated transmission maps and the observed processed images, becoming zero only when \autoref{eq:dataFidelity}
@@ -1097,9 +1100,9 @@ $F$, $\mathcal{D}$, regularizations, and their effects on the reconstruction of 
 \section{Processing Model}
 
 Throughout the entire model experimentation, a fixed parameterized processing operator is used to represent a
-digital radiography processing pipeline. The goal of building such a function is so that it can produce
-X-ray images with an appearance consistent to the existing image datasets. If the function and its parameters
-allow it, then, there is the expectation that inverting this would produce transmission maps
+digital radiography processing pipeline. The goal of building such a function is that it can produce
+X-ray images with an appearance consistent with the existing image datasets. If the function and its parameters
+allow it, then there is the expectation that inverting this would produce transmission maps
 
 The choices of the steps for the operator are driven by the goals of image processing described
 in \autoref{sec:DigitalImageProcessing}. These guide the design of our operator $F$ as a composition
@@ -1161,7 +1164,7 @@ The parameter variable $\theta$ includes all the parameters described for these 
 \label{sec:optimization}
 
 As depicted in \autoref{eq:optimizationProblem}, the transmission map recovery involves solving a
-non-linear optimization problem constrained on $\theta$. The ill-posedness nature of our
+non-linear optimization problem constrained on $\theta$. The ill-posed nature of our
 problem prevents the choice of an ideal optimization method and hyperparameters
 analytically. Thus, experiments are conducted to find an appropriate loss function and a set of hyperparameters
 that consistently converge to 'valid' solutions.
@@ -1249,7 +1252,7 @@ compliance with the expected transmission ranges at each of the absorption-simil
 
 \subsection{Descent method}
 
-For finding the solution of the minimization problem, we resort to iterative descent methods. These refer to
+For finding the solution to the minimization problem, we resort to iterative descent methods. These refer to
 iterative algorithms that compute a sequence of parameters $x^{(k)}$, $\theta^{(k)}$ that reduce an
 objective function $\ell$ at each iteration, i.e.
 
@@ -1336,15 +1339,15 @@ have the box constraints:
 \end{aligned}
 \end{equation}
 
-These values are set empirically, based primarily on the assumption that high-frequencies are always amplified to some degree, while not a necessity for low-frequencies. The windowing parameters are set arbitrarily to allow centering in the first
+These values are set empirically, based primarily on the assumption that high-frequencies are always amplified to some degree, while it is not necessary for low-frequencies. The windowing parameters are set arbitrarily to allow centering in the first
 half of the dynamic range, as observed in the sample transmission map. These bounds and the standard deviation variables can also
 be considered hyperparameters of the model, and they can condition the features of the recovered transmission maps. For
-instance, if the lower bound for the enhancement factor is too high it can promote less sharp edges.
+instance, if the lower bound for the enhancement factor is too high, it can promote less sharp edges.
 
 Since the initial approach does not involve learning an inverse model, but rather solving an optimization
 on a per-image basis, the objective is then to find a model and corresponding hyperparameters that can be reused across different
 sets of images and guarantee convergence into valid solutions. In addition to finding regularization weights,
-another hyperparameters considered are a learning rate, and the constraints for the processing parameters. The later
+other hyperparameters considered are the descent method's learning rate, and the box constraints for the processing parameters. The latter
 are initially set on assumptions and prior knowledge of the image processing pipeline, but ultimately, they are hyperparameters
 that shape the feasible transmission maps.
 
@@ -1358,14 +1361,14 @@ functionality.
 \label{sec:dataCollection}
 
 Throughout the experimentation, besides the single transmission map-processed image pair, images were sampled from
-cheXpert dataset \cite{chexpert} and NIH Chest X-ray dataset \cite{nih}. Recall the motivation to use these datasets
+cheXpert dataset \cite{chexpert} and NIH Chest X-ray dataset \cite{nih}. Recall that the motivation to use these datasets
 is to get value from the diagnostic labels they provide, which can then be tied to the simulated transmission maps.
 However, these labels are not used for the model.
 
 Although we present an optimization problem that operates per image, it is expected that multiple images will
 be processed in parallel to speed up the optimization process. Thus, a fixed image size is set for the implementation.
 Images from the datasets also do not have a standard size or aspect ratio, so all images are preprocessed by
-cropping to the center to keep a square aspect ratio and resized to 512 pixels width, as well as rescaling the
+cropping to the center to keep a square aspect ratio and resized to 512 pixels in width, as well as rescaling the
 grayscale values to the range [0, 1]. The choice of the size 512 is set to match the input size of the selected
 segmentation model implemented in torchxrayvision \cite{torchxrayvision}, although an arbitrary size can be chosen
 by upscaling the masks. The complete data preprocessing steps are shown in \autoref{fig:preprocessing_steps}
@@ -1437,10 +1440,10 @@ One way of approximating the transmission map trivially is to compute a negative
 and squeeze (e.g., scaling to the range [0, 0.5]) the image range. This will effectively give an image that is close to the expected
 anatomical bounds. Let \textit{trivial inversion} refer to the type of transmission mas produced in this way. This concept can
 be helpful as a baseline for evaluating against ground truth, even though there is a single pair of such data. This transformation
-also resulted in a good initial value for the optimization, so unless otherwise specified, for the hyperparameter searches done,
+also resulted in a good initial value for the optimization, so, unless otherwise specified, for the hyperparameter searches done,
 it is assumed that the images are initialized with this transformation.
 
-An additional note on this transformation is that this kind of images can't be considered physically plausible, as they present
+An additional note on this transformation is that this kind of image can't be considered physically plausible, as they present
 a flattened histogram characteristic of processed images.
 
 \begin{figure}[h]
@@ -1453,20 +1456,20 @@ a flattened histogram characteristic of processed images.
 
 \section{Experiment Methodology}
 
-Let's recall that there are two core cases of the optimization problem proposed. One consists in solving an optimization problem
-on a per-image basis, assuming there is no set of parameters that can map a plausible transmission map with the processed image.
+Let's recall that there are two core cases of the optimization problem proposed. One consists of solving an optimization problem
+on a per-image basis, assuming there is no set of parameters that can map a plausible transmission map to the processed image.
 Note that, in terms of implementation, it is possible to solve multiple optimization problems at once to speed up computing.
 For this case, the hyperparameter search is done by choosing a new set of parameters and performing the minimization algorithm
-for a small set of images at once, and repeat it for other sets of images. Evaluation metrics are then aggregated across all the
+for a small set of images at once, and repeating it for other sets of images. Evaluation metrics are then aggregated across all the
 seen images and iterations. The batches of images and iterations are kept small to speed up the computation, specifically,
 batches of 4 images for 4 different batches. For validation, a larger set of images is used to evaluate the scaling suitability
 of the chosen parameters.
 
 The second approach is to find a single set of parameters that can produce a valid solution for all images.
-The approach taken in this case is analogous to the first one. However, there is the significant difference that image
+The approach taken in this case is analogous to the first one. However, there is a significant difference that image
 updates are not independent, since the updates of $\theta$ will aim to reduce the loss across the selected subset.
 
-The expected outcome of the implementation is to find a set of hyperparameters and a concrete model (e.g. choosing the
+The expected outcome of the implementation is to find a set of hyperparameters and a concrete model (e.g., choosing the
 proper smoothing regularization) that can be used to solve the inverse problem for any given image without any further tuning,
 and ideally, in an efficient manner. For the selection of the optimal hyperparameters, there are certain considerations that may
 conflict with each other. The ideal model should
@@ -1479,12 +1482,12 @@ conflict with each other. The ideal model should
 
 Regarding measuring the fidelity of the processed images, it was mentioned previously that \arcshort{MSE} does not necessarily favor
 solutions that are perceptually close to the original images. The $\matchal{L}^{\text{Mix}}$ loss \cite{zhaoLossFunctionsImage2017}
-can be a suitable choice for evaluating the results and discern the best choice of hyperparameters.
+can be a suitable choice for evaluating the results and discerning the best choice of hyperparameters.
 A detailed description of the function can be found in \autoref{app:mixLoss}. The next chapter will also present further
 insights on this choice.
 
-As for ensuring the physical bounds, it is addressed by computing the total square error of the transmission maps,
-and aiming to minimize the error simultaneously. Finally, a set of hyperparameters that can reduce the overall amount of
+As for ensuring the physical bounds, it is addressed by computing the total square error of the transmission maps
+and aiming to minimize the error simultaneously. Finally, a set of hyperparameters that can reduce the overall number of
 iterations to converge is preferred.
 
 
@@ -1497,7 +1500,7 @@ quantitative and qualitative insights on the performance of the model.
 \section{Data Fidelity}
 
 In the last section, the loss $\mathcal{L}^{\text{Mix}}$ was mentioned as the core evaluation metric for the model performance,
-in terms of quality of the recovered transmission maps and the estimated processed images. An evidence of the suitability
+in terms of the quality of the recovered transmission maps and the estimated processed images. Evidence of the suitability
 of this metric is shown in \autoref{fig:transmission_maps}.
 
 \begin{figure}[ht]
@@ -1505,18 +1508,18 @@ of this metric is shown in \autoref{fig:transmission_maps}.
     \includegraphics[width=1.0\textwidth]{figures/L_mix.png}
     \caption{The data points in the scatter plots represent different optimization runs and the average of the metric values
     (MSE, SSIM, $\mathcal{L}$) over the images used on each run. It can be observed a correlation of $\mathcal{L}^{\text{Mix}}$,
-    getting closer to zero as SSIM gets close to one, and as MSE gets close to zero. However, $\mathcal{L}^{\text{Mix}}$
+    As SSIM approaches one, and MSE approaches zero, the value gets closer to zero. However, $\mathcal{L}^{\text{Mix}}$
     converges at a much slower rate than the other metrics.}
     \label{fig:transmission_maps}
 \end{figure}
 
 \section{Per-image optimization}
 
-An inital set of hyperparameter searches was set out to perform the choice of a smoothing regularization, as well as a preliminar
+An initial set of hyperparameter searches was set out to perform the choice of a smoothing regularization, as well as a preliminary
 choice of regularization parameters. Three separate searches were done for each type of smoothing regularization:
 no regularization, Tikhonov regularization, and Total Variation. The consideration of this type of regularization came up during
-initial experiments, where reconstructed images were found to be noisy and presenting artifacts, such as the ones in
-\autoref{fig:artifacts}. The list of the best evaluation scores across these searches are shown in \autoref{tab:hyperparameterSearch}.
+initial experiments, where reconstructed images were found to be noisy and presented artifacts, such as the ones in
+\autoref{fig:artifacts}. The list of the best evaluation scores across these searches is shown in \autoref{tab:hyperparameterSearch}.
 
 \begin{figure}[ht]
     \centering
@@ -1528,10 +1531,10 @@ initial experiments, where reconstructed images were found to be noisy and prese
 The latest searches were set to optimize parameters relative to the $\mathcal{L}^{\text{Mix}}$ loss, and out of the three methods, the one
 that achieved the best score was using no regularization. Even though the regularization terms converge to parameters
 that yield low reconstruction errors, the choice of parameters for both regularization terms introduced
-shadow artifacts around the segmentation regions as seen in \autoref{fig:shadowArtifacts}. The reason of not needing
+shadow artifacts around the segmentation regions as seen in \autoref{fig:shadowArtifacts}. The reason for not needing
 a smoothing regularization could come from the initialization of images with their trivial transformation, which
 can be seen as a close approximation of the transmission map. This initialization was different in initial experiments,
-defaulting to the original images, or random noise. Ultimately, this initialization was found to converge faster.
+defaulting to the original images or random noise. Ultimately, this initialization was found to converge faster.
 
 \begin{figure}[ht]
     \centering
@@ -1540,9 +1543,9 @@ defaulting to the original images, or random noise. Ultimately, this initializat
     \label{fig:shadowArtifacts}
 \end{figure}
 
-Using the parameters that turned to a lower loss on a larger set of images for validation, the quality in the reconstructed
+Using the parameters that led to a lower loss on a larger set of images for validation, the quality in the reconstructed
 processed images remained consistent, as well as the compliance with the anatomical bounds. A full overview of the results can
-be seen in appendix. However, few cases on the transmission maps showed hard edges in the outline of the body depicted
+be seen in \autoref{app:initialParamsResults}. However, few cases on the transmission maps showed hard edges in the outline of the body depicted
 in \autoref{fig:outlineArtifacts}.
 
 
@@ -1555,14 +1558,14 @@ in \autoref{fig:outlineArtifacts}.
   \begin{minipage}[b]{0.4\textwidth}
     \includegraphics[width=\textwidth]{figures/outline2.png}
   \end{minipage}
-  \caption{Example of  presenting glowing edges.}
+  \caption{Example of transmission maps presenting glowing edges.}
   \label{fig:outlineArtifacts}
 \end{figure}
 
 
 \section{Further parameter search}
 
-The model considers other parameters besides the regularization terms and optimization terms such as learning rates.
+The model considers other parameters besides the regularization terms and optimization terms, such as learning rates.
 These refer to the box constraints set on the processing function. These are initially set based on empirical evidence,
 such as suggestions of kernel sizes based on the real size of edges in radiographies. These constraints are set to inject
 prior information about the minimal transformations expected in the image processing pipeline. Choosing these values without
@@ -1572,35 +1575,38 @@ but constraining the lower bound of an enhancement factor too high in the high-f
 be perceived as a close reconstruction of the original image, but the transmission map is overly smooth, which is unlikely
 to be a realistic representation.
 
-\begin{figure}[!tbp]
+\begin{figure}[ht]
   \centering
-  \begin{minipage}[b]{0.5\textwidth}
+  \begin{minipage}[b]{0.4\textwidth}
     \includegraphics[width=\textwidth]{figures/wrong_character_tm.png}
   \end{minipage}
-  \begin{minipage}[b]{0.5\textwidth}
+  \begin{minipage}[b]{0.4\textwidth}
     \includegraphics[width=\textwidth]{figures/wrong_character_proc.png}
   \end{minipage}
   \hfill
   \caption{Example of a recovered transmission map and its estimated processed version using a minimum enhancement factor
-  of 0.59 in the low-frequencies, and setting 3.95 as the std. for such bands.}
+  of 0.59 in the low-frequencies, and setting 3.95 as the std. for such frequency bands.}
   \label{fig:wrongCharacterization}
 \end{figure}
 
 These, nevertheless, are based on assumptions and no solid data. They can also be hard to set since they can
 depend on the image size. A straightforward way to adjust these constraints is to pick an optimal set of
 hyperparameters and perform once again a parameter search, specifically to fix these bounds. The objective is to find parameters
-that can minimize the error with the known ground truth. This method keeps the data fidelity errors low as
-the original hyperparameters. Specific metrics and examples can be seen in \autoref{app:refinedParamsResults}.
+that can minimize the error with the known ground truth. This method keeps the data fidelity errors low, as
+the original hyperparameters. Specific metrics and examples are presented in \autoref{app:refinedParamsResults}.
 
 \begin{table}[H]
 \centering
-\begin{tabular}{ | l | c| }
+\begin{tabular}{ | c | c| }
 \hline \\
 Parameter & Value \\
 \hline \\
 Low-frequency std. & 28.033104695552467 \\
+\hline \\
 Minimum Low-frequency enhancement factor in low frequencies & 0.23209908549082872 \\
+\hline \\
 High-frequency std. & 2.5834306818846415 \\
+\hline \\
 Minimum High-frequency enhancement factor in high frequencies & 0.4323876961409312 \\
 \hline
 \end{tabular}
@@ -1609,11 +1615,10 @@ Minimum High-frequency enhancement factor in high frequencies & 0.43238769614093
 
 \section{Common parameters optimization}
 
-An alternative way to implement the optimization solver is by updating a single set of parameters from all images.
-The first thought of this approach is to use a single set of parameters for all images and update them simultaneously.
+An alternative approach to implementing the optimization solver is to update a single set of parameters across all images.
 This can be done by using a single loss function that combines the losses of all images and updating the parameters
 using a single optimizer. This approach showed poor performance, failing to converge to a set of hyperparameters
-that reduce the Mixed loss sufficiently, and also tend to produce images with flat regions as seen in \autoref{fig:flatRegions}.
+that reduce the Mixed loss sufficiently, and also showed a trend to produce images with flat regions as seen in \autoref{fig:flatRegions}.
 
 \begin{figure}[H]
 \centering
@@ -1627,13 +1632,13 @@ hinted that a single choice of processing parameters can effectively map back to
 That idea can be proved by picking a set of parameters returned from an optimization run, and setting it as the initial
 weights and freezing their updates. An experiment proved this possible. Nonetheless, there is no noticeable
 performance improvement, inverting 96 images in 44 minutes (1 image every ~27 seconds). This suggests the parameters
-converge at a much higher rate than the transmission map images, although few images stuck in the iteration process
-can also be a reason of the high runtime.
+converge at a much higher rate than the transmission map images, although a few images stuck in the iteration process
+can also be a reason for the high runtime.
 
 \begin{figure}[h]
 \centering
-\includegraphics[width=0.8\textwidth]{figures/weights_boxplot.png}
-\caption{Distribution of the processing function parameters from a sample of 200 }
+\includegraphics[width=1.0\textwidth]{figures/weights_boxplot.png}
+\caption{Distribution of the processing function parameters from 200 reconstructed transmission maps.}
 \label{fig:parameterDistribution}
 \end{figure}
 
@@ -1654,19 +1659,15 @@ The physics-informed approach developed in this work successfully models the for
 
 However, the current implementation faces a significant computational challenge that limits its immediate practical application. Each image requires an independent optimization process involving hundreds of iterations to achieve convergence. This computational burden makes the processing of large-scale datasets impractical with current resources. Furthermore, the method does not yield a generalizable transformation operator that can be directly applied to new images. Instead, each optimization may converge to different processing parameters, preventing the extraction of a unified inverse model.
 
-The validation of our approach remains constrained by the availability of only a single ground truth transmission map-processed image pair. While the method demonstrates consistent performance across images from standard datasets, comprehensive validation of transmission map accuracy would benefit from additional ground truth data. The optimization landscape also presents challenges, containing multiple local minima that make results sensitive to initialization strategies and hyperparameter choices, particularly the weights balancing smoothness constraints against anatomical priors.
-
-\section{Implications and Future Directions}
+The validation of our approach remains constrained by the availability of only a single ground truth transmission map-processed image pair. While the method demonstrates consistent performance across images from standard datasets, comprehensive validation of transmission map accuracy would benefit from additional ground truth data. The optimization landscape also presents challenges, containing multiple local minima that make results sensitive to initialization strategies and hyperparameter choices, particularly in balancing the weights between smoothness constraints and anatomical priors.
 
 Despite these limitations, this work establishes important foundations for advancing medical imaging accessibility. The demonstrated feasibility of transmission map recovery provides a potential pathway for leveraging existing annotated datasets with alternative imaging systems. This capability could accelerate the deployment of AI-assisted diagnosis in underserved regions where conventional high-end imaging systems are unavailable or impractical.
 
-The physics-informed methodology presented here also contributes to the broader discourse on incorporating domain knowledge into machine learning systems. In an era dominated by purely data-driven approaches, our work demonstrates that careful integration of physical constraints can effectively guide solutions in under-constrained problems, offering a complementary paradigm particularly valuable when training data is scarce.
-
-Looking forward, several research directions could address the current limitations while building upon the established framework. The optimization trajectories generated by our method contain rich information about the inverse mapping that could serve as training data for neural networks designed to directly invert the processing pipeline. Such learned models could potentially achieve real-time performance while maintaining the physical grounding established by our approach.
-
-Hybrid methodologies that combine physics-informed constraints with modern deep learning architectures represent another promising avenue. These approaches could leverage the efficiency of neural networks while ensuring adherence to physical principles, potentially yielding models that are both computationally efficient and theoretically grounded. Although Deep Learning models heavily rely on large volumes of data, the present work suggests that it is feasible to build useful models by leveraging domain knowledge.
+The physics-informed methodology presented here also contributes to the broader discourse on incorporating domain knowledge into machine learning systems. In an era dominated by purely data-driven approaches, our work demonstrates that the careful integration of physical constraints can effectively guide solutions in under-constrained problems, offering a complementary paradigm that is particularly valuable when training data is scarce.
 
 \section{Concluding Remarks}
+
+
 
 While computational efficiency remains a challenge, the framework established here provides both a proof of concept and a benchmark for future developments. As healthcare systems worldwide continue to grapple with issues of accessibility and equity, approaches that can bridge the gap between high-end imaging systems and resource-appropriate alternatives become increasingly vital. By enabling the potential translation of existing medical knowledge to new imaging contexts, this research contributes to the broader goal of universal access to healthcare diagnostics.
 
@@ -1740,9 +1741,9 @@ While computational efficiency remains a challenge, the framework established he
  14 & 287.046453 & 0.147056 & 0.135629 & 0.124201 & 0.451391 & 0.267444 & 0.129689 & tikhonov
  \end{tabularx}
 \caption{Initial hyperparameter search results, ordered by the average $\mathcal{L}$.
-The table also include penalty values, which correspond to the total sum of the
-segmentation penalties (averaged over all images), smoothing regularization and the
-total runtime used}
+The table also includes penalty values, which correspond to the total sum of the
+segmentation penalties (averaged over all images), smoothing regularization, and the
+total runtime used (in seconds).}
 \label{tab:hyperparameterSearch}
 \end{sidewaystable}
 
@@ -1798,45 +1799,45 @@ The trivial transmission map scores $\mathcal{L}^{\text{Mix}} = 0.40223184227943
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=0.8\textwidth]{figures/initial/pred_ms_ssim_percentiles.png}
+\includegraphics[width=1.0\textwidth]{figures/initial/pred_ms_ssim_percentiles.png}
 \caption{Sample images at percentiles of $\mathcal{L}^{\text{Mix}}$ }
 \end{figure}
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=0.8\textwidth]{figures/initial/histogram_heatmap.png}
+\includegraphics[width=1.0\textwidth]{figures/initial/histogram_heatmap.png}
 \caption{Histograms of recovered transmission maps, sampled 200 images.}
 \end{figure}
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=0.8\textwidth]{figures/initial/cmp_histogram.png}
-\caption{Comparison of histograms between trivial, real, and predicte transmission maps.}
+\includegraphics[width=1.0\textwidth]{figures/initial/cmp_histogram.png}
+\caption{Comparison of histograms between trivial, real, and predicted transmission maps.}
 \end{figure}
 
 
 \chapter{Refined Parameter Search Results}
 \label{app:refinedParamsResults}
 
-The recovered transmission map scores $\mathcal{L}^{\text{Mix}} = 0.2652566134929657$
+The recovered transmission map scores $\mathcal{L}^{\text{Mix}} = 0.2652566134929657$..
 The trivial transmission map scores $\mathcal{L}^{\text{Mix}} = 0.4022318422794342$
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=0.8\textwidth]{figures/further/pred_ms_ssim_percentiles.png}
+\includegraphics[width=1.0\textwidth]{figures/further/pred_ms_ssim_percentiles.png}
 \caption{Sample images at percentiles of $\mathcal{L}^{\text{Mix}}$ }
 \end{figure}
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=0.8\textwidth]{figures/further/histogram_heatmap.png}
+\includegraphics[width=1.0\textwidth]{figures/further/histogram_heatmap.png}
 \caption{Histograms of recovered transmission maps, sampled 200 images.}
 \end{figure}
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=0.8\textwidth]{figures/further/cmp_histogram.png}
-\caption{Comparison of histograms between trivial, real, and predicte transmission maps.}
+\includegraphics[width=1.0\textwidth]{figures/further/cmp_histogram.png}
+\caption{Comparison of histograms between trivial, real, and predicted transmission maps.}
 \end{figure}
 
 % \generalExpl{Here is a place to add supporting material that can help others build upon your work. You can include files as attachments to the PDF file or indirectly via URLs. Alternatively, consider adding supporting material uploaded as separate files in DiVA.}
