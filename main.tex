@@ -1640,7 +1640,7 @@ This can be done by using a single loss function that combines the losses of all
 using a single optimizer. This approach showed poor performance, failing to converge to a set of hyperparameters
 that reduce the Mixed loss sufficiently, and tended to produce images with flat regions as seen in .
 
-An alternative approach, suggested by the proximity of parameters recovered by the mentioned experiments, hinted that a single choice of processing parameters can effectively map back to a realistic transmission map. That idea can be proved by picking a set of parameters returned from an optimization run, and setting it as the initial weights and freezing their updates. An experiment proved this possible. Nonetheless, there is no noticeable performance improvement, suggesting the parameters converge at a much higher rate than the transition map images.   
+An alternative approach, suggested by the proximity of parameters recovered by the mentioned experiments, hinted that a single choice of processing parameters can effectively map back to a realistic transmission map. That idea can be proved by picking a set of parameters returned from an optimization run, and setting it as the initial weights and freezing their updates. An experiment proved this possible. Nonetheless, there is no noticeable performance improvement, suggesting the parameters converge at a much higher rate than the transmission map images.   
 
 
 
