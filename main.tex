@@ -431,17 +431,23 @@ eng
 % An abstract should stand on its own, \ie no citations, cross-references to the body of the document, acronyms must be spelled out, \ldots .\\Write this early and revise as necessary. This will help keep you focused on what you are trying to do.}
 
 \begin{scontents}[store-env=abstracts,print-env=true]
-% \generalExpl{Enter your abstract here!}
-An abstract is (typically) about 250 and 350 words (1/2 A4-page) with the following components:
-% key parts of the abstract
-\begin{itemize}
-  \item What is the topic area? (optional) Introduces the subject area for the project.
-  \item Short problem statement
-  \item Why was this problem worth a Bachelor's/Master’s thesis project? (\ie, why is the problem both significant and of a suitable degree of difficulty for a Bachelor's/Master’s thesis project? Why has no one else solved it yet?)
-  \item How did you solve the problem? What was your method/insight?
-  \item Results/Conclusions/Consequences/Impact: What are your key results/\linebreak[4]conclusions? What will others do based on your results? What can be done now that you have finished - that could not be done before your thesis project was completed?
-\end{itemize}
+% % \generalExpl{Enter your abstract here!}
+% An abstract is (typically) about 250 and 350 words (1/2 A4-page) with the following components:
+% % key parts of the abstract
+% \begin{itemize}
+%   \item What is the topic area? (optional) Introduces the subject area for the project.
+%   \item Short problem statement
+%   \item Why was this problem worth a Bachelor's/Master’s thesis project? (\ie, why is the problem both significant and of a suitable degree of difficulty for a Bachelor's/Master’s thesis project? Why has no one else solved it yet?)
+%   \item How did you solve the problem? What was your method/insight?
+%   \item Results/Conclusions/Consequences/Impact: What are your key results/\linebreak[4]conclusions? What will others do based on your results? What can be done now that you have finished - that could not be done before your thesis project was completed?
+% \end{itemize}
 
+Chest X-ray datasets exhibit significant appearance variability due to diverse acquisition systems and proprietary image processing pipelines across manufacturers, limiting the generalizability of learning models. This variability particularly affects alternative X-ray detectors that are underrepresented in major datasets like CheXpert and ChestX-ray8, hindering the development of diagnostic tools for, for instance, resource-limited settings where such systems are essential.
+This thesis addresses the challenge of recovering transmission maps—the fundamental physical measurements representing the fraction of incident X-ray radiation transmitted through the patient—from processed clinical images. Transmission maps are the raw measurements common to all X-ray detectors before manufacturer-specific processing, making them ideal detector-agnostic representations for machine learning applications.
+The primary challenge is the absence of paired transmission map and processed image data, as manufacturers do not typically provide access to raw detector outputs, and is neither a tool directly used by radiologists to do diagnoses. Combined with the proprietary and non-linear nature of image processing algorithms, this creates an ill-posed inverse problem that has not been previously addressed. Without ground truth data, conventional supervised learning approaches are infeasible.
+A framework to simulate transmission is proposed in the form of a solution for a constrained non-linear optimization method. The method leverages knowledge of common image processing operations in x-ray images to constrain the solution space. By incorporating anatomical priors based on the known attenuation properties of different tissue types, the problem can be conditioned to yield physically plausible solutions despite the lack of training data.
+The method successfully recovers transmission maps that satisfies empirical expectations
+from such images and that can be mapped back into their processed versions. 
 \end{scontents}
 
 \subsection*{Keywords}
@@ -462,7 +468,13 @@ swe
 \end{scontents}
 % \warningExpl{Inside the following scontents environment, you cannot use a \textbackslash include{filename} as the command rather than the file contents will end up in the for DiVA information. Additionally, you should not use a straight double quote character in the abstracts or keywords, use two single quote characters instead.}
 \begin{scontents}[store-env=abstracts,print-env=true]
-\generalExpl{Enter your Swedish abstract or summary here!}
+Dataset för röntgenbilder av bröstkorgen uppvisar betydande variationer i utseende på grund av olika insamlingssystem och proprietära bildbehandlingspipelines hos olika tillverkare, vilket begränsar generaliserbarheten hos inlärningsmodeller. Denna variation påverkar särskilt alternativa röntgendetektorer som är underrepresenterade i stora dataset som CheXpert och ChestX-ray8, vilket hindrar utvecklingen av diagnostiska verktyg för exempelvis resursbegränsade miljöer där sådana system är nödvändiga.
+Denna avhandling behandlar utmaningen att återställa transmissionskartor – de grundläggande fysiska mätningarna som representerar andelen av den infallande röntgenstrålningen som transmitteras genom patienten – från bearbetade kliniska bilder. Transmissionskartor är de råa mätningar som är gemensamma för alla röntgendetektorer före tillverkarspecifik bearbetning, vilket gör dem till idealiska detektoroberoende representationer för maskininlärningsapplikationer.
+Den främsta utmaningen är avsaknaden av parade transmissionskartor och bearbetade bilddata, eftersom tillverkare vanligtvis inte ger tillgång till råa detektorutdata, och det är inte heller ett verktyg som radiologer använder direkt för att ställa diagnoser. I kombination med den proprietära och icke-linjära karaktären hos bildbearbetningsalgoritmer skapar detta ett illa formulerat invers problem som inte har behandlats tidigare. Utan grundläggande sanningsdata är konventionella övervakade inlärningsmetoder omöjliga.
+Ett ramverk för att simulera transmission föreslås i form av en lösning för en begränsad icke-linjär optimeringsmetod. Metoden utnyttjar kunskap om vanliga bildbehandlingsoperationer i röntgenbilder för att begränsa lösningsutrymmet. Genom att införliva anatomiska förkunskaper baserade på kända dämpningsegenskaper hos olika vävnadstyper kan problemet konditioneras för att ge fysiskt rimliga lösningar trots bristen på träningsdata.
+Metoden återställer framgångsrikt transmissionskartor som uppfyller empiriska förväntningar
+från sådana bilder och som kan mappas tillbaka till sina bearbetade versioner.
+
 % \sweExpl{Alla avhandlingar vid KTH \textbf{måste ha} ett abstrakt på både \textit{engelska} och \textit{svenska}.\\
 % Om du skriver din avhandling på svenska ska detta göras först (och placera det som det första abstraktet) - och du bör revidera det vid behov.}
 
@@ -532,8 +544,16 @@ swe
 % En dualism som måste hanteras i hela rapporten och projektet
 % }
 
-I would like to thank xxxx for having yyyy. Or in the case of two authors:\\
-We would like to thank xxxx for having yyyy.
+
+I would like to thank Kian Shaker, who introduced me to the problem studied in this thesis, 
+as well as introducing me to my first research experience in a welcoming group. I appreciate
+his continuous and great mentorship throughout the past few months. I also want to thank
+my colleagues at the Hard X-ray lab and Bio-Opto-Nano groups, whom I learned a lot about
+research life and other cultures. Additionally, I would like to thank Ozan Öktem for 
+his valuable insights and feedback on the development of my project.
+
+Finally, I would like to express my gratitude to my friends and family for their support
+and encouragement.
 
 \acknowlegmentssignature
 
@@ -1283,42 +1303,45 @@ differentiation, handling the computation of gradients for the chosen loss funct
 operator. \textit{Optax} is a gradient processing and optimization library that provides multiple gradient descent optimizers, ruled
 by additional hyperparameters, such as a learning rate.
 
-Regarding the actual choice of the processing operator, the following snippet shows the proper order and operations
-it uses:
+
+Regarding the actual choice of the processing operator, it consists of a windowing function,
+negative log, and assumes at least two unsharp masking operations are done at two different 
+frequency bands. The unsharp masking operations are put to enforce an enhancement in both
+low and high frequencies. The following snippet shows the proper order and operations:
 
 \begin{lstlisting}[
-    basicstyle=\small
+    basicstyle=\smal,
+    caption={Processing operator model}
 ]
 def processing(txm, theta):
     x = window(txm, theta.window_center, theta.window_width, theta.gamma)
     x = negative_log(x)
-    x = unsharp_mask(x, low_sigma, theta.low_enhance_factor)
-    x = clip(x, 0., 1.)
     x = unsharp_mask(x, high_sigma, theta.high_enhance_factor)
+    x = clip(x, 0., 1.)
+    x = unsharp_mask(x, low_sigma, theta.low_enhance_factor)
     x = clip(x, 0., 1.)
 
     return x
 \end{lstlisting}
 
-The actual box constraints set to these parameters are shown below:
+Except for the $\sigma$ parameters, the rest are variables that 
+have the box constraints:
 
 \begin{equation}
 \begin{aligned}
-    0.1 & \leq  \text{low\_enhance\_factor} & <= 0.8 \\
-    0.3 & \leq  \text{high\_enhance\_factor} & <= 1.0 \\
-    0.1 & \leq  \text{window\_center} & <= 0.8 \\
-    0.1 & \leq  \text{window\_width} & <= 1.0
+    0.1&  \leq & \theta^{\text{low enhance factor}} && <= &0.8 \\
+    0.3 & \leq  &\theta^{\text{high enhance factor}}& & <= &1.0 \\
+    0.1 & \leq  &\theta^{\text{window center}} & &<= &0.8 \\
+    0.1  &\leq  &\theta^{\text{window width}}&& <= &1.0.
 \end{aligned}
 \end{equation}
 
-These values are set empirically, based on the assumption that high-frequencies are always amplified to some degree,
-while not a necessity for low-frequencies. The windowing parameters are set arbitrarily to allow centering in the first
-half of the dynamic range, as observed in the sample transmission map.
+These values are set empirically, based primarily on the assumption that high-frequencies are always amplified to some degree, while not a necessity for low-frequencies. The windowing parameters are set arbitrarily to allow centering in the first
+half of the dynamic range, as observed in the sample transmission map. These are also be considered hyperparameters of the model.
 
-Since the approach taken for this project does not involve learning an inverse model, but rather solving an optimization
+Since the initial approach does not involve learning an inverse model, but rather solving an optimization
 on a per-image basis, the objective is then to find a model and corresponding hyperparameters that can be reused across different
-sets of images and guarantee convergence into valid solutions. Besides optimization-related hyperparameters such as
-learning rates, other choices are considered that can produce valid solutions but won't match qualitatively
+sets of images and guarantee convergence into valid solutions. Other  choices are considered that can produce valid solutions but won't match qualitatively
 the expectations for transmission maps. One such choice is a regularization term (besides its corresponding weight)
 that promotes smoothness on the transmission map, which, if not appropriately chosen, can lead to artifacts or over-smoothing.
 Overall, the hyperparameters and configurations to find are listed in \autoref{tab:hyperparametersList}.
@@ -1482,14 +1505,14 @@ conflict with each other. The ideal model should
 Regarding measuring the fidelity of the processed images, it was mentioned previously that \arcshort{MSE} does not necessarily favor
 solutions that are perceptually close to the original images. There are multiple alternative loss functions explicitly designed for
 Image Quality Assessment metrics; an alternative is a mixed loss metric $\mathcal{L}^\text{Mix}$ proposed by \cite{zhaoLossFunctionsImage2017} that combines
-\acrfull{MS-SSIM} with the $\ell_1$ loss (Mean Absolute Error). \acrshort{SSIM} is an Image Quality Assessment
+\acrfull{MS-SSIM} with the $\ell_1$ loss (Mean Absolute Error). SSIM is an Image Quality Assessment
 metric that evaluates images accounting for the fact that the \acrfull{HVS} is sensitive to changes in local
-structure. \acrshort{MS-SSIM} was later proposed to extend \acrshort{SSIM} to account for the fact that the
+structure. MS-SSIM was later proposed to extend SSIM to account for the fact that the
 scale at which local structure should be analyzed depends on the distance to the observer. This extension
-weighs \acrshort{SSIM} computed at different scales and outperforms other loss functions by correlating to good scores
+weighs SSIM computed at different scales and outperforms other loss functions by correlating to good scores
 in multiple image quality indices. Nonetheless, its demonstrated good performance in image reconstruction problems comes
 at the cost of a higher computational cost, which can scale well for Deep Learning settings, but for the current
-approach, it incentivates the alternative choice of \acrshort{MSE}. As for the evaluation the $\matchal{L}^{\text{Mix}}$ loss
+approach, it incentivates the alternative choice of MSE. As for the evaluation the $\matchal{L}^{\text{Mix}}$ loss
 will be used to discern the best choice of hyperparameters, and the next chapter will present further insights on this choice.
 
 As for ensuring the physical bounds, it is addressed by computing the total square error of the transmission maps,
@@ -1500,8 +1523,8 @@ iterations to converge is preferred.
 \chapter{Results and Analysis}
 \label{ch:resultsAndAnalysis}
 
-This chapter will cover the results of the multiple hyperparameter searches done, and characterize the effect of
-these parameters on the overall performance of the model, as well as the process of choosing the best hyperparameters.
+This chapter covers the results of the multiple hyperparameter searches done, as well as
+quantitative and qualitative insights on the performance of the model. 
 
 \section{Data Fidelity}
 
@@ -1509,9 +1532,9 @@ In the last section, the loss $\mathcal{L}^{\text{Mix}}$ was mentioned as the co
 in terms of quality of the recovered transmission maps and the estimated processed images. An evidence of the suitability
 of this metric is shown in \autoref{fig:transmission_maps}.
 
-\begin{figure}
+\begin{figure}[ht]
     \centering
-    \includegraphics[width=0.8\textwidth]{figures/L_mix.png}
+    \includegraphics[width=1.0\textwidth]{figures/L_mix.png}
     \caption{The data points in the scatter plots represent different optimization runs and the average of the metric values
     (MSE, SSIM, $\mathcal{L}$) over the images used on each run. It can be observed a correlation of $\mathcal{L}^{\text{Mix}}$,
     getting closer to zero as SSIM gets close to one, and as MSE gets close to zero. However, $\mathcal{L}^{\text{Mix}}$
@@ -1651,54 +1674,86 @@ xxxx.
 \chapter{Initial hyperparameter search}
 \label{sec:initialHyperparameterSearch}
 
-\begin{table}
+\begin{sidewaystable}
 \centering
-\begin{tabular}{lrrrrrrrl}
+\begin{tabularx}{\linewidth}{lrrrrrrrl}
  & Runtime & $\mathcal{L}^{\text{Mix}}$ max & $\mathcal{L}^{\text{Mix}}$ mean & $\mathcal{L}^{\text{Mix}}$ min & Penalties max & Penalties mean & Penalties min & Smooth reg. \\
  29 & 563.109801 & \bfseries 0.016853 & \bfseries 0.014564 & \bfseries 0.012100 & \bfseries 0.003202 & \bfseries 0.001207 & 0.000044 & none \\
  30 & 1071.619600 & 0.018997 & 0.016656 & 0.013023 & 0.003599 & 0.001449 & 0.000052 & none \\
  34 & 1017.985566 & 0.027841 & 0.024338 & 0.018678 & 0.004580 & 0.002035 & 0.000077 & none \\
- 12 & 699.119695 & 0.030976 & 0.027394 & 0.023818 & 0.017649 & 0.003872 & 0.000143 & tikonov \\
- 18 & 476.124311 & 0.036701 & 0.033039 & 0.029165 & 0.029165 & 0.012455 & 0.000625 & tikonov \\
- 21 & 475.003554 & 0.054005 & 0.049602 & 0.046968 & 0.242348 & 0.156652 & 0.017277 & tikonov \\
+ 12 & 699.119695 & 0.030976 & 0.027394 & 0.023818 & 0.017649 & 0.003872 & 0.000143 & tikhonov \\
+ 18 & 476.124311 & 0.036701 & 0.033039 & 0.029165 & 0.029165 & 0.012455 & 0.000625 & tikhonov \\
+ 21 & 475.003554 & 0.054005 & 0.049602 & 0.046968 & 0.242348 & 0.156652 & 0.017277 & tikhonov \\
  0 & 713.010703 & 0.058910 & 0.053848 & 0.049643 & 0.020831 & 0.010680 & 0.000624 & tv \\
  3 & 970.882263 & 0.060052 & 0.054773 & 0.047618 & 0.523728 & 0.309372 & 0.044149 & tv \\
  8 & 539.165788 & 0.059271 & 0.055080 & 0.052517 & 1.536641 & 0.989059 & 0.135147 & tv \\
  5 & 245.019457 & 0.059813 & 0.055580 & 0.051776 & 0.054485 & 0.026585 & 0.001869 & tv \\
- 17 & 468.220039 & 0.065625 & 0.060227 & 0.054002 & 0.048943 & 0.027634 & 0.003310 & tikonov \\
+ 17 & 468.220039 & 0.065625 & 0.060227 & 0.054002 & 0.048943 & 0.027634 & 0.003310 & tikhonov \\
  10 & 368.075797 & 0.068312 & 0.064878 & 0.059608 & 0.951185 & 0.535663 & 0.066518 & tv \\
  7 & 376.274129 & 0.075618 & 0.070741 & 0.066959 & 0.058924 & 0.032396 & 0.003098 & tv \\
- 16 & 661.980748 & 0.076345 & 0.071043 & 0.064878 & 0.030261 & 0.017630 & 0.002333 & tikonov \\
- 20 & 605.175529 & 0.080235 & 0.074267 & 0.068925 & 0.067765 & 0.039111 & 0.006383 & tikonov \\
+ 16 & 661.980748 & 0.076345 & 0.071043 & 0.064878 & 0.030261 & 0.017630 & 0.002333 & tikhonov \\
+ 20 & 605.175529 & 0.080235 & 0.074267 & 0.068925 & 0.067765 & 0.039111 & 0.006383 & tikhonov \\
  32 & 687.701262 & 0.085997 & 0.076598 & 0.069191 & 0.012257 & 0.006835 & 0.000804 & none \\
  1 & 595.768241 & 0.226541 & 0.098334 & 0.053218 & 0.583420 & 0.351899 & 0.000231 & tv \\
  27 & 730.086226 & 0.344054 & 0.100650 & 0.015107 & 0.005781 & 0.002064 & \bfseries 0.000000 & none \\
  2 & 514.845521 & 0.255809 & 0.111593 & 0.054730 & 0.078831 & 0.049376 & \bfseries 0.000000 & tv \\
  4 & 717.700773 & 0.197577 & 0.115705 & 0.033487 & 119.200302 & 28.410555 & 0.982594 & tv \\
  9 & \bfseries 244.023881 & 0.310923 & 0.117600 & 0.045247 & 0.254540 & 0.129439 & 0.000000 & tv \\
- 15 & 784.657229 & 0.127563 & 0.121181 & 0.113680 & 0.155192 & 0.085257 & 0.013254 & tikonov \\
- 23 & 461.161033 & 0.370886 & 0.122585 & 0.033377 & 0.084576 & 0.022226 & 0.000004 & tikonov \\
+ 15 & 784.657229 & 0.127563 & 0.121181 & 0.113680 & 0.155192 & 0.085257 & 0.013254 & tikhonov \\
+ 23 & 461.161033 & 0.370886 & 0.122585 & 0.033377 & 0.084576 & 0.022226 & 0.000004 & tikhonov \\
  26 & 692.708670 & 0.129267 & 0.122605 & 0.114367 & 0.051751 & 0.029769 & 0.005660 & none \\
  33 & 756.872708 & 0.141169 & 0.130073 & 0.116452 & 0.040259 & 0.022843 & 0.004338 & none \\
- 14 & 287.046453 & 0.147056 & 0.135629 & 0.124201 & 0.451391 & 0.267444 & 0.129689 & tikonov \\
- 11 & 1502.621316 & 0.172000 & 0.161249 & 0.147474 & 0.149162 & 0.072276 & 0.008850 & tv \\
- 25 & 1142.076985 & 0.184621 & 0.172976 & 0.159600 & 4.722511 & 1.707338 & 0.045966 & tikonov \\
- 13 & 863.810063 & 0.248246 & 0.233034 & 0.224911 & 0.461262 & 0.259505 & 0.101780 & tikonov \\
- 31 & 609.036502 & 0.247875 & 0.233104 & 0.212421 & 0.668524 & 0.362827 & 0.131232 & none \\
- 19 & 1382.335828 & 0.246748 & 0.233258 & 0.222307 & 0.117650 & 0.063041 & 0.020512 & tikonov \\
- 24 & 891.642819 & 0.267730 & 0.250945 & 0.243238 & 0.242788 & 0.135459 & 0.051026 & tikonov \\
- 6 & 1019.439793 & 0.337225 & 0.325268 & 0.310967 & 1.855743 & 1.017381 & 0.396396 & tv \\
- 22 & 944.191942 & 0.375721 & 0.365707 & 0.357103 & 335.244873 & 149.642599 & 17.020586 & tikonov \\
- 28 & 1113.942507 & 0.421934 & 0.406647 & 0.390264 & 8.849885 & 3.725257 & 0.548269 & none \\
- \end{tabular}
+ 14 & 287.046453 & 0.147056 & 0.135629 & 0.124201 & 0.451391 & 0.267444 & 0.129689 & tikhonov
+ \end{tabularx}
 \caption{Initial hyperparameter search results, ordered by the average $\mathcal{L}$.
 The table also include penalty values, which correspond to the total sum of the
 segmentation penalties (averaged over all images), smoothing regularization and the
-total runtime used
+total runtime used}
 \label{tab:hyperparameterSearch}
-\end{table}
+\end{sidewaystable}
+\chapter{Mix Loss Function}
+\label{app:mixLoss}
 
+The $\mathcal{L}^{\text{Mix}}$ loss function used for evaluation in this work combines the perceptual advantages of \acrfull{MS-SSIM} with the stability of the $\ell_1$ loss. As proposed by Zhao et al. \cite{zhaoLossFunctionsImage2017}, this hybrid loss function is defined as:
 
+\begin{equation}
+\mathcal{L}^{\text{Mix}} = \alpha \cdot \mathcal{L}^{\text{MS-SSIM}} + (1 - \alpha) \cdot \mathcal{L}_1
+\label{eq:mixLoss}
+\end{equation}
+
+where $\alpha \in [0, 1]$ is a weighting parameter that balances the contribution of each component. The optimal value $\alpha = 0.84$ was determined empirically across various image restoration tasks.
+
+The MS-SSIM loss component is derived from the Multi-Scale Structural Similarity index by converting it to a loss form:
+
+\begin{equation}
+\mathcal{L}^{\text{MS-SSIM}} = 1 - \text{MS-SSIM}(x, y)
+\end{equation}
+
+The MS-SSIM index itself evaluates image similarity at multiple scales through:
+
+\begin{equation}
+\text{MS-SSIM}(x, y) = [l_M(x, y)]^{\alpha_M} \cdot \prod_{j=1}^{M} [c_j(x, y)]^{\beta_j} [s_j(x, y)]^{\gamma_j}
+\end{equation}
+
+where $M$ denotes the number of scales, and the components at each scale $j$ are defined as:
+
+\begin{align}
+l_j(x, y) &= \frac{2\mu_x\mu_y + C_1}{\mu_x^2 + \mu_y^2 + C_1} \quad \text{(luminance comparison)}\\
+c_j(x, y) &= \frac{2\sigma_x\sigma_y + C_2}{\sigma_x^2 + \sigma_y^2 + C_2} \quad \text{(contrast comparison)}\\
+s_j(x, y) &= \frac{\sigma_{xy} + C_3}{\sigma_x\sigma_y + C_3} \quad \text{(structure comparison)}
+\end{align}
+
+Here, $\mu_x$ and $\mu_y$ are the mean intensities, $\sigma_x$ and $\sigma_y$ are the standard deviations, and $\sigma_{xy}$ is the covariance between images $x$ and $y$ at scale $j$. The constants $C_1$, $C_2$, and $C_3$ provide numerical stability. The exponents $\{\alpha_M, \beta_j, \gamma_j\}$ weight the relative importance of each component, with typical values being $\alpha_M = \beta_M = \gamma_M = 1$ and normalized  $\sum_{j=1}^M \gamma_j = 1$ \cite[p.~1399]{wangMultiscaleStructuralSimilarity2003}.
+
+The $\ell_1$ loss component provides the mean absolute error:
+
+\begin{equation}
+\mathcal{L}_1 = \frac{1}{N} \sum_{i=1}^{N} |x_i - y_i|
+\end{equation}
+
+where $N$ is the total number of pixels in the image. This component ensures pixel-level fidelity and helps preserve color and brightness information that might be underweighted by the MS-SSIM component alone.
+
+The combination of these two losses leverages MS-SSIM's ability to capture perceptual similarity across multiple scales—aligning with how the human visual system processes images—while the $\ell_1$ term provides optimization stability and prevents color shifts. This makes $\mathcal{L}^{\text{Mix}}$ particularly effective for image reconstruction tasks where both perceptual quality and pixel accuracy are critical.
 
 % \generalExpl{Here is a place to add supporting material that can help others build upon your work. You can include files as attachments to the PDF file or indirectly via URLs. Alternatively, consider adding supporting material uploaded as separate files in DiVA.}
 
