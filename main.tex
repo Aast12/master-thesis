@@ -447,7 +447,7 @@ This thesis addresses the challenge of recovering transmission maps—the fundam
 The primary challenge is the absence of paired transmission map and processed image data, as manufacturers do not typically provide access to raw detector outputs, and is neither a tool directly used by radiologists to do diagnoses. Combined with the proprietary and non-linear nature of image processing algorithms, this creates an ill-posed inverse problem that has not been previously addressed. Without ground truth data, conventional supervised learning approaches are infeasible.
 A framework to simulate transmission is proposed in the form of a solution for a constrained non-linear optimization method. The method leverages knowledge of common image processing operations in x-ray images to constrain the solution space. By incorporating anatomical priors based on the known attenuation properties of different tissue types, the problem can be conditioned to yield physically plausible solutions despite the lack of training data.
 The method successfully recovers transmission maps that satisfies empirical expectations
-from such images and that can be mapped back into their processed versions. 
+from such images and that can be mapped back into their processed versions.
 \end{scontents}
 
 \subsection*{Keywords}
@@ -545,11 +545,11 @@ från sådana bilder och som kan mappas tillbaka till sina bearbetade versioner.
 % }
 
 
-I would like to thank Kian Shaker, who introduced me to the problem studied in this thesis, 
+I would like to thank Kian Shaker, who introduced me to the problem studied in this thesis,
 as well as introducing me to my first research experience in a welcoming group. I appreciate
 his continuous and great mentorship throughout the past few months. I also want to thank
 my colleagues at the Hard X-ray lab and Bio-Opto-Nano groups, whom I learned a lot about
-research life and other cultures. Additionally, I would like to thank Ozan Öktem for 
+research life and other cultures. Additionally, I would like to thank Ozan Öktem for
 his valuable insights and feedback on the development of my project.
 
 Finally, I would like to express my gratitude to my friends and family for their support
@@ -1305,7 +1305,7 @@ by additional hyperparameters, such as a learning rate.
 
 
 Regarding the actual choice of the processing operator, it consists of a windowing function,
-negative log, and assumes at least two unsharp masking operations are done at two different 
+negative log, and assumes at least two unsharp masking operations are done at two different
 frequency bands. The unsharp masking operations are put to enforce an enhancement in both
 low and high frequencies. The following snippet shows the proper order and operations:
 
@@ -1324,7 +1324,7 @@ def processing(txm, theta):
     return x
 \end{lstlisting}
 
-Except for the $\sigma$ parameters, the rest are variables that 
+Except for the $\sigma$ parameters, the rest are variables that
 have the box constraints:
 
 \begin{equation}
@@ -1503,17 +1503,10 @@ conflict with each other. The ideal model should
 \end{itemize}
 
 Regarding measuring the fidelity of the processed images, it was mentioned previously that \arcshort{MSE} does not necessarily favor
-solutions that are perceptually close to the original images. There are multiple alternative loss functions explicitly designed for
-Image Quality Assessment metrics; an alternative is a mixed loss metric $\mathcal{L}^\text{Mix}$ proposed by \cite{zhaoLossFunctionsImage2017} that combines
-\acrfull{MS-SSIM} with the $\ell_1$ loss (Mean Absolute Error). SSIM is an Image Quality Assessment
-metric that evaluates images accounting for the fact that the \acrfull{HVS} is sensitive to changes in local
-structure. MS-SSIM was later proposed to extend SSIM to account for the fact that the
-scale at which local structure should be analyzed depends on the distance to the observer. This extension
-weighs SSIM computed at different scales and outperforms other loss functions by correlating to good scores
-in multiple image quality indices. Nonetheless, its demonstrated good performance in image reconstruction problems comes
-at the cost of a higher computational cost, which can scale well for Deep Learning settings, but for the current
-approach, it incentivates the alternative choice of MSE. As for the evaluation the $\matchal{L}^{\text{Mix}}$ loss
-will be used to discern the best choice of hyperparameters, and the next chapter will present further insights on this choice.
+solutions that are perceptually close to the original images. The $\matchal{L}^{\text{Mix}}$ loss \cite{zhaoLossFunctionsImage2017}
+can be a suitable choice for evaluating the results and discern the best choice of hyperparameters.
+A detailed description of the function can be found in \autoref{app:mixLoss}. The next chapter will also present further
+insights on this choice.
 
 As for ensuring the physical bounds, it is addressed by computing the total square error of the transmission maps,
 and aiming to minimize the error simultaneously. Finally, a set of hyperparameters that can reduce the overall amount of
@@ -1524,7 +1517,7 @@ iterations to converge is preferred.
 \label{ch:resultsAndAnalysis}
 
 This chapter covers the results of the multiple hyperparameter searches done, as well as
-quantitative and qualitative insights on the performance of the model. 
+quantitative and qualitative insights on the performance of the model.
 
 \section{Data Fidelity}
 
@@ -1544,22 +1537,109 @@ of this metric is shown in \autoref{fig:transmission_maps}.
 
 \section{Per-image optimization}
 
-An inital set of hyperparameter searches was set out to perform the choice of a smoothing regularization,
+An inital set of hyperparameter searches was set out to perform the choice of a smoothing regularization, as well as a preliminar
+choice of regularization parameters. Three separate searches were done for each type of smoothing regularization:
+no regularization, Tikhonov regularization, and Total Variation. The consideration of this type of regularization came up during
+initial experiments, where reconstructed images were found to be noisy and presenting artifacts, such as the ones in
+\autoref{fig:artifacts}. The list of the best evaluation scores across these searches are shown in \autoref{tab:hyperparameterSearch}.
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.7\textwidth]{figures/noisy.png}
+    \caption{Reconstructed processed image with noise artifacts.}
+    \label{fig:artifacts}
+\end{figure}
+
+The latest searches were set to optimize parameters relative to the $\mathcal{L}^{\text{Mix}}$ loss, and out of the three methods, the one
+that achieved the best score was using no regularization. Even though the regularization terms converge to parameters
+that yield low reconstruction errors, the choice of parameters for both regularization terms introduced
+shadow artifacts around the segmentation regions as seen in \autoref{fig:shadowArtifacts}.
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.7\textwidth]{figures/shadowed.png}
+    \caption{Reconstructed processed image with shadow artifacts.}
+    \label{fig:shadowArtifacts}
+\end{figure}
+
+Using the parameters that turned to a lower loss on a larger set of images for validation, the quality in the reconstructed
+processed images remained consistent, as well as the compliance with the anatomical bounds. A full overview of the results can
+be seen in appendix. However, few cases on the transmission maps showed hard edges in the outline of the body depicted
+in \autoref{fig:outlineArtifacts}.
 
 
-\textbf{Convergence in non-set constraints}
+\begin{figure}[!tbp]
+  \centering
+  \begin{minipage}[b]{0.4\textwidth}
+    \includegraphics[width=\textwidth]{figures/outline1.png}
+  \end{minipage}
+  \hfill
+  \begin{minipage}[b]{0.4\textwidth}
+    \includegraphics[width=\textwidth]{figures/outline2.png}
+  \end{minipage}
+  \caption{Example of  presenting glowing edges.}
+  \label{fig:outlineArtifacts}
+\end{figure}
 
-\textbf{Parameters on unseen data}
-\textbf{Parameters on unseen hyperparameters}
 
+\section{Further parameter search}
 
-Effect of not putting hard constraints on the transmission map
+The model considers other parameters besides the regularization terms and optimization terms such as learning rates.
+These refer to the box constraints set on the processing function. These are initially set based on empirical evidence,
+such as suggestions of kernel sizes based on the real size of edges in radiographies. These constraints are set to inject
+prior information about the minimal transformations expected in the image processing pipeline. Choosing these values without
+care can lead to seemingly valid reconstructions, but can characterize the reconstructed transmission maps to be
+unrealistic. Consider the case depicted in \autoref{fig:wrongCharacterization} of using an optimal choice of hyperparameters,
+but constraining the lower bound of an enhancement factor too high in the high-frequencies. The processed image can
+be perceived as a close reconstruction of the original image, but the transmission map is overly smooth, which is unlikely
+to be a realistic representation.
 
+\begin{figure}[!tbp]
+  \centering
+  \begin{minipage}[b]{0.4\textwidth}
+    \includegraphics[width=\textwidth]{figures/wrong_character_tm.png}
+  \end{minipage}
+  \begin{minipage}[b]{0.4\textwidth}
+    \includegraphics[width=\textwidth]{figures/wrong_character_tm.png}
+  \end{minipage}
+  \hfill
+  \caption{Example of a recovered transmission map and its estimated processed version using a minimum enhancement factor
+  of 0.59 in the low-frequencies, and setting 3.95 as the std. for such bands.}
+  \label{fig:wrongCharacterization}
+\end{figure}
 
+These, nevertheless, are set on assumptions and no solid data. These can also be hard to set since they can depend on the image size.
+A straightforward way to adjust these constraints is to pick an optimal set of hyperparameters, and perform once again
+a parameter search, specific to fix these bounds. The objective is to find a set of parametersthat can
+minimize the error with the known ground truth.
 
-1. find hyperparameters on very low volumes of data
-2. validate behavior holds on larger batches
-3. Evaluate constraints and data fidelity, qualitative assesment on transmission maps
+\begin{table}
+\centering
+\begin{tabular}{|c|c|c|}
+\hline
+Parameter & Value \\
+\hline
+Low-frequency std. & 28.033104695552467 \\
+Minimum Low-frequency enhancement factor in low frequencies & 0.23209908549082872 \\
+High-frequency std. & 2.5834306818846415 \\
+Minimum High-frequency enhancement factor in high frequencies & 0.4323876961409312 \\
+\hline
+\end{tabular}
+\caption{Found parameters for frequency band constraints.}
+\end{table}
+
+Converged after 174 steps
+times:  [1357.8525059223175, 1261.3608360290527, 1142.5163519382477]
+lens:  [64, 64, 64]
+
+\section{Common parameters optimization}
+
+An alternative way to implement the optimization solver is by updating a single set of parameters from all images.
+The first thought of this approach is to use a single set of parameters for all images, and update them simultaneously.
+This can be done by using a single loss function that combines the losses of all images, and updating the parameters
+using a single optimizer. This approach showed poor performance, failing to converge to a set of hyperparameters
+that reduce the Mixed loss sufficiently.
+
 
 
 
@@ -1567,58 +1647,17 @@ Effect of not putting hard constraints on the transmission map
 \chapter{Conclusions and Future work}
 \label{ch:conclusionsAndFutureWork}
 
-\section{Conclusions}
-\label{sec:conclusions}
 
 
-\section{Limitations}
-\label{sec:limitations}
+There are many paths of improvement for this project and alternative approaches that might also get to the solutions
+found with this work. The principal area of improvement is in regard of computational efficiency. While the results showed
+a promising approximation to the latent transmission maps, the main motivation that drives this work is the extension of
+large datasets, that due to their magnitude, represent a great tool for scientific research and developing novel models
+in the medical field. Being able to keep up to the scale of these datasets is crucial for achieving said goal.
+Many immediate improvements can be made to the proposed method, such as doing deeper hyperparameter tuning, improving
+the implementation efficiency, and considering the execution on parallel environments.
 
-Several limitations constrain the current approach:
 
-\begin{itemize}
-    \item \textbf{Computational Scalability}: Processing large datasets remains computationally intensive, requiring days of GPU time for comprehensive datasets.
-
-    \item \textbf{Hyperparameter Sensitivity}: Optimal parameters vary across image characteristics, necessitating extensive search or adaptive strategies.
-
-    \item \textbf{Ground Truth Scarcity}: Limited availability of paired transmission map and processed image data restricts validation options.
-
-    \item \textbf{Model Complexity}: The simplified forward model may not capture all nuances of commercial processing pipelines.
-\end{itemize}
-
-\section{Future work}
-\label{sec:futureWork}
-
-Even though the current project could find solutions that, according to our criteria
-
-\subsection{Immediate Extensions}
-\begin{enumerate}
-    \item \textbf{Adaptive Hyperparameter Selection}: Develop methods to automatically select hyperparameters based on image characteristics, potentially using meta-learning approaches.
-
-    \item \textbf{Efficient Optimization Strategies}: Explore second-order optimization methods or learned optimizers to reduce the number of iterations required.
-
-    \item \textbf{Multi-Resolution Processing}: Implement coarse-to-fine optimization strategies to improve both speed and convergence.
-\end{enumerate}
-
-\subsection{Long-term Research Directions}
-\begin{enumerate}
-    \item \textbf{Learned Inverse Models}: Train neural networks to directly predict transmission maps, using our optimization results as training data.
-
-    \item \textbf{Manufacturer-Specific Models}: Develop specialized forward models for different equipment manufacturers based on their processing characteristics.
-
-    \item \textbf{Uncertainty Quantification}: Incorporate Bayesian approaches to quantify uncertainty in recovered transmission maps.
-
-    \item \textbf{Real-time Processing}: Develop approximation methods enabling real-time transmission map recovery for clinical applications.
-\end{enumerate}
-
-\subsection{Practical Deployment}
-For practical deployment in support of low-cost X-ray system development:
-\begin{itemize}
-    \item Create a cloud-based processing pipeline for batch transmission map recovery
-    \item Develop quality metrics to automatically identify successfully recovered maps
-    \item Build a curated dataset of transmission maps with associated metadata
-    \item Establish validation protocols with clinical partners
-\end{itemize}
 
 \section{Reflections}
 \label{sec:reflections}
@@ -1711,6 +1750,7 @@ segmentation penalties (averaged over all images), smoothing regularization and 
 total runtime used}
 \label{tab:hyperparameterSearch}
 \end{sidewaystable}
+
 \chapter{Mix Loss Function}
 \label{app:mixLoss}
 
@@ -1754,6 +1794,8 @@ The $\ell_1$ loss component provides the mean absolute error:
 where $N$ is the total number of pixels in the image. This component ensures pixel-level fidelity and helps preserve color and brightness information that might be underweighted by the MS-SSIM component alone.
 
 The combination of these two losses leverages MS-SSIM's ability to capture perceptual similarity across multiple scales—aligning with how the human visual system processes images—while the $\ell_1$ term provides optimization stability and prevents color shifts. This makes $\mathcal{L}^{\text{Mix}}$ particularly effective for image reconstruction tasks where both perceptual quality and pixel accuracy are critical.
+
+\chapter{Initial Parameter Search Results}
 
 % \generalExpl{Here is a place to add supporting material that can help others build upon your work. You can include files as attachments to the PDF file or indirectly via URLs. Alternatively, consider adding supporting material uploaded as separate files in DiVA.}
 
