@@ -723,12 +723,7 @@ knowledge presented in this section motivates the design choices made to develop
 \section{X-ray intensity and Beer's law}
 
 X-rays are thought of as a flux of very high-energy electromagnetic radiation. The X-ray beam is
-described by a vector-valued function $I(x)$. The direction of $I$ at $x$ is the direction of the flux at $x$ and
-its magnitude,
-\begin{equation}
-    I (x) = \lVert I(x) \rVert
-\end{equation}
-is the intensity of the beam. If $dS$ is an infinitesimal surface element at $x$ of area
+described by a vector-valued function $I(x)$. If $dS$ is an infinitesimal surface element at $x$ of area
 $|dS|$, placed at right angles to $I(x)$, then the energy-per-unit-time passing through $dS$ is \cite[p.~56]{epstein2008}
 
 \begin{equation}
@@ -795,7 +790,7 @@ For a medium composed of $n$ distinct homogeneous regions with attenuation coeff
 $\{\mu_i\}_{i=1}^n$ and thicknesses $\{d_i\}_{i=1}^n$ along a given ray path,
 a simplified model can be expressed as
 \begin{equation}
-    I(x,y) &= I_0(x,y) \cdot \exp\left(-\sum_{i=1}^n \mu_i d_i\right).
+    I(x,y) = I_0(x,y) \cdot \exp\left(-\sum_{i=1}^n \mu_i d_i\right).
     \label{eq:discrete_materials}
 \end{equation}
 
@@ -1295,7 +1290,7 @@ and processing operators are ruled by hyperparameters fixed for the entire itera
 
 \chapter{Implementation}
 
-The implementation of the proposed model consisted on building a processing operator that can produce images with a similar
+The implementation of the proposed model consisted of building a processing operator that can produce images with a similar
 visual appearance to images found in datasets such as CheXpert and ChestX-ray8. As for the optimization task,
 \textit{JAX} \cite{jax2018github} and \textit{Optax} \cite{deepmind2020jax} are used to implement the
 algorithm described in \autoref{sec:optimization}. JAX is a Python array computation library that provides automatic
@@ -1305,8 +1300,8 @@ by additional hyperparameters, such as a learning rate.
 
 
 Regarding the actual choice of the processing operator, it consists of a windowing function,
-negative log, and assumes at least two unsharp masking operations are done at two different
-frequency bands. The unsharp masking operations are put to enforce an enhancement in both
+negative log, and assumes that at least two unsharp masking operations are done at two different
+frequency bands. The unsharp masking operations are used to enforce an enhancement in both
 low and high frequencies. The following snippet shows the proper order and operations:
 
 \begin{lstlisting}[
@@ -1314,11 +1309,16 @@ low and high frequencies. The following snippet shows the proper order and opera
     caption={Processing operator model}
 ]
 def processing(txm, theta):
-    x = window(txm, theta.window_center, theta.window_width, theta.gamma)
+    x = window(txm, 
+               theta.window_center,
+               theta.window_width,
+               theta.gamma)
     x = negative_log(x)
-    x = unsharp_mask(x, high_sigma, theta.high_enhance_factor)
+    x = unsharp_mask(x, low_sigma,
+                     theta.low_enhance_factor)
     x = clip(x, 0., 1.)
-    x = unsharp_mask(x, low_sigma, theta.low_enhance_factor)
+    x = unsharp_mask(x, high_sigma,
+                     theta.high_enhance_factor)
     x = clip(x, 0., 1.)
 
     return x
@@ -1348,7 +1348,7 @@ Overall, the hyperparameters and configurations to find are listed in \autoref{t
 
 \begin{table}[H]
     \centering
-    \begin{tabular}{ | c | p{0.7\linewidth}| }
+    \begin{tabular}{ | p{0.2\linewidth} | p{0.7\linewidth}| }
         \hline
         \textbf{Hyperparameter} & \textbf{Description} \\
         \hline
@@ -1596,11 +1596,11 @@ to be a realistic representation.
 
 \begin{figure}[!tbp]
   \centering
-  \begin{minipage}[b]{0.4\textwidth}
+  \begin{minipage}[b]{0.5\textwidth}
     \includegraphics[width=\textwidth]{figures/wrong_character_tm.png}
   \end{minipage}
-  \begin{minipage}[b]{0.4\textwidth}
-    \includegraphics[width=\textwidth]{figures/wrong_character_tm.png}
+  \begin{minipage}[b]{0.5\textwidth}
+    \includegraphics[width=\textwidth]{figures/wrong_character_proc.png}
   \end{minipage}
   \hfill
   \caption{Example of a recovered transmission map and its estimated processed version using a minimum enhancement factor
@@ -1608,17 +1608,17 @@ to be a realistic representation.
   \label{fig:wrongCharacterization}
 \end{figure}
 
-These, nevertheless, are set on assumptions and no solid data. These can also be hard to set since they can depend on the image size.
-A straightforward way to adjust these constraints is to pick an optimal set of hyperparameters, and perform once again
-a parameter search, specific to fix these bounds. The objective is to find a set of parametersthat can
+These, nevertheless, are based on assumptions and no solid data. These can also be hard to set since they can depend on the image size.
+A straightforward way to adjust these constraints is to pick an optimal set of hyperparameters and perform once again
+a parameter search, specifically to fix these bounds. The objective is to find a set of parameters that can
 minimize the error with the known ground truth.
 
-\begin{table}
+\begin{table}[H]
 \centering
-\begin{tabular}{|c|c|c|}
-\hline
+\begin{tabular}{ | l | c| }
+\hline \\
 Parameter & Value \\
-\hline
+\hline \\
 Low-frequency std. & 28.033104695552467 \\
 Minimum Low-frequency enhancement factor in low frequencies & 0.23209908549082872 \\
 High-frequency std. & 2.5834306818846415 \\
@@ -1635,46 +1635,49 @@ lens:  [64, 64, 64]
 \section{Common parameters optimization}
 
 An alternative way to implement the optimization solver is by updating a single set of parameters from all images.
-The first thought of this approach is to use a single set of parameters for all images, and update them simultaneously.
-This can be done by using a single loss function that combines the losses of all images, and updating the parameters
+The first thought of this approach is to use a single set of parameters for all images and update them simultaneously.
+This can be done by using a single loss function that combines the losses of all images and updating the parameters
 using a single optimizer. This approach showed poor performance, failing to converge to a set of hyperparameters
-that reduce the Mixed loss sufficiently.
+that reduce the Mixed loss sufficiently, and tended to produce images with flat regions as seen in .
+
+An alternative approach, suggested by the proximity of parameters recovered by the mentioned experiments, hinted that a single choice of processing parameters can effectively map back to a realistic transmission map. That idea can be proved by picking a set of parameters returned from an optimization run, and setting it as the initial weights and freezing their updates. An experiment proved this possible. Nonetheless, there is no noticeable performance improvement, suggesting the parameters converge at a much higher rate than the transition map images.   
 
 
 
 
 \cleardoublepage
-\chapter{Conclusions and Future work}
+\chapter{Conclusions and Future Work}
 \label{ch:conclusionsAndFutureWork}
 
+\section{Summary of Contributions}
+
+This thesis addressed a critical challenge in medical imaging: the significant appearance variability in chest X-ray datasets caused by diverse acquisition systems and proprietary image processing pipelines. This diversity limits the generalization of diagnostic learning models, particularly affecting alternative X-ray detectors that are underrepresented in major datasets. The implications extend beyond technical limitations, as these alternative systems often represent the only viable diagnostic option in resource-limited settings, making this a matter of healthcare equity.
+
+We successfully recovered transmission maps from processed clinical X-ray images without access to the manufacturer's proprietary algorithms or paired training data. Our constrained optimization approach exploited the fact that all clinical processing pipelines share common goals to infer plausible inverse transformations. The recovered transmission maps not only produced accurate reconstructions when re-processed but also exhibited the physical characteristics expected from real X-ray attenuation data, including appropriate tissue-specific absorption values and the absence of enhancement artifacts present in processed images.
 
 
-There are many paths of improvement for this project and alternative approaches that might also get to the solutions
-found with this work. The principal area of improvement is in regard of computational efficiency. While the results showed
-a promising approximation to the latent transmission maps, the main motivation that drives this work is the extension of
-large datasets, that due to their magnitude, represent a great tool for scientific research and developing novel models
-in the medical field. Being able to keep up to the scale of these datasets is crucial for achieving said goal.
-Many immediate improvements can be made to the proposed method, such as doing deeper hyperparameter tuning, improving
-the implementation efficiency, and considering the execution on parallel environments.
+\section{Technical Achievements and Limitations}
 
+The physics-informed approach developed in this work successfully models the forward processing pipeline as a composition of fundamental operations, including negative logarithm transformation, windowing, and multi-scale unsharp masking. This modeling choice, validated through close correspondence between reconstructed and original clinical images, confirms our understanding of the essential transformations applied in commercial systems despite their proprietary nature.
 
+However, the current implementation faces a significant computational challenge that limits its immediate practical application. Each image requires an independent optimization process involving hundreds of iterations to achieve convergence. This computational burden makes the processing of large-scale datasets impractical with current resources. Furthermore, the method does not yield a generalizable transformation operator that can be directly applied to new images. Instead, each optimization may converge to different processing parameters, preventing the extraction of a unified inverse model.
 
-\section{Reflections}
-\label{sec:reflections}
+The validation of our approach remains constrained by the availability of only a single ground truth transmission map-processed image pair. While the method demonstrates consistent performance across images from standard datasets, comprehensive validation of transmission map accuracy would benefit from additional ground truth data. The optimization landscape also presents challenges, containing multiple local minima that make results sensitive to initialization strategies and hyperparameter choices, particularly the weights balancing smoothness constraints against anatomical priors.
 
-This work contributes to global health equity by enabling the development of affordable diagnostic imaging systems. The ability to generate training data for alternative X-ray detectors could significantly reduce the cost barrier for medical imaging in resource-limited settings.
+\section{Implications and Future Directions}
 
-The project also highlights the importance of physics-informed machine learning approaches in medical imaging, demonstrating how domain knowledge can guide optimization in under-constrained problems.
+Despite these limitations, this work establishes important foundations for advancing medical imaging accessibility. The demonstrated feasibility of transmission map recovery provides a potential pathway for leveraging existing annotated datasets with alternative imaging systems. This capability could accelerate the deployment of AI-assisted diagnosis in underserved regions where conventional high-end imaging systems are unavailable or impractical.
 
-While significant computational challenges remain, the framework established here provides a foundation for future work in radiographic image analysis and affordable medical technology development.
+The physics-informed methodology presented here also contributes to the broader discourse on incorporating domain knowledge into machine learning systems. In an era dominated by purely data-driven approaches, our work demonstrates that careful integration of physical constraints can effectively guide solutions in under-constrained problems, offering a complementary paradigm particularly valuable when training data is scarce.
 
+Looking forward, several research directions could address the current limitations while building upon the established framework. The optimization trajectories generated by our method contain rich information about the inverse mapping that could serve as training data for neural networks designed to directly invert the processing pipeline. Such learned models could potentially achieve real-time performance while maintaining the physical grounding established by our approach.
 
-One of the most important results is the reduction in the amount of
-energy required to process each packet while at the same time reducing the
-time required to process each packet.
+Hybrid methodologies that combine physics-informed constraints with modern deep learning architectures represent another promising avenue. These approaches could leverage the efficiency of neural networks while ensuring adherence to physical principles, potentially yielding models that are both computationally efficient and theoretically grounded. Although Deep Learning models heavily rely on large volumes of data, the present work suggests that it is feasible to build useful models by leveraging domain knowledge. 
 
-The thesis contributes to the \gls{UN}\enspace\glspl{SDG} numbers 1 and 9 by
-xxxx.
+\section{Concluding Remarks}
+
+While computational efficiency remains a challenge, the framework established here provides both a proof of concept and a benchmark for future developments. As healthcare systems worldwide continue to grapple with issues of accessibility and equity, approaches that can bridge the gap between high-end imaging systems and resource-appropriate alternatives become increasingly vital. By enabling the potential translation of existing medical knowledge to new imaging contexts, this research contributes to the broader goal of universal access to healthcare diagnostics.
+
 
 
 
