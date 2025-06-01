@@ -239,11 +239,11 @@ nopostdot]{glossaries}
 \input{custom_configuration}
 
 \title{Chest X-ray Transmission Map Reconstruction}
-\subtitle{Constrained Optimization to Invert a Family of Image Processing Algorithms}
+\subtitle{Regularizing Inverse Problems Through Domain Knowledge of Radiographic Image Processing}
 
 % give the alternative title - i.e., if the thesis is in English, then give a Swedish title
-\alttitle{Detta är den svenska översättningen av titeln}
-\altsubtitle{Detta är den svenska översättningen av undertiteln}
+\alttitle{Rekonstruktion av röntgenbild av bröstkorgen}
+\altsubtitle{Reglering av inversa problem genom domänkunskap om radiografisk bildbehandling}
 % alternative, if the thesis is in Swedish, then give an English title
 %\alttitle{This is the English translation of the title}
 %\altsubtitle{This is the English translation of the subtitle}
@@ -1309,7 +1309,7 @@ low and high frequencies. The following snippet shows the proper order and opera
     caption={Processing operator model}
 ]
 def processing(txm, theta):
-    x = window(txm, 
+    x = window(txm,
                theta.window_center,
                theta.window_width,
                theta.gamma)
@@ -1337,46 +1337,21 @@ have the box constraints:
 \end{equation}
 
 These values are set empirically, based primarily on the assumption that high-frequencies are always amplified to some degree, while not a necessity for low-frequencies. The windowing parameters are set arbitrarily to allow centering in the first
-half of the dynamic range, as observed in the sample transmission map. These are also be considered hyperparameters of the model.
+half of the dynamic range, as observed in the sample transmission map. These bounds and the standard deviation variables can also
+be considered hyperparameters of the model, and they can condition the features of the recovered transmission maps. For
+instance, if the lower bound for the enhancement factor is too high it can promote less sharp edges.
 
 Since the initial approach does not involve learning an inverse model, but rather solving an optimization
 on a per-image basis, the objective is then to find a model and corresponding hyperparameters that can be reused across different
-sets of images and guarantee convergence into valid solutions. Other  choices are considered that can produce valid solutions but won't match qualitatively
-the expectations for transmission maps. One such choice is a regularization term (besides its corresponding weight)
-that promotes smoothness on the transmission map, which, if not appropriately chosen, can lead to artifacts or over-smoothing.
-Overall, the hyperparameters and configurations to find are listed in \autoref{tab:hyperparametersList}.
+sets of images and guarantee convergence into valid solutions. In addition to finding regularization weights,
+another hyperparameters considered are a learning rate, and the constraints for the processing parameters. The later
+are initially set on assumptions and prior knowledge of the image processing pipeline, but ultimately, they are hyperparameters
+that shape the feasible transmission maps.
 
-\begin{table}[H]
-    \centering
-    \begin{tabular}{ | p{0.2\linewidth} | p{0.7\linewidth}| }
-        \hline
-        \textbf{Hyperparameter} & \textbf{Description} \\
-        \hline
-        Optimizer & Due to the non-smoothness and overall lack of favorable properties, we
-       use the AMSGrad \cite{reddiConvergenceAdam2019} optimizer, chosen empirically on an initial search of hyperparameters. \\
-        \hline
-        Optimizer hyperparameters & The optimizer's learning rate. \\
-        \hline
-        Segmentation threshold & Threshold to delimit binary segmentation masks, set to 0.5 for all results. \\
-        \hline
-        Frequency bands & Usharp mask is an operation that amplifies specific frequency bands, which are determined
-        by the kernel size for the blurring operation. The processing model assumes enhancement on at least two
-        frequency bands, low and high. The consequence of this is the exclusion of this parameter from the optimization
-        variables. The choice can be set empirically as a mean to constrain high frequencies in the transmission maps.  \\
-        \hline
-        Regularization weights & Weights for the smoothing and segmentation regularization. \\
-        \hline
-        Smoothing regularization & The choice among Tikhonov, Total Variation, and no regularization,
-        to penalize discontinuities in the transmission maps. \\
-        \hline
-    \end{tabular}
-    \caption{Optimization hyperparameters}
-    \label{tab:hyperparametersList}
-\end{table}
-
-For finding hyperparameters, a Bayesian search was done, optimizing for the perceptual metric $\mathcal{L}^{Mix}$.
+Finding hyperparameters can be done with a Bayesian search, optimizing for accurate processed image reconstructions,
+i.e. minimizing the perceptual metric $\mathcal{L}^{Mix}$.
 An analysis is then done on the choices of hyperparameters and how they affect qualitative results and
-the compliance with the anatomical constraints. To implement this search, we used Weights \& Biases \cite{wandb} sweep
+the compliance with the physics constraints and assumptions. To implement this search, we used Weights \& Biases \cite{wandb} sweep
 functionality.
 
 \section{Data Collection and Preprocessing}
@@ -1553,7 +1528,10 @@ initial experiments, where reconstructed images were found to be noisy and prese
 The latest searches were set to optimize parameters relative to the $\mathcal{L}^{\text{Mix}}$ loss, and out of the three methods, the one
 that achieved the best score was using no regularization. Even though the regularization terms converge to parameters
 that yield low reconstruction errors, the choice of parameters for both regularization terms introduced
-shadow artifacts around the segmentation regions as seen in \autoref{fig:shadowArtifacts}.
+shadow artifacts around the segmentation regions as seen in \autoref{fig:shadowArtifacts}. The reason of not needing
+a smoothing regularization could come from the initialization of images with their trivial transformation, which
+can be seen as a close approximation of the transmission map. This initialization was different in initial experiments,
+defaulting to the original images, or random noise. Ultimately, this initialization was found to converge faster.
 
 \begin{figure}[ht]
     \centering
@@ -1608,10 +1586,11 @@ to be a realistic representation.
   \label{fig:wrongCharacterization}
 \end{figure}
 
-These, nevertheless, are based on assumptions and no solid data. These can also be hard to set since they can depend on the image size.
-A straightforward way to adjust these constraints is to pick an optimal set of hyperparameters and perform once again
-a parameter search, specifically to fix these bounds. The objective is to find a set of parameters that can
-minimize the error with the known ground truth.
+These, nevertheless, are based on assumptions and no solid data. They can also be hard to set since they can
+depend on the image size. A straightforward way to adjust these constraints is to pick an optimal set of
+hyperparameters and perform once again a parameter search, specifically to fix these bounds. The objective is to find parameters
+that can minimize the error with the known ground truth. This method keeps the data fidelity errors low as
+the original hyperparameters. Specific metrics and examples can be seen in \autoref{app:refinedParamsResults}.
 
 \begin{table}[H]
 \centering
@@ -1628,22 +1607,35 @@ Minimum High-frequency enhancement factor in high frequencies & 0.43238769614093
 \caption{Found parameters for frequency band constraints.}
 \end{table}
 
-Converged after 174 steps
-times:  [1357.8525059223175, 1261.3608360290527, 1142.5163519382477]
-lens:  [64, 64, 64]
-
 \section{Common parameters optimization}
 
 An alternative way to implement the optimization solver is by updating a single set of parameters from all images.
 The first thought of this approach is to use a single set of parameters for all images and update them simultaneously.
 This can be done by using a single loss function that combines the losses of all images and updating the parameters
 using a single optimizer. This approach showed poor performance, failing to converge to a set of hyperparameters
-that reduce the Mixed loss sufficiently, and tended to produce images with flat regions as seen in .
+that reduce the Mixed loss sufficiently, and also tend to produce images with flat regions as seen in \autoref{fig:flatRegions}.
 
-An alternative approach, suggested by the proximity of parameters recovered by the mentioned experiments, hinted that a single choice of processing parameters can effectively map back to a realistic transmission map. That idea can be proved by picking a set of parameters returned from an optimization run, and setting it as the initial weights and freezing their updates. An experiment proved this possible. Nonetheless, there is no noticeable performance improvement, suggesting the parameters converge at a much higher rate than the transition map images.   
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.7\textwidth]{figures/flat_regions.png}
+\caption{Sample recovered transmission map image with flat regions.}
+\label{fig:flatRegions}
+\end{figure}
 
+An alternative approach, suggested by the proximity of parameters recovered by previous experiments (see \autoref{fig:parameterDistribution}),
+hinted that a single choice of processing parameters can effectively map back to a realistic transmission map.
+That idea can be proved by picking a set of parameters returned from an optimization run, and setting it as the initial
+weights and freezing their updates. An experiment proved this possible. Nonetheless, there is no noticeable
+performance improvement, inverting 96 images in 44 minutes (1 image every ~27 seconds). This suggests the parameters
+converge at a much higher rate than the transmission map images, although few images stuck in the iteration process
+can also be a reason of the high runtime.
 
-
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.8\textwidth]{figures/weights_boxplot.png}
+\caption{Distribution of the processing function parameters from a sample of 200 }
+\label{fig:parameterDistribution}
+\end{figure}
 
 \cleardoublepage
 \chapter{Conclusions and Future Work}
@@ -1672,7 +1664,7 @@ The physics-informed methodology presented here also contributes to the broader 
 
 Looking forward, several research directions could address the current limitations while building upon the established framework. The optimization trajectories generated by our method contain rich information about the inverse mapping that could serve as training data for neural networks designed to directly invert the processing pipeline. Such learned models could potentially achieve real-time performance while maintaining the physical grounding established by our approach.
 
-Hybrid methodologies that combine physics-informed constraints with modern deep learning architectures represent another promising avenue. These approaches could leverage the efficiency of neural networks while ensuring adherence to physical principles, potentially yielding models that are both computationally efficient and theoretically grounded. Although Deep Learning models heavily rely on large volumes of data, the present work suggests that it is feasible to build useful models by leveraging domain knowledge. 
+Hybrid methodologies that combine physics-informed constraints with modern deep learning architectures represent another promising avenue. These approaches could leverage the efficiency of neural networks while ensuring adherence to physical principles, potentially yielding models that are both computationally efficient and theoretically grounded. Although Deep Learning models heavily rely on large volumes of data, the present work suggests that it is feasible to build useful models by leveraging domain knowledge.
 
 \section{Concluding Remarks}
 
@@ -1799,6 +1791,53 @@ where $N$ is the total number of pixels in the image. This component ensures pix
 The combination of these two losses leverages MS-SSIM's ability to capture perceptual similarity across multiple scales—aligning with how the human visual system processes images—while the $\ell_1$ term provides optimization stability and prevents color shifts. This makes $\mathcal{L}^{\text{Mix}}$ particularly effective for image reconstruction tasks where both perceptual quality and pixel accuracy are critical.
 
 \chapter{Initial Parameter Search Results}
+\label{app:initialParamsResults}
+
+The recovered transmission map scores $\mathcal{L}^{\text{Mix}} = 0.276278555393219$.
+The trivial transmission map scores $\mathcal{L}^{\text{Mix}} = 0.4022318422794342$
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.8\textwidth]{figures/initial/pred_ms_ssim_percentiles.png}
+\caption{Sample images at percentiles of $\mathcal{L}^{\text{Mix}}$ }
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.8\textwidth]{figures/initial/histogram_heatmap.png}
+\caption{Histograms of recovered transmission maps, sampled 200 images.}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.8\textwidth]{figures/initial/cmp_histogram.png}
+\caption{Comparison of histograms between trivial, real, and predicte transmission maps.}
+\end{figure}
+
+
+\chapter{Refined Parameter Search Results}
+\label{app:refinedParamsResults}
+
+The recovered transmission map scores $\mathcal{L}^{\text{Mix}} = 0.2652566134929657$
+The trivial transmission map scores $\mathcal{L}^{\text{Mix}} = 0.4022318422794342$
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.8\textwidth]{figures/further/pred_ms_ssim_percentiles.png}
+\caption{Sample images at percentiles of $\mathcal{L}^{\text{Mix}}$ }
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.8\textwidth]{figures/further/histogram_heatmap.png}
+\caption{Histograms of recovered transmission maps, sampled 200 images.}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.8\textwidth]{figures/further/cmp_histogram.png}
+\caption{Comparison of histograms between trivial, real, and predicte transmission maps.}
+\end{figure}
 
 % \generalExpl{Here is a place to add supporting material that can help others build upon your work. You can include files as attachments to the PDF file or indirectly via URLs. Alternatively, consider adding supporting material uploaded as separate files in DiVA.}
 
